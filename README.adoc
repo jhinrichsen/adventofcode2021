@@ -1,4 +1,78 @@
 = adventofcode2021
 
-My take on https://adventofcode.com/2021/ in Go
+My take on https://adventofcode.com/2021/ in Go. As usual, i don't particularly
+care if i provide my solutions _fast_, i try to be _correct_ on the first
+answer, and care for being runtime efficient.
+Most, if not all, puzzles are backed by unit testing the examples, and by some
+benchmarks.
 
+== Day 1
+
+Part 1 Blattschuss.
+Part 2 Blattschuss.
+
+Nice and easy one. Parsing numbers happens so often i extended my helper file
+`input.go` with an additional function that directly returns an array of
+integers.
+
+Benchmark:
+
+----
+go test -bench=. -run="" -benchmem
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay01Part2-8   	 1204111	      1033 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	gitlab.com/jhinrichsen/adventofcode2021	1.673s
+----
+
+Go 1.17 introduces the use of register calling, but as most of my solutions are
+in one function this is not a real difference to previous Go releases.
+
+[source,go,linenums]
+----
+package adventofcode2021
+
+func Day01Part1(ns []int) int {
+	count := 0
+	for i := 1; i < len(ns); i++ {
+		if ns[i] > ns[i-1] {
+			count++
+		}
+	}
+	return count
+}
+----
+
+
+[source,assembler]
+----
+"".Day01Part1 STEXT nosplit size=46 args=0x18 locals=0x0 funcid=0x0
+	0x0000 00000 (day01.go:3)	TEXT	"".Day01Part1(SB), NOSPLIT|ABIInternal, $0-24
+	0x0000 00000 (day01.go:3)	MOVQ	AX, "".ns+8(FP)
+	0x0005 00005 (day01.go:3)	FUNCDATA	$0, gclocals·1a65e721a2ccc325b382662e7ffee780(SB)
+	0x0005 00005 (day01.go:3)	FUNCDATA	$1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+	0x0005 00005 (day01.go:3)	FUNCDATA	$5, "".Day01Part1.arginfo1(SB)
+	0x0005 00005 (day01.go:6)	MOVL	$1, CX            ; i := 1
+	0x000a 00010 (day01.go:6)	XORL	DX, DX            ; count := 0
+	0x000c 00012 (day01.go:5)	JMP	37
+	0x000e 00014 (day01.go:6)	MOVQ	(AX)(CX*8), SI    ; ns[i] <1>
+	0x0012 00018 (day01.go:6)	MOVQ	-8(AX)(CX*8), DI  ; ns[i-1] <1>
+	0x0017 00023 (day01.go:7)	LEAQ	1(DX), R8
+	0x001b 00027 (day01.go:6)	CMPQ	DI, SI
+	0x001e 00030 (day01.go:7)	CMOVQLT	R8, DX
+	0x0022 00034 (day01.go:5)	INCQ	CX                ; i++
+	0x0025 00037 (day01.go:5)	CMPQ	BX, CX            ; len(ns) > i <2>
+	0x0028 00040 (day01.go:5)	JGT	14
+	0x002a 00042 (day01.go:10)	MOVQ	DX, AX            ; return count <3>
+	0x002d 00045 (day01.go:10)	RET
+----
+<1> The index loop is easy enough for the compiler to reason it needs no bounds
+checking, no panic()
+<2> 3 words calling convention for slices: AX is pointer to
+slice, BX is `len()`,
+CX is `cap()`. `cap()` is not used in this function, so the compiler uses CX for
+index `i`.
+<3> return result via register, no stack cleanup required
