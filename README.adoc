@@ -28,6 +28,10 @@ PASS
 ok  	gitlab.com/jhinrichsen/adventofcode2021	1.673s
 ----
 
+To put 1.33 ns/op in perspective: without I/O, meaning excluding time for
+reading puzzle input, the time it takes to solve part #1 is 1 μs.
+Or, put the other way around, it solves part #1 one million times per second.
+
 Go 1.17 introduces the use of register calling, but as most of my solutions are
 in one function this is not a real difference to previous Go releases.
 
