@@ -1,0 +1,4 @@
+= adventofcode2021
+
+My take on https://adventofcode.com/2021/ in Go
+
