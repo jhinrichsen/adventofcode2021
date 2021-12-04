@@ -1,3 +1,10 @@
+image:https://godoc.org/gitlab.com/jhinrichsen/adventofcode2021?status.svg["godoc",
+link="https://godoc.org/gitlab.com/jhinrichsen/adventofcode2021"]
+image:https://goreportcard.com/badge/gitlab.com/jhinrichsen/adventofcode2021["Go report
+card", link="https://goreportcard.com/report/gitlab.com/jhinrichsen/adventofcode2021"]
+image:https://gitlab.com/jhinrichsen/adventofcode2021/badges/master/coverage.svg?style=flat["coverage",
+link="https://gitlab.com/jhinrichsen/adventofcode2021/-/jobs"]
+
 = adventofcode2021
 
 My take on https://adventofcode.com/2021/ in Go. As usual, i don't particularly
@@ -116,5 +123,6 @@ which is easier on the eyes.
 == Day 3
 
 Part 1 Blattschuss.
+
 
 
