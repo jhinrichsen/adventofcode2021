@@ -126,3 +126,37 @@ Part 1 Blattschuss.
 
 Part 2 Blattschuss.
 
+== Day 4
+
+Part 1 Blattschuss.
+
+Part2: one miss. My index was working when cutting input file into boards for
+example input, but it was wrong and created 120 boards (the last 20 being empty)
+instead of 100 boards when used on the read puzzle input for part 2.
+
+
+Another gotcha: dynamically resizing a slice in a struct does not work, even
+when passed via pointer receiver.
+
+----
+type S struct {
+	A []int
+}
+
+func (a *S) add(i int) {
+	a.A = append(a.A, i) // does not work
+}
+----
+
+Benchmark for part 2:
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay04Part2-8   	     687	   1852821 ns/op	  560245 B/op	    2846 allocs/op
+----
+
+1.8 ms, excluding I/O, including parsing.
+
