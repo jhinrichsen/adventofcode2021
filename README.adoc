@@ -113,3 +113,8 @@ can be replaced using closures (anonymous inner functions)
 
 which is easier on the eyes.
 
+== Day 3
+
+Part 1 Blattschuss.
+
+
