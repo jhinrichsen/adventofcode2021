@@ -2,8 +2,8 @@ image:https://godoc.org/gitlab.com/jhinrichsen/adventofcode2021?status.svg["godo
 link="https://godoc.org/gitlab.com/jhinrichsen/adventofcode2021"]
 image:https://goreportcard.com/badge/gitlab.com/jhinrichsen/adventofcode2021["Go report
 card", link="https://goreportcard.com/report/gitlab.com/jhinrichsen/adventofcode2021"]
-image:https://gitlab.com/jhinrichsen/adventofcode2021/badges/master/coverage.svg?style=flat["coverage",
-link="https://gitlab.com/jhinrichsen/adventofcode2021/-/jobs"]
+image:https://gitlab.com/jhinrichsen/adventofcode2021/badges/main/pipeline.svg[link="https://gitlab.com/jhinrichsen/adventofcode2021/-/commits/main",title="pipeline status"]
+image:https://gitlab.com/jhinrichsen/adventofcode2021/badges/main/coverage.svg[link="https://gitlab.com/jhinrichsen/adventofcode2021/-/commits/main",title="coverage report"]
 
 = adventofcode2021
 
