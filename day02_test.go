@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// 6:30
+// 6:30 - 7:11
 
 func day02(t *testing.T, filename string, part1 bool, want int) {
 	lines, err := linesFromFilename(filename)
