@@ -9,6 +9,7 @@ benchmarks.
 == Day 1
 
 Part 1 Blattschuss.
+
 Part 2 Blattschuss.
 
 Nice and easy one. Parsing numbers happens so often i extended my helper file
@@ -80,3 +81,35 @@ slice, BX is `len()`,
 CX is `cap()`. `cap()` is not used in this function, so the compiler uses CX for
 index `i`.
 <3> return result via register, no stack cleanup required
+
+== Day 2
+
+Part 1 Blattschuss.
+
+Part 2 Blattschuss.
+
+No brainer. The only noticable piece is maybe the use of closures to avoid deep
+structures surrounded by an `if/else`:
+
+----
+    if part1 {
+        // 10 lines of complicated business logic
+	// including more indent levels
+    } else {
+        // 15 lines of complicated business logic
+	// including more indent levels
+    }
+----
+
+can be replaced using closures (anonymous inner functions)
+
+----
+    if part1 {
+        fn1()
+    } else {
+        fn2()
+    }
+----
+
+which is easier on the eyes.
+
