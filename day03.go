@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// Day03 solves both parts of day 3.
 func Day03(lines []string, part1 bool) (int, error) {
 	if part1 {
 		return day03Part1(lines)
@@ -104,7 +105,7 @@ func day03Part2(lines []string) (int, error) {
 				return firstEntry()
 			}
 		}
-		return 0, fmt.Errorf("want 1 entry in map but got %d: %+v\n",
+		return 0, fmt.Errorf("want 1 entry in map but got %d: %+v",
 			len(m), m)
 	}
 

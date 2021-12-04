@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Day02 solves both parts of day 2.
 func Day02(lines []string, part1 bool) (int, error) {
 	var position, depth, aim, n int
 	var parts []string
