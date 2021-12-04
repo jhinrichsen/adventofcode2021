@@ -23,3 +23,11 @@ func TestDay03Part1Example(t *testing.T) {
 func TestDay03Part1(t *testing.T) {
 	day03(t, filename(3), true, 4138664)
 }
+
+func TestDay03Part2Example(t *testing.T) {
+	day03(t, exampleFilename(3), false, 230)
+}
+
+func TestDay03Part2(t *testing.T) {
+	day03(t, filename(3), false, 4273224)
+}
