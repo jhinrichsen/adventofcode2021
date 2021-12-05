@@ -195,3 +195,16 @@ BenchmarkDay05Part2-8   	      22	  46896856 ns/op	16126620 B/op	    7643 allocs
 That is 46 ms for part 2, excluding I/O, including parsing, for 500 lines and a
 total of 203660 coordinates, averaging to 230 ns per coordinate. 230*10^-9.
 
+Using integer based arithmetic instead of complex numbers is a little bit
+faster, it completes at 87% of the time the complex implementation requires.
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay05Part2-8   	      26	  40890804 ns/op	16117340 B/op	    7627 allocs/op
+----
+
+
+
