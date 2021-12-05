@@ -173,10 +173,9 @@ transparently handles both part 1 and part 2 using
 diagonal := func(c1, c2 complex128) bool {
         return real(c1) != real(c2) && imag(c1) != imag(c2)
 }
+----
 
-.
-.
-.
+----
 // for part 1, only consider horizontal or vertical lines
 if part1 && diagonal(src, dst) {
         continue
