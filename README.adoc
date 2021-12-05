@@ -192,5 +192,6 @@ cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
 BenchmarkDay05Part2-8   	      22	  46896856 ns/op	16126620 B/op	    7643 allocs/op
 ----
 
-That is 46 ms for part 2, excluding I/O, including parsing.
+That is 46 ms for part 2, excluding I/O, including parsing, for 500 lines and a
+total of 203660 coordinates, averaging to 230 ns per coordinate. 230*10^-9.
 
