@@ -160,3 +160,38 @@ BenchmarkDay04Part2-8   	     687	   1852821 ns/op	  560245 B/op	    2846 allocs
 
 1.8 ms, excluding I/O, including parsing.
 
+== Day 5
+
+Part 1 Blattschuss.
+
+Part 2 Blattschuss.
+
+Took me 30 min for part 1 and then another 60 min for part 2. The implementation
+transparently handles both part 1 and part 2 using
+
+----
+diagonal := func(c1, c2 complex128) bool {
+        return real(c1) != real(c2) && imag(c1) != imag(c2)
+}
+
+.
+.
+.
+// for part 1, only consider horizontal or vertical lines
+if part1 && diagonal(src, dst) {
+        continue
+}
+----
+
+Benchmark:
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay05Part2-8   	      22	  46896856 ns/op	16126620 B/op	    7643 allocs/op
+----
+
+That is 46 ms for part 2, excluding I/O, including parsing.
+
