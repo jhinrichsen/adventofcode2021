@@ -1,6 +1,7 @@
 package adventofcode2021
 
 import (
+	"image"
 	"strconv"
 	"strings"
 )
@@ -59,15 +60,11 @@ func Day04Part1(draws []int, boards []Bingo) int {
 	return 0
 }
 
-type Coordinate struct {
-	X, Y int
-}
-
 type Bingo struct {
 	DimX, DimY int
 	Drawn      map[int]bool
 	Cols, Rows []int // number of hits per col/ row
-	Numbers    map[int]Coordinate
+	Numbers    map[int]image.Point
 }
 
 // NewBingo parses a rectangular table of newline and whitespace separated
@@ -75,7 +72,7 @@ type Bingo struct {
 func NewBingo(lines []string) (Bingo, error) {
 	var b Bingo
 	b.DimY = len(lines)
-	b.Numbers = make(map[int]Coordinate)
+	b.Numbers = make(map[int]image.Point)
 	for y, line := range lines {
 		parts := strings.Fields(line)
 		b.DimX = len(parts)
@@ -84,7 +81,7 @@ func NewBingo(lines []string) (Bingo, error) {
 			if err != nil {
 				return b, err
 			}
-			b.Numbers[n] = Coordinate{x, y}
+			b.Numbers[n] = image.Point{x, y}
 		}
 	}
 	b.Drawn = make(map[int]bool)

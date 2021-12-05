@@ -1,14 +1,15 @@
 package adventofcode2021
 
 import (
+	"image"
 	"math"
 	"strconv"
 	"strings"
 )
 
-func Day05(lines []string, part1 bool) (int, error) {
-	parse := func(line string) (Coordinate, error) {
-		var c Coordinate
+func Day05Int(lines []string, part1 bool) (int, error) {
+	parse := func(line string) (image.Point, error) {
+		var c image.Point
 		var err error
 		parts := strings.Split(line, ",")
 		c.X, err = strconv.Atoi(parts[0])
@@ -19,7 +20,7 @@ func Day05(lines []string, part1 bool) (int, error) {
 		return c, err
 	}
 
-	diagonal := func(c1, c2 Coordinate) bool {
+	diagonal := func(c1, c2 image.Point) bool {
 		return c1.X != c2.X && c1.Y != c2.Y
 	}
 
@@ -30,7 +31,7 @@ func Day05(lines []string, part1 bool) (int, error) {
 		return i
 	}
 
-	m := make(map[Coordinate]int)
+	m := make(map[image.Point]int)
 	for _, line := range lines {
 		parts := strings.Fields(line)
 		src, err := parse(parts[0])
@@ -55,7 +56,7 @@ func Day05(lines []string, part1 bool) (int, error) {
 		if dy != 0 {
 			dy = dy / abs(dy)
 		}
-		inc := Coordinate{dx, dy}
+		inc := image.Point{dx, dy}
 
 		c := src
 		for {
@@ -77,7 +78,7 @@ func Day05(lines []string, part1 bool) (int, error) {
 	return count, nil
 }
 
-func day05Cmplx(lines []string, part1 bool) (int, error) {
+func Day05Cmplx(lines []string, part1 bool) (int, error) {
 	parse := func(line string) (complex128, error) {
 		parts := strings.Split(line, ",")
 		x, err := strconv.Atoi(parts[0])
