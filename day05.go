@@ -3,7 +3,6 @@ package adventofcode2021
 import (
 	"image"
 	"math"
-	"strconv"
 	"strings"
 )
 
@@ -11,12 +10,12 @@ func Day05Int(lines []string, part1 bool) (int, error) {
 	parse := func(line string) (image.Point, error) {
 		var c image.Point
 		var err error
-		parts := strings.Split(line, ",")
-		c.X, err = strconv.Atoi(parts[0])
+		numbers, err := ParseCommaSeparatedNumbers(line)
 		if err != nil {
 			return c, err
 		}
-		c.Y, err = strconv.Atoi(parts[1])
+		c.X = numbers[0]
+		c.Y = numbers[1]
 		return c, err
 	}
 
@@ -80,16 +79,11 @@ func Day05Int(lines []string, part1 bool) (int, error) {
 
 func Day05Cmplx(lines []string, part1 bool) (int, error) {
 	parse := func(line string) (complex128, error) {
-		parts := strings.Split(line, ",")
-		x, err := strconv.Atoi(parts[0])
+		parts, err := ParseCommaSeparatedNumbers(line)
 		if err != nil {
 			return 0, err
 		}
-		y, err := strconv.Atoi(parts[1])
-		if err != nil {
-			return 0, err
-		}
-		return complex(float64(x), float64(y)), nil
+		return complex(float64(parts[0]), float64(parts[1])), nil
 	}
 
 	diagonal := func(c1, c2 complex128) bool {

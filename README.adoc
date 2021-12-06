@@ -13,6 +13,9 @@ answer, and care for being runtime efficient.
 Most, if not all, puzzles are backed by unit testing the examples, and by some
 benchmarks.
 
+Expected results are hard coded into the unit tests, so unless you are peeking
+for a solution avoid looking at those.
+
 == Day 1
 
 Part 1 Blattschuss.
@@ -206,5 +209,22 @@ cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
 BenchmarkDay05Part2-8   	      26	  40890804 ns/op	16117340 B/op	    7627 allocs/op
 ----
 
+== Day 6
 
+Part 1 Blattschuss
+
+Part 2 Blattschuss
+
+Part 2 blows my machine around day 240/245 of 256 days when using the naive
+approach of counting each lanternfish separate.
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay06Part2-8   	   60168	     19808 ns/op	    5880 B/op	       8 allocs/op
+----
+
+20 μs, this time including I/O and parsing, or 50_000 solutions per second.
 

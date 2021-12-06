@@ -6,25 +6,11 @@ import (
 	"strings"
 )
 
-// parseNumbers converts a list of comma separated numbers.
-func parseNumbers(line string) ([]int, error) {
-	var ns []int
-	parts := strings.Split(line, ",")
-	for n := range parts {
-		n, err := strconv.Atoi(parts[n])
-		if err != nil {
-			return ns, err
-		}
-		ns = append(ns, n)
-	}
-	return ns, nil
-}
-
 func NewDay04(lines []string) ([]int, []Bingo, error) {
 	// first line is comma separated list of numbers
-	draws, err := parseNumbers(lines[0])
+	draws, err := ParseCommaSeparatedNumbers(lines[0])
 	if err != nil {
-		return nil, nil, err
+		return draws, nil, err
 	}
 
 	nBoards := 0
