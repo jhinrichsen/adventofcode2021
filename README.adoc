@@ -61,6 +61,23 @@ func Day01Part1(ns []int) int {
 }
 ----
 
+Let's double check how this transfers to assembler.
+Remember Go has its own assembler opcodes.
+Even if you can recite chapter 'Conditional Jump' on page 64 of
+https://www.amd.com/system/files/TechDocs/24592.pdf[AMD64 Reference] woken up at
+3:30am in the middle of the night completely drunk, you will not find JLS.
+For the time being, one needs to refer to Go internal source code to find the
+mappings for
+https://go.googlesource.com/go/+/master/src/cmd/asm/internal/arch/arch.go#145[
+JLS]:
+
+[source,go]
+----
+	instructions["JLS"] = x86.AJLS  /* lower or same (unsigned) (CF = 1 || ZF = 1) */
+----
+
+The https://go.dev/doc/asm[Quick Guide to Go's assembler] is a useful read to
+understand this snippet.
 
 [source,assembler]
 ----
@@ -228,3 +245,111 @@ BenchmarkDay06Part2-8   	   60168	     19808 ns/op	    5880 B/op	       8 allocs
 
 20 μs, this time including I/O and parsing, or 50_000 solutions per second.
 
+There is one superfluous bound check at runtime, an array of lines is passed
+although we only expect one single line of comma separated values:
+
+[source,go]
+----
+21 func Day06(lines []string, days int) (uint, error) {
+22         fishes, err := ParseCommaSeparatedNumbers(lines[0]) <1>
+----
+<1> directly accessing line #0 requires bounds checking
+
+----
+"".Day06 STEXT size=350 args=0x20 locals=0x60 funcid=0x0
+	0x0000 00000 (day06.go:21)	TEXT	"".Day06(SB), ABIInternal, $96-32
+	0x0000 00000 (day06.go:21)	CMPQ	SP, 16(R14)
+	0x0004 00004 (day06.go:21)	PCDATA	$0, $-2
+	0x0004 00004 (day06.go:21)	JLS	296
+	0x000a 00010 (day06.go:21)	PCDATA	$0, $-1
+	0x000a 00010 (day06.go:21)	SUBQ	$96, SP
+	0x000e 00014 (day06.go:21)	MOVQ	BP, 88(SP)
+	0x0013 00019 (day06.go:21)	LEAQ	88(SP), BP
+	0x0018 00024 (day06.go:21)	MOVQ	AX, "".lines+104(FP)
+	0x001d 00029 (day06.go:21)	FUNCDATA	$0, gclocals·1a65e721a2ccc325b382662e7ffee780(SB)
+	0x001d 00029 (day06.go:21)	FUNCDATA	$1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+	0x001d 00029 (day06.go:21)	FUNCDATA	$5, "".Day06.arginfo1(SB)
+	0x001d 00029 (day06.go:21)	NOP
+	0x0020 00032 (day06.go:22)	TESTQ	BX, BX <1>
+	0x0023 00035 (day06.go:22)	JLS	285 <2>
+
+
+	0x011d 00285 (day06.go:22)	XORL	AX, AX
+	0x011f 00287 (day06.go:22)	MOVQ	BX, CX
+	0x0122 00290 (day06.go:22)	CALL	runtime.panicIndex(SB)
+----
+<1> lines passed via AX, len(lines) passed via BX
+<2> JLS translates to JBE, 'Jump if below or equal' (BX <= 0)
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay06Part2-8   	   60613	     19137 ns/op	    7552 B/op	       2 allocs/op
+----
+
+If we expect exactly one line, it should be part of the function's signature.
+This is not a premature optimization, it is part of the contract.
+
+[source,go]
+----
+----
+
+== Day 7
+
+Part 1 Blattschuss
+
+Part 2 Blattschuss.
+
+Easiest puzzle so far, took me 23 min for both parts.
+Everybody and their mother was fast on this one, so we broke the private
+leaderboard :-).
+
+Mysteriously, i had no off-by-one in this puzzle, and avoided my typical
+mistakes:
+
+----
+	burn := func(dist int) int {
+		if part1 {
+			return dist
+		}
+		// OEIS A000217 triangular number
+		return dist * (dist + 1) / 2 <1>
+	}
+
+	fuel := func(pos int) int {
+		sum := 0
+		for i := range positions {
+			dist := positions[i] - pos
+			if dist < 0 {
+				dist = -dist <2>
+			}
+			sum += burn(dist)
+		}
+		return sum
+	}
+
+	fmin := math.MaxInt32 <3>
+	for pos := min; pos <= max; pos++ { <4>
+		f := fuel(pos)
+		if f < fmin {
+			fmin = f
+		}
+	}
+----
+<1> OEIS contains thousands of man-years of the smartest brains on this planet
+ever
+<2> A distance can never be negative
+<3> Do not initialize min values to 0
+<4> Control end of interval (pos < max versus pos <= max)
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay07Part2-8   	     260	   4508358 ns/op	       0 B/op	       0 allocs/op
+----
+
+4.5 ms, no allocations.
