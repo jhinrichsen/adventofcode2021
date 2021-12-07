@@ -2,15 +2,27 @@ package adventofcode2021
 
 import "testing"
 
-func day06(t *testing.T, filename string, days int, want uint) {
+func day06(t *testing.T, filename string, days uint, want uint) {
 	lines, err := linesFromFilename(filename)
 	if err != nil {
 		t.Fatal(err)
 	}
-	got, err := Day06(lines, days)
+	fishes, err := ParseCommaSeparatedNumbers(lines[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := Day06(asUint(fishes), days)
 	if want != got {
 		t.Fatalf("want %d but got %d", want, got)
 	}
+}
+
+func asUint(is []int) []uint {
+	us := make([]uint, len(is))
+	for i := range is {
+		us[i] = uint(is[i])
+	}
+	return us
 }
 
 func TestDay06Part1Example(t *testing.T) {
@@ -34,7 +46,13 @@ func BenchmarkDay06Part2(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	fishes, err := ParseCommaSeparatedNumbers(lines[0])
+	if err != nil {
+		b.Fatal(err)
+	}
+	ufishes := asUint(fishes)
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = Day06(lines, 256)
+		_, _ = Day06(ufishes, 256)
 	}
 }

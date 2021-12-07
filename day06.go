@@ -18,20 +18,16 @@ package adventofcode2021
 	return len(fishes), nil
 */
 
-func Day06(lines []string, days int) (uint, error) {
-	fishes, err := ParseCommaSeparatedNumbers(lines[0])
-	if err != nil {
-		return 0, err
-	}
-
-	var ages [9]uint
+func Day06(fishes []uint, days uint) (uint, error) {
+	const groups = 8
+	var ages [groups + 1]uint // 0..7 plus babies in 8
 	for i := 0; i < len(fishes); i++ {
-		ages[fishes[i]]++
+		ages[fishes[i]%groups]++
 	}
 
-	for day := 0; day < days; day++ {
+	for day := uint(0); day < days; day++ {
 		babies := ages[0]
-		for age := 0; age < 8; age++ {
+		for age := 0; age < groups; age++ {
 			ages[age] = ages[age+1]
 		}
 		ages[6] += babies

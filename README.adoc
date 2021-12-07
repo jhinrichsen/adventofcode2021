@@ -5,7 +5,10 @@ card", link="https://goreportcard.com/report/gitlab.com/jhinrichsen/adventofcode
 image:https://gitlab.com/jhinrichsen/adventofcode2021/badges/main/pipeline.svg[link="https://gitlab.com/jhinrichsen/adventofcode2021/-/commits/main",title="pipeline status"]
 image:https://gitlab.com/jhinrichsen/adventofcode2021/badges/main/coverage.svg[link="https://gitlab.com/jhinrichsen/adventofcode2021/-/commits/main",title="coverage report"]
 
-= adventofcode2021
+= Advent of Code 2021
+
+[index]
+== Index
 
 My take on https://adventofcode.com/2021/ in Go. As usual, i don't particularly
 care if i provide my solutions _fast_, i try to be _correct_ on the first
@@ -15,6 +18,19 @@ benchmarks.
 
 Expected results are hard coded into the unit tests, so unless you are peeking
 for a solution avoid looking at those.
+
+----
+      --------Part 1---------   --------Part 2---------
+Day       Time    Rank  Score       Time    Rank  Score
+  7   00:16:00    6872      0   00:23:18    5947      0
+  6   00:22:46    7219      0   00:42:14    5105      0
+  5   00:36:31    5008      0   01:30:41    7233      0
+  4   13:46:10   40167      0   15:28:20   39605      0 <1>
+  3       >24h   92810      0       >24h   70078      0
+  2       >24h  118229      0       >24h  114094      0
+  1       >24h  142010      0       >24h  128905      0
+----
+<1> I started on the weekend following Dec 1
 
 == Day 1
 
@@ -292,9 +308,553 @@ BenchmarkDay06Part2-8   	   60613	     19137 ns/op	    7552 B/op	       2 allocs
 If we expect exactly one line, it should be part of the function's signature.
 This is not a premature optimization, it is part of the contract.
 
+In addition, if the algorithm requires a list of numbers, it should be stated
+so. Parsing from a comma separated list of string values is duty of the caller.
+Of course we provide `ParseCommaSeparatedNumbers()` for this exact use case.
+
 [source,go]
 ----
 ----
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay06Part2-8   	 1006672	      1076 ns/op	       0 B/op	       0 allocs/op
+----
+
+So instead of 20 μs, we are down to 1 μs, and reduced 8 allocations to 0.
+
+Ready for some ARM Opcodes? Let's Go...
+
+.Disassembler listing
+|===
+| Assembler | Go
+
+a|
+----
+0x0000 00000 (day06.go:21)	TEXT	"".Day06(SB), ABIInternal, $112-56
+0x0000 00000 (day06.go:21)	MOVD	16(g), R1
+0x0004 00004 (day06.go:21)	PCDATA	$0, $-2
+0x0004 00004 (day06.go:21)	MOVD	RSP, R2
+0x0008 00008 (day06.go:21)	CMP	R1, R2
+0x000c 00012 (day06.go:21)	BLS	268
+0x0010 00016 (day06.go:21)	PCDATA	$0, $-1
+0x0010 00016 (day06.go:21)	MOVD.W	R30, -112(RSP)
+0x0014 00020 (day06.go:21)	MOVD	R29, -8(RSP)
+0x0018 00024 (day06.go:21)	SUB	$8, RSP, R29
+0x001c 00028 (day06.go:21)	FUNCDATA	ZR, gclocals·564c88c798e834d77927d2fafb0b5dca(SB)
+0x001c 00028 (day06.go:21)	FUNCDATA	$1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+0x001c 00028 (day06.go:21)	FUNCDATA	$5, "".Day06.arginfo1(SB)
+----
+
+a|
+----
+func Day06(fishes []int, days int) (uint, error) {
+----
+a|
+----
+0x001c 00028 (day06.go:23)	STP	(ZR, ZR), "".ages-72(SP)
+0x0020 00032 (day06.go:23)	STP	(ZR, ZR), "".ages-56(SP)
+0x0024 00036 (day06.go:23)	STP	(ZR, ZR), "".ages-40(SP)
+0x0028 00040 (day06.go:23)	STP	(ZR, ZR), "".ages-24(SP)
+0x002c 00044 (day06.go:23)	MOVD	ZR, "".ages-8(SP)
+----
+
+a|
+----
+var ages [groups]uint
+----
+a|
+----
+0x0030 00048 (day06.go:24)	MOVD	"".fishes+8(FP), R2
+0x0034 00052 (day06.go:24)	MOVD	"".fishes(FP), R3
+0x0038 00056 (day06.go:24)	MOVD	ZR, R0
+0x003c 00060 (day06.go:24)	JMP	84
+----
+
+a|
+----
+for i := 0; i < len(fishes); i++ {
+----
+a|
+----
+0x0040 00064 (day06.go:25)	MOVD	$"".ages-72(SP), R5
+0x0044 00068 (day06.go:25)	MOVD	(R5)(R4<<3), R6
+0x0048 00072 (day06.go:25)	ADD	$1, R6, R6
+0x004c 00076 (day06.go:25)	MOVD	R6, (R5)(R4<<3)
+----
+
+a|
+----
+ages[fishes[i]]++
+----
+a|
+----
+0x0050 00080 (day06.go:24)	ADD	$1, R0, R0
+0x0054 00084 (day06.go:24)	CMP	R0, R2
+0x0058 00088 (day06.go:24)	BLE	108
+----
+
+a|
+----
+for i := 0; i < len(fishes); i++ {
+----
+a|
+----
+0x005c 00092 (day06.go:25)	MOVD	(R3)(R0<<3), R4
+0x0060 00096 (day06.go:25)	CMP	$9, R4
+0x0064 00100 (day06.go:25)	BLO	64
+0x0068 00104 (day06.go:25)	JMP	252
+----
+
+a|
+----
+ages[fishes[i]]++
+----
+a|
+----
+0x006c 00108 (day06.go:24)	MOVD	"".days+24(FP), R0
+0x0070 00112 (day06.go:24)	MOVD	ZR, R1
+0x0074 00116 (day06.go:24)	JMP	140
+----
+
+a|
+----
+for i := 0; i < len(fishes); i++ {
+----
+a|
+----
+0x0078 00120 (day06.go:33)	MOVD	"".ages-24(SP), R3
+0x007c 00124 (day06.go:33)	ADD	R2, R3, R3
+0x0080 00128 (day06.go:33)	MOVD	R3, "".ages-24(SP)
+----
+
+a|
+----
+ages[6] += babies
+----
+a|
+----
+0x0084 00132 (day06.go:34)	MOVD	R2, "".ages-8(SP)
+----
+
+a|
+----
+ages[8] = babies
+----
+a|
+----
+0x0088 00136 (day06.go:28)	ADD	$1, R1, R1
+0x008c 00140 (day06.go:28)	CMP	R1, R0
+0x0090 00144 (day06.go:28)	BLE	160
+----
+
+a|
+----
+for day := 0; day < days; day++ {
+----
+a|
+----
+0x0094 00148 (day06.go:29)	MOVD	"".ages-72(SP), R2
+0x0098 00152 (day06.go:29)	MOVD	ZR, R3
+----
+
+a|
+----
+babies := ages[0]
+----
+a|
+----
+0x009c 00156 (day06.go:30)	JMP	240
+0x00a0 00160 (day06.go:30)	MOVD	ZR, R0
+0x00a4 00164 (day06.go:30)	MOVD	ZR, R1
+----
+
+a|
+----
+for age := 0; age < groups-1; age++ {
+----
+a|
+----
+0x00a8 00168 (day06.go:28)	JMP	192
+----
+
+a|
+----
+for day := 0; day < days; day++ {
+----
+a|
+----
+0x00ac 00172 (day06.go:38)	ADD	$1, R0, R2
+----
+
+a|
+----
+for i := range ages {
+----
+a|
+----
+0x00b0 00176 (day06.go:39)	MOVD	$"".ages-72(SP), R3
+0x00b4 00180 (day06.go:39)	MOVD	(R3)(R0<<3), R3
+0x00b8 00184 (day06.go:39)	ADD	R3, R1, R1
+----
+
+a|
+----
+sum += ages[i]
+----
+a|
+----
+0x00bc 00188 (day06.go:38)	MOVD	R2, R0
+0x00c0 00192 (day06.go:38)	CMP	$9, R0
+0x00c4 00196 (day06.go:38)	BLT	172
+----
+
+a|
+----
+for i := range ages {
+----
+a|
+----
+0x00c8 00200 (day06.go:41)	MOVD	R1, "".~r2+32(FP)
+0x00cc 00204 (day06.go:41)	STP	(ZR, ZR), "".~r3+40(FP)
+0x00d0 00208 (day06.go:41)	MOVD	-8(RSP), R29
+0x00d4 00212 (day06.go:41)	MOVD.P	112(RSP), R30
+0x00d8 00216 (day06.go:41)	RET	(R30)
+----
+
+a|
+----
+return sum, nil
+----
+a|
+----
+0x00dc 00220 (day06.go:31)	ADD	$1, R3, R4
+0x00e0 00224 (day06.go:31)	MOVD	$"".ages-72(SP), R5
+0x00e4 00228 (day06.go:31)	MOVD	(R5)(R4<<3), R6
+0x00e8 00232 (day06.go:31)	MOVD	R6, (R5)(R3<<3)
+----
+
+a|
+----
+ages[age] = ages[age+1]
+----
+a|
+----
+0x00ec 00236 (day06.go:30)	MOVD	R4, R3
+0x00f0 00240 (day06.go:30)	CMP	$8, R3
+0x00f4 00244 (day06.go:30)	BLT	220
+0x00f8 00248 (day06.go:30)	JMP	120
+----
+
+a|
+----
+for age := 0; age < groups-1; age++ {
+----
+a|
+----
+0x00fc 00252 (day06.go:25)	MOVD	R4, R0
+0x0100 00256 (day06.go:25)	MOVD	$9, R1
+0x0104 00260 (day06.go:25)	PCDATA	$1, $1
+0x0104 00260 (day06.go:25)	CALL	runtime.panicIndex(SB) <1>
+0x0108 00264 (day06.go:25)	HINT	ZR
+0x010c 00268 (day06.go:25)	NOP
+----
+
+a|
+----
+ages[fishes[i]]++
+----
+a|
+----
+0x010c 00268 (day06.go:21)	PCDATA	$1, $-1
+0x010c 00268 (day06.go:21)	PCDATA	$0, $-2
+0x010c 00268 (day06.go:21)	MOVD	R30, R3
+0x0110 00272 (day06.go:21)	CALL	runtime.morestack_noctxt(SB)
+0x0114 00276 (day06.go:21)	PCDATA	$0, $-1
+0x0114 00276 (day06.go:21)	JMP	0
+----
+
+a|
+----
+func Day06(fishes []int, days int) (uint, error) {
+----
+
+|===
+<1> No more bound checking on input
+
+There is one more bound check in
+
+    ages[fishes[i]]++
+
+We are using the input itself to index into the `ages` array, which the compiler
+obviously cannot verify.
+
+Verification:
+
+[source,go]
+----
+21 func Day06(fishes []int, days int) (uint, error) {
+22         const groups = 8
+23         var ages [groups + 1]uint // 0..7 plus babies in 8
+24         for i := 0; i < len(fishes); i++ {
+25                 ages[fishes[i]]++
+26         }
+----
+
+Now, there's a shortcut for checking for bound checking.
+Instead of looking at the disassembly, one can
+
+----
+go build -gcflags="-d=ssa/check_bce/debug=1" day06.go
+./day06.go:25:7: Found IsInBounds
+----
+
+The message is a bit misleading for my taste, what the compiler is telling us is
+that line #25 requires bound checking.
+
+What if we provide some more information about our `fishes` universe?
+We expect ages from 0..7, so what if we hint `ages[fishes[i] % groups]`?
+
+[source,go]
+----
+21 func Day06(fishes []int, days int) (uint, error) {
+22         const groups = 8
+23         var ages [groups + 1]uint // 0..7 plus babies in 8
+24         for i := 0; i < len(fishes); i++ {
+25                 ages[fishes[i]%groups]++
+26         }
+----
+
+----
+go build -gcflags="-d=ssa/check_bce/debug=1" day06.go
+./day06.go:25:7: Found IsInBounds
+----
+
+Nearly there, but still checking.
+x % 8 does not necessarily result in `0..7`.
+If x is of type `int`, it can be negative, and `-3 % 8 = -3`, so the compiler is
+right to keep checking.
+One more try, this time using `uint` instead of `int` fishes:
+
+----
+ 21 func Day06(fishes []uint, days uint) (uint, error) {
+ 22         const groups = 8
+ 23         var ages [groups + 1]uint // 0..7 plus babies in 8
+ 24         for i := 0; i < len(fishes); i++ {
+ 25                 ages[fishes[i]%groups]++
+ 26         }
+----
+
+Great, no more bound checking.
+
+.Disassembler listing
+|===
+| Assembler | Go
+
+a|
+----
+0x0000 00000 (day06.go:21)	TEXT	"".Day06(SB), NOSPLIT|LEAF|ABIInternal, $96-56
+0x0000 00000 (day06.go:21)	MOVD.W	R30, -96(RSP)
+0x0004 00004 (day06.go:21)	MOVD	R29, -8(RSP)
+0x0008 00008 (day06.go:21)	SUB	$8, RSP, R29
+0x000c 00012 (day06.go:21)	FUNCDATA	ZR, gclocals·564c88c798e834d77927d2fafb0b5dca(SB)
+0x000c 00012 (day06.go:21)	FUNCDATA	$1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+0x000c 00012 (day06.go:21)	FUNCDATA	$5, "".Day06.arginfo1(SB)
+----
+
+a|
+----
+func Day06(fishes []uint, days uint) (uint, error) {
+----
+a|
+----
+0x000c 00012 (day06.go:23)	STP	(ZR, ZR), "".ages-72(SP)
+0x0010 00016 (day06.go:23)	STP	(ZR, ZR), "".ages-56(SP)
+0x0014 00020 (day06.go:23)	STP	(ZR, ZR), "".ages-40(SP)
+0x0018 00024 (day06.go:23)	STP	(ZR, ZR), "".ages-24(SP)
+0x001c 00028 (day06.go:23)	MOVD	ZR, "".ages-8(SP)
+----
+
+a|
+----
+var ages [groups + 1]uint // 0..7 plus babies in 8
+----
+a|
+----
+0x0020 00032 (day06.go:24)	MOVD	"".fishes+8(FP), R0
+0x0024 00036 (day06.go:24)	MOVD	"".fishes(FP), R1
+0x0028 00040 (day06.go:24)	MOVD	ZR, R2
+0x002c 00044 (day06.go:24)	JMP	76
+----
+
+a|
+----
+for i := 0; i < len(fishes); i++ {
+----
+a|
+----
+0x0030 00048 (day06.go:25)	MOVD	(R1)(R2<<3), R3
+0x0034 00052 (day06.go:25)	UBFIZ	$3, R3, $3, R3
+0x0038 00056 (day06.go:25)	MOVD	$"".ages-72(SP), R4
+0x003c 00060 (day06.go:25)	MOVD	(R4)(R3), R5
+0x0040 00064 (day06.go:25)	ADD	$1, R5, R5
+0x0044 00068 (day06.go:25)	MOVD	R5, (R4)(R3)
+----
+
+a|
+----
+ages[fishes[i]%groups]++
+----
+a|
+----
+0x0048 00072 (day06.go:24)	ADD	$1, R2, R2
+0x004c 00076 (day06.go:24)	CMP	R2, R0
+0x0050 00080 (day06.go:24)	BGT	48
+0x0054 00084 (day06.go:24)	MOVD	"".days+24(FP), R0
+0x0058 00088 (day06.go:24)	MOVD	ZR, R1
+0x005c 00092 (day06.go:24)	JMP	116
+----
+
+a|
+----
+for i := 0; i < len(fishes); i++ {
+----
+a|
+----
+0x0060 00096 (day06.go:33)	MOVD	"".ages-24(SP), R3
+0x0064 00100 (day06.go:33)	ADD	R2, R3, R3
+0x0068 00104 (day06.go:33)	MOVD	R3, "".ages-24(SP)
+----
+
+a|
+----
+ages[6] += babies
+----
+a|
+----
+0x006c 00108 (day06.go:34)	MOVD	R2, "".ages-8(SP)
+----
+
+a|
+----
+ages[8] = babies
+----
+a|
+----
+0x0070 00112 (day06.go:28)	ADD	$1, R1, R1
+0x0074 00116 (day06.go:28)	CMP	R1, R0
+0x0078 00120 (day06.go:28)	BLS	136
+----
+
+a|
+----
+for day := uint(0); day < days; day++ {
+----
+a|
+----
+0x007c 00124 (day06.go:29)	MOVD	"".ages-72(SP), R2
+0x0080 00128 (day06.go:29)	MOVD	ZR, R3
+----
+
+a|
+----
+babies := ages[0]
+----
+a|
+----
+0x0084 00132 (day06.go:30)	JMP	216
+0x0088 00136 (day06.go:30)	MOVD	ZR, R0
+0x008c 00140 (day06.go:30)	MOVD	ZR, R1
+----
+
+a|
+----
+for age := 0; age < groups; age++ {
+----
+a|
+----
+0x0090 00144 (day06.go:28)	JMP	168
+----
+
+a|
+----
+for day := uint(0); day < days; day++ {
+----
+a|
+----
+0x0094 00148 (day06.go:38)	ADD	$1, R0, R2
+----
+
+a|
+----
+for i := range ages {
+----
+a|
+----
+0x0098 00152 (day06.go:39)	MOVD	$"".ages-72(SP), R3
+0x009c 00156 (day06.go:39)	MOVD	(R3)(R0<<3), R3
+0x00a0 00160 (day06.go:39)	ADD	R3, R1, R1
+----
+
+a|
+----
+sum += ages[i]
+----
+a|
+----
+0x00a4 00164 (day06.go:38)	MOVD	R2, R0
+0x00a8 00168 (day06.go:38)	CMP	$9, R0
+0x00ac 00172 (day06.go:38)	BLT	148
+----
+
+a|
+----
+for i := range ages {
+----
+a|
+----
+0x00b0 00176 (day06.go:41)	MOVD	R1, "".~r2+32(FP)
+0x00b4 00180 (day06.go:41)	STP	(ZR, ZR), "".~r3+40(FP)
+0x00b8 00184 (day06.go:41)	ADD	$96, RSP
+0x00bc 00188 (day06.go:41)	SUB	$8, RSP, R29
+0x00c0 00192 (day06.go:41)	RET	(R30)
+----
+
+a|
+----
+return sum, nil
+----
+a|
+----
+0x00c4 00196 (day06.go:31)	ADD	$1, R3, R4
+0x00c8 00200 (day06.go:31)	MOVD	$"".ages-72(SP), R5
+0x00cc 00204 (day06.go:31)	MOVD	(R5)(R4<<3), R6
+0x00d0 00208 (day06.go:31)	MOVD	R6, (R5)(R3<<3)
+----
+
+a|
+----
+ages[age] = ages[age+1]
+----
+a|
+----
+0x00d4 00212 (day06.go:30)	MOVD	R4, R3
+0x00d8 00216 (day06.go:30)	CMP	$8, R3
+0x00dc 00220 (day06.go:30)	BLT	196
+0x00e0 00224 (day06.go:30)	JMP	96
+----
+
+a|
+----
+for age := 0; age < groups; age++ {
+----
+
+|===
+
+
 
 == Day 7
 
