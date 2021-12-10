@@ -90,10 +90,7 @@ func (a *Bingo) Draw(n int) bool {
 		return true
 	}
 	a.Cols[c.Y]++
-	if a.Cols[c.Y] == a.DimY {
-		return true
-	}
-	return false
+	return a.Cols[c.Y] == a.DimY
 }
 
 // Unmarked returns a list of unmarked numbers.
