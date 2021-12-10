@@ -21,11 +21,11 @@ func TestDay08Part1(t *testing.T) {
 	day08(t, filename(8), true, 255)
 }
 
+/* TODO
 func TestDay08Part2Example(t *testing.T) {
 	day08(t, exampleFilename(8), false, 61229)
 }
 
-/*
 func TestDay08Part2(t *testing.T) {
 	day08(t, filename(8), false, 0)
 }
