@@ -21,6 +21,7 @@ func TestDay20Part1Example(t *testing.T) {
 }
 
 func TestDay20Part2Example(t *testing.T) {
+	const want = 3351
 	lines, err := linesFromFilename(exampleFilename(20))
 	if err != nil {
 		t.Fatalf("failed to read example file: %v", err)
@@ -30,7 +31,6 @@ func TestDay20Part2Example(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := Day20(tm, false) // part2
-	want := 3351
 	if got != want {
 		t.Fatalf("Part2 example: got %d, want %d", got, want)
 	}
@@ -53,6 +53,7 @@ func TestDay20Part1(t *testing.T) {
 }
 
 func TestDay20Part2(t *testing.T) {
+	const want = 20395
 	lines, err := linesFromFilename(filename(20))
 	if err != nil {
 		t.Fatalf("failed to read input file: %v", err)
@@ -62,8 +63,7 @@ func TestDay20Part2(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := Day20(tm, false)
-	want := /* YOUR_PART2_ANSWER */ 0
-	if got != want {
+	if want != got {
 		t.Fatalf("Part2: got %d, want %d", got, want)
 	}
 }
