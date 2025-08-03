@@ -1,0 +1,73 @@
+# Contributing rules
+
+When solving puzzles from Advent Of Code, you MUST follow these rules.
+Advent Of Code is made available once every year.
+Starting december 1, each day (1..25) has two puzzles, part 1 and part 2.
+Puzzles include a problem description, small examples, and a usually very much larger, and resource intensive, puzzle input
+Part 2 is usually a derivation of part 1, a specialization, or generalisation.
+The puzzle input is identical for part 1 and part 2.
+Part 2 is only available once part 1 is solved.
+To solve a puzzle, the problem must be run with the input provided, and calculate a result, either a number or a string.
+Puzzle input is user specific, so solutions MUST calculate the correct result for the given input, and MUST NOT hardcode known solutions ("return 42")
+Solutions MUST NOT transpile existing solutions publicly available
+
+## General
+
+- Priority 1: Special care MUST taken for getting the right answer in the first try
+- Priority 2: Package reusability MUST NOT be considered, only solve the problem at hand
+- Priority 3: Solutions MUST run at maximum performance, i.e. minimal runtime
+- Priority 4: Solutions SHOULD avoid memory allocations. The less GC, the faster
+
+- Use the Go version from go.mod and always use the complete feature set, taking special care for new features not available in previous Go versions
+- New packages from Go's 'x' package SHOULD be used (generic, slices, iter)
+- Implementations MUST NOT cater for future extensions, but solve the problem at hand
+- Use a two digit identifier for the day, e.g. Day08 instead of Day8.
+This includes, but is not limited to
+  - filenames (/dayNN.go, /dayNN_test.go, all files at project root, no subdirectories)
+  - functions (Day08, NewDay08, RunDay08)
+  - Tests (TestDay08, TestNewDay08, TestRunDay08)
+  - Benchmarks (BenchmarkDay08)
+- Usually, puzzle input for the example(s) given are in a textual representation. This representation MAY require parsing into a computer friendly format (e.g. `map[string]int`)
+If parsing is required, the parsing function MUST be named `NewDayNN` returning the computer representation, and a function `RunDayNN` that uses this representation.
+- Prefer custom parsers without memory allocations versus standard text handling (`strings.Fields`, `strconv.Itoa`)
+- Parser SHOULD NOT use `regexp` package (slow, memory intensive) if the alternative can be implemented in a reasonable amount of code
+- If the implementation for a given day supports part #1 and part #2, use a boolean parameter 'part1' to indicate which part is being used.
+- Error handling MUST be used, but input is assumed to be correct. No need to defend parser against malicious input. 
+- logging can be used during implementation, but MUST be removed when test cases succeed
+- implementations SHOULD be limited to the use of stdlib, no external libraries
+- standard Go error handling MUST be used, panic() or os.Exit() MUST NOT be used
+- package level variables MUST NOT be used
+
+== Project layout
+
+The solution for each day is implemented as a test case, `TestDayNNPart1`, and `TestDayNNPart2` in `/dayNN_test.go'.
+The implementation is via a function `DayNN` in the file `/dayNN.go`.
+There is no main() function.
+Puzzle input for a day N is located in `/testdata/dayNN.txt`.
+Loading the file is done in test cases and benchmarks, parsing in `NewDayNN` in file `dayNN.go`.
+
+## How to implement (solve) puzzle NN (NN being a Day from 1 to 25)
+
+=== Part 1
+
+- Read the problem description for the given day from http://adventofcode/{{YEAR}}/day/NN.
+- Puzzle description include examples
+- Test cases MUST be used to validate all examples given (`TestDay08Part1Test3`)
+- Test cases can either use hardcoded examples or offline files in `testdata/`
+- if all test cases are succesful, write a single test case for this day part1, using the input for the puzzle from `testdata/dayNN.txt'
+- make sure to use the provided helper in `input.go`, such as `filename(day int)`.
+- make sure the test case for day NN part 1 succeeds
+- add a benchmark for day NN part 1 that includes parsing
+
+=== Part 3
+
+- read the problem description for part 2
+- write a test case (`TestDayNNPart2`)
+- use the same puzzle input  (`testdata/dayNN.txt`) for part 2 as in part 1
+- add a benchmark for day NN part 2 that includes parsing
+
+== Definition of done
+
+1. `go vet` is clean
+2. Both `TestDayNNPart1` and `TestDaynnPart2` succeed
+3. `BenchmarkDayNNPart1` and `BenchmarkDayNNPart2` exist
