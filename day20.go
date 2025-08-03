@@ -1,104 +1,147 @@
 // day20.go
 package adventofcode2021
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-// TrenchMap holds the enhancement algorithm and current image.
+// TrenchMap holds the 512-byte algorithm and two flat buffers.
 type TrenchMap struct {
-	algo                   string
-	img                    map[int]map[int]bool
-	minY, maxY, minX, maxX int
+	algo      [512]byte
+	buf, next []byte
+	size      int
 }
 
-// NewDay20 parses the raw lines into a TrenchMap.
+// NewDay20 parses the input lines (single- or multi-line algorithm) and
+// initializes flat buffers sized for 50 steps of padding.
 func NewDay20(lines []string) (*TrenchMap, error) {
-	if len(lines) < 3 {
-		return nil, fmt.Errorf("input too short")
-	}
-	algo := lines[0]
-	img := make(map[int]map[int]bool)
-	for y, row := range lines[2:] {
-		for x, ch := range row {
-			if img[y] == nil {
-				img[y] = make(map[int]bool)
-			}
-			img[y][x] = (ch == '#')
+	// locate blank separator
+	sep := -1
+	for i, l := range lines {
+		if l == "" {
+			sep = i
+			break
 		}
 	}
-	h := len(lines) - 2
-	w := len(lines[2])
+
+	var algoLines, imageLines []string
+	if sep >= 0 {
+		algoLines = lines[:sep]
+		imageLines = lines[sep+1:]
+	} else {
+		if len(lines) < 2 {
+			return nil, fmt.Errorf("not enough lines")
+		}
+		algoLines = lines[:1]
+		imageLines = lines[1:]
+	}
+
+	algostr := strings.Join(algoLines, "")
+	if len(algostr) != 512 {
+		return nil, fmt.Errorf("algorithm length invalid: got %d, want 512", len(algostr))
+	}
+
+	var algoArr [512]byte
+	for i := 0; i < 512; i++ {
+		algoArr[i] = algostr[i]
+	}
+
+	h0 := len(imageLines)
+	w0 := 0
+	if h0 > 0 {
+		w0 = len(imageLines[0])
+	}
+
+	padding := 50
+	size := w0 + 2*padding
+	buf := make([]byte, size*size)
+	next := make([]byte, size*size)
+
+	// draw initial image into center of buf
+	offset := padding
+	for y, row := range imageLines {
+		base := (offset+y)*size + offset
+		for x := 0; x < len(row); x++ {
+			if row[x] == '#' {
+				buf[base+x] = 1
+			}
+		}
+	}
+
 	return &TrenchMap{
-		algo: algo,
-		img:  img,
-		minY: 0, maxY: h - 1,
-		minX: 0, maxX: w - 1,
+		algo: algoArr,
+		buf:  buf,
+		next: next,
+		size: size,
 	}, nil
 }
 
-// Day20 runs either part1 (2 steps) or part2 (50 steps) and returns the lit‐pixel count.
+// Day20 runs 2 enhancement steps if part1==true, else 50, returning lit-pixel count.
 func Day20(tm *TrenchMap, part1 bool) int {
 	steps := 50
 	if part1 {
 		steps = 2
 	}
-	fill := false
-	for i := 0; i < steps; i++ {
-		tm.img, tm.minY, tm.maxY, tm.minX, tm.maxX, fill = enhance(tm.algo, tm.img, tm.minY, tm.maxY, tm.minX, tm.maxX, fill)
+	size := tm.size
+	buf := tm.buf
+	next := tm.next
+	algo := tm.algo[:]
+
+	// neighbor offsets in the flat buffer
+	nbs := [9]int{
+		-size - 1, -size, -size + 1,
+		-1, 0, +1,
+		+size - 1, +size, +size + 1,
 	}
-	return countLit(tm.img)
-}
 
-// enhance performs one enhancement step, expanding bounds by 1 in every direction.
-func enhance(algo string, img map[int]map[int]bool, minY, maxY, minX, maxX int, fill bool) (map[int]map[int]bool, int, int, int, int, bool) {
-	nbMinY, nbMaxY := minY-1, maxY+1
-	nbMinX, nbMaxX := minX-1, maxX+1
-	out := make(map[int]map[int]bool)
+	fill := byte(0)
+	toggle := (algo[0] == '#')
 
-	for y := nbMinY; y <= nbMaxY; y++ {
-		for x := nbMinX; x <= nbMaxX; x++ {
-			idx := 0
-			for dy := -1; dy <= 1; dy++ {
-				for dx := -1; dx <= 1; dx++ {
-					idx <<= 1
-					yy, xx := y+dy, x+dx
-					var bit bool
-					if yy < minY || yy > maxY || xx < minX || xx > maxX {
-						bit = fill
-					} else {
-						bit = img[yy][xx]
-					}
-					if bit {
-						idx |= 1
+	for step := 0; step < steps; step++ {
+		// pre-fill next[] to the infinite background value
+		if fill == 1 {
+			for i := range next {
+				next[i] = 1
+			}
+		} else {
+			for i := range next {
+				next[i] = 0
+			}
+		}
+
+		// enhancement pass: only update inner pixels [1..size-2]
+		for y := 1; y < size-1; y++ {
+			base := y * size
+			for x := 1; x < size-1; x++ {
+				idx := base + x
+				code := 0
+				for k, off := range nbs {
+					if buf[idx+off] == 1 {
+						code |= 1 << (8 - k)
 					}
 				}
-			}
-			if algo[idx] == '#' {
-				if out[y] == nil {
-					out[y] = make(map[int]bool)
+				if algo[code] == '#' {
+					next[idx] = 1
 				}
-				out[y][x] = true
 			}
+		}
+
+		// swap buffers and toggle fill if needed
+		buf, next = next, buf
+		if toggle {
+			fill ^= 1
 		}
 	}
 
-	// flip fill if algorithm[0]=='#'
-	newFill := fill
-	if algo[0] == '#' {
-		newFill = !fill
-	}
-
-	return out, nbMinY, nbMaxY, nbMinX, nbMaxX, newFill
-}
-
-// countLit counts the number of lit pixels.
-func countLit(img map[int]map[int]bool) int {
+	// count lit pixels in the final buffer
 	cnt := 0
-	for _, row := range img {
-		for _, on := range row {
-			if on {
-				cnt++
-			}
-		}
+	for _, v := range buf {
+		cnt += int(v)
 	}
+
+	// store buffers back into tm
+	tm.buf = buf
+	tm.next = next
 	return cnt
 }
