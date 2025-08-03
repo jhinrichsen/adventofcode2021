@@ -17,6 +17,30 @@ func day11(t *testing.T, filename string, part1 bool, want uint) {
 	}
 }
 
+func bench11(b *testing.B, part1 bool) {
+	b.Helper()
+	lines, err := linesFromFilename(filename(11))
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	data, err := NewDay11(lines)
+	if err != nil {
+		b.Fatal(err)
+	}
+	for i := 0; i < b.N; i++ {
+		Day11(data, part1)
+	}
+}
+
+func BenchmarkDay11Part1(b *testing.B) {
+	bench11(b, true)
+}
+
+func BenchmarkDay11Part2(b *testing.B) {
+	bench11(b, false)
+}
+
 func TestDay11Part1Example(t *testing.T) {
 	day11(t, exampleFilename(11), true, 1656)
 }
@@ -31,28 +55,4 @@ func TestDay11Part2Example(t *testing.T) {
 
 func TestDay11Part2(t *testing.T) {
 	day11(t, filename(11), false, 285)
-}
-
-func bench11(b *testing.B, part1 bool) {
-	lines, err := linesFromFilename(filename(11))
-	if err != nil {
-		b.Fatal(err)
-	}
-	data, err := NewDay11(lines)
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = Day11(data, part1)
-	}
-}
-
-func BenchmarkDay11Part1(b *testing.B) {
-	bench11(b, true)
-}
-
-func BenchmarkDay11Part2(b *testing.B) {
-	bench11(b, false)
 }
