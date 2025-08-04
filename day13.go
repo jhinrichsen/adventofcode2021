@@ -2,47 +2,62 @@ package adventofcode2021
 
 import (
 	"image"
-	"strconv"
-	"strings"
 )
 
 // NewDay13 parses the input lines into dots and fold instructions
 func NewDay13(lines []string) (map[image.Point]struct{}, []int) {
 	dots := make(map[image.Point]struct{})
 	folds := make([]int, 0)
-
 	parsingDots := true
 
 	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
+		b := []byte(line)
+		if len(b) == 0 {
 			parsingDots = false
 			continue
 		}
+
 		if parsingDots {
-			// Parse dot coordinates: "x,y"
-			parts := strings.Split(line, ",")
-			if len(parts) == 2 {
-				x, _ := strconv.Atoi(parts[0])
-				y, _ := strconv.Atoi(parts[1])
-				dots[image.Point{X: x, Y: y}] = struct{}{}
-			}
-		} else {
-			// Parse fold instructions: "fold along x=5" or "fold along y=7"
-			if strings.HasPrefix(line, "fold along ") {
-				instruction := strings.TrimPrefix(line, "fold along ")
-				parts := strings.Split(instruction, "=")
-				if len(parts) == 2 {
-					axis := parts[0]
-					value, _ := strconv.Atoi(parts[1])
-					if axis == "x" {
-						folds = append(folds, value)
-					} else if axis == "y" {
-						folds = append(folds, -value)
+			// Parse "x,y"
+			x, y, mode, val := 0, 0, 0, 0
+			for _, c := range b {
+				switch c {
+				case ',':
+					x = val
+					val = 0
+					mode = 1
+				default:
+					if c >= '0' && c <= '9' {
+						val = val*10 + int(c-'0')
 					}
 				}
 			}
+			if mode == 1 {
+				y = val
+				dots[image.Point{X: x, Y: y}] = struct{}{}
+			}
+			continue
 		}
+
+		// Parse fold: "fold along x=number" or "fold along y=number"
+		// We know line must begin: 'f','o','l','d',' ','a','l','o','n','g',' '
+		if len(b) < 13 {
+			continue
+		}
+		axisC := b[11]
+		valIdx := 13 // character after 'x=' or 'y='
+		val := 0
+		for j := valIdx; j < len(b); j++ {
+			c := b[j]
+			if c < '0' || c > '9' {
+				break
+			}
+			val = val*10 + int(c-'0')
+		}
+		if axisC == 'y' {
+			val = -val
+		}
+		folds = append(folds, val)
 	}
 	return dots, folds
 }
