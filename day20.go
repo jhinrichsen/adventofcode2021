@@ -77,71 +77,124 @@ func NewDay20(lines []string) (*TrenchMap, error) {
 	}, nil
 }
 
+// Constants for Day20 implementation
+const (
+	neighborhood = 3 * 3
+	darkPixel    = 0
+	lightPixel   = 1
+	outOfBounds  = -1 // Marker for out-of-bounds pixels
+)
+
 // Day20 runs 2 enhancement steps if part1==true, else 50, returning lit-pixel count.
 func Day20(tm *TrenchMap, part1 bool) int {
 	steps := 50
 	if part1 {
 		steps = 2
 	}
-	size := tm.size
-	buf := tm.buf
-	next := tm.next
+
 	algo := tm.algo[:]
+	size := tm.size
+	bufSize := len(tm.buf)
+	current := make([]byte, bufSize)
+	next := make([]byte, bufSize)
+	copy(current, tm.buf)
 
-	// neighbor offsets in the flat buffer
-	nbs := [9]int{
-		-size - 1, -size, -size + 1,
-		-1, 0, +1,
-		+size - 1, +size, +size + 1,
-	}
+	// Track infinite grid state
+	infiniteValue := byte(0)
+	toggleInfinite := (algo[0] == '#' && algo[511] == '.')
 
-	fill := byte(0)
-	toggle := (algo[0] == '#')
-
-	for step := 0; step < steps; step++ {
-		// pre-fill next[] to the infinite background value
-		if fill == 1 {
-			for i := range next {
-				next[i] = 1
-			}
-		} else {
-			for i := range next {
-				next[i] = 0
-			}
-		}
-
-		// enhancement pass: only update inner pixels [1..size-2]
-		for y := 1; y < size-1; y++ {
-			base := y * size
-			for x := 1; x < size-1; x++ {
-				idx := base + x
-				code := 0
-				for k, off := range nbs {
-					if buf[idx+off] == 1 {
-						code |= 1 << (8 - k)
+	// Only precompute offsets for part 2 (50 steps)
+	var offsets [][9]int
+	if !part1 {
+		offsets = make([][9]int, bufSize)
+		for y := range size {
+			for x := range size {
+				i := y*size + x
+				offsetIdx := 0
+				for dy := -1; dy <= 1; dy++ {
+					for dx := -1; dx <= 1; dx++ {
+						ny, nx := y+dy, x+dx
+						offset := ny*size + nx
+						if ny < 0 || ny >= size || nx < 0 || nx >= size {
+							offset = -1
+						}
+						offsets[i][offsetIdx] = offset
+						offsetIdx++
 					}
 				}
-				if algo[code] == '#' {
-					next[idx] = 1
+			}
+		}
+	}
+
+	for step := 0; step < steps; step++ {
+		// Clear next buffer
+		for i := range next {
+			next[i] = 0
+		}
+
+		if part1 {
+			// Optimized path for part 1 (2 steps)
+			for y := range size {
+				for x := range size {
+					index := 0
+					for dy := -1; dy <= 1; dy++ {
+						for dx := -1; dx <= 1; dx++ {
+							ny, nx := y+dy, x+dx
+							bit := infiniteValue
+							if ny >= 0 && ny < size && nx >= 0 && nx < size {
+								bit = current[ny*size+nx]
+							}
+							index = (index << 1) | int(bit)
+						}
+					}
+					if algo[index] == '#' {
+						next[y*size+x] = 1
+					}
+				}
+			}
+		} else {
+			// Optimized path for part 2 (50 steps)
+			for i := 0; i < bufSize; i++ {
+				index := 0
+				for j := 0; j < 9; j++ {
+					offset := offsets[i][j]
+					bit := infiniteValue
+					if offset != -1 {
+						bit = current[offset]
+					}
+					index = (index << 1) | int(bit)
+				}
+				if algo[index] == '#' {
+					next[i] = 1
 				}
 			}
 		}
 
-		// swap buffers and toggle fill if needed
-		buf, next = next, buf
-		if toggle {
-			fill ^= 1
+		current, next = next, current
+
+		if toggleInfinite {
+			infiniteValue = 1 - infiniteValue
+			if infiniteValue == 1 {
+				// Optimized border handling
+				sizeMinus1 := size - 1
+				for i := 0; i < size; i++ {
+					// Top and bottom borders
+					current[i] = 1
+					current[sizeMinus1*size+i] = 1
+
+					// Left and right borders
+					current[i*size] = 1
+					current[i*size+sizeMinus1] = 1
+				}
+			}
 		}
 	}
 
-	// count lit pixels in the final buffer
+	// Count all lit pixels in the final image using a single loop for better performance
 	cnt := 0
-	for _, v := range buf {
-		cnt += int(v)
+	for i := 0; i < len(current); i++ {
+		cnt += int(current[i])
 	}
 
-	// store buffers back into tm
-	tm.buf = buf
-	tm.next = next
 	return cnt
 }
