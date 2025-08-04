@@ -23,53 +23,43 @@ func NewDay11(lines []string) (OctopusGrid, error) {
 	return OctopusGrid(grid), nil
 }
 
-// Directions for adjacent cells (including diagonals)
-var octopusDirections = [8][2]int{
-	{-1, -1}, {-1, 0}, {-1, 1},
-	{0, -1}, {0, 1},
-	{1, -1}, {1, 0}, {1, 1},
-}
 
 func Day11(data OctopusGrid, part1 bool) uint {
-	// Create a copy of the grid to avoid modifying the original
-	grid := make([][]int, len(data))
-	for i := range data {
-		grid[i] = make([]int, len(data[i]))
-		copy(grid[i], data[i])
-	}
-
-	rows, cols := len(grid), len(grid[0])
+	rows, cols := len(data), len(data[0])
 	totalFlashes := uint(0)
 
-	// Pre-allocate arrays for better performance
-	flashed := make([][]bool, rows)
-	for i := range flashed {
-		flashed[i] = make([]bool, cols)
+	// Use flat arrays for better cache locality
+	gridSize := rows * cols
+	grid := make([]int, gridSize)
+	flashed := make([]bool, gridSize)
+
+	// Copy data to flat array
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			grid[i*cols+j] = data[i][j]
+		}
 	}
 
-	// Use a more efficient queue implementation
-	// Queue needs to be larger than grid size due to cascading flashes adding duplicates
-	queue := make([][2]int, rows*cols*10)        // Allow for multiple additions of same cell
-	flashedCells := make([][2]int, 0, rows*cols) // Track cells that flashed for efficient reset
+	// Use integer queue for better performance (store flat indices)
+	queue := make([]int, gridSize*10) // Allow for multiple additions of same cell
+	flashedCells := make([]int, 0, gridSize) // Track cells that flashed for efficient reset
 
 	// Function to simulate one step
 	simulateStep := func() uint {
-		// Reset only previously flashed cells (more efficient than full grid scan)
-		for _, cell := range flashedCells {
-			flashed[cell[0]][cell[1]] = false
+		// Reset only previously flashed cells
+		for _, idx := range flashedCells {
+			flashed[idx] = false
 		}
 		flashedCells = flashedCells[:0] // Clear the list
 
 		queueHead, queueTail := 0, 0
 
 		// Increase energy level and check for initial flashes
-		for i := 0; i < rows; i++ {
-			for j := 0; j < cols; j++ {
-				grid[i][j]++
-				if grid[i][j] > 9 && queueTail < len(queue) {
-					queue[queueTail] = [2]int{i, j}
-					queueTail++
-				}
+		for idx := 0; idx < gridSize; idx++ {
+			grid[idx]++
+			if grid[idx] > 9 {
+				queue[queueTail] = idx
+				queueTail++
 			}
 		}
 
@@ -77,30 +67,92 @@ func Day11(data OctopusGrid, part1 bool) uint {
 
 		// Process flashes using efficient queue operations
 		for queueHead < queueTail {
-			pos := queue[queueHead]
+			idx := queue[queueHead]
 			queueHead++
-			i, j := pos[0], pos[1]
 
 			// Skip if already flashed
-			if flashed[i][j] {
+			if flashed[idx] {
 				continue
 			}
 
 			// Ensure energy level is still above 9
-			if grid[i][j] > 9 {
+			if grid[idx] > 9 {
 				// Flash this octopus
-				flashed[i][j] = true
-				flashedCells = append(flashedCells, [2]int{i, j})
+				flashed[idx] = true
+				flashedCells = append(flashedCells, idx)
 				stepFlashes++
 
-				// Increase energy of all adjacent octopuses
-				for _, dir := range octopusDirections {
-					ni, nj := i+dir[0], j+dir[1]
-					if ni >= 0 && ni < rows && nj >= 0 && nj < cols {
-						grid[ni][nj]++
-						// Add to queue if this causes a new flash
-						if grid[ni][nj] > 9 && !flashed[ni][nj] && queueTail < len(queue) {
-							queue[queueTail] = [2]int{ni, nj}
+				// Convert flat index to 2D coordinates for bounds checking
+				i, j := idx/cols, idx%cols
+
+				// Increase energy of all adjacent octopuses using precomputed flat offsets
+				// Top row
+				if i > 0 {
+					if j > 0 { // Top-left
+						nIdx := idx - cols - 1
+						grid[nIdx]++
+						if grid[nIdx] > 9 && !flashed[nIdx] {
+							queue[queueTail] = nIdx
+							queueTail++
+						}
+					}
+					// Top
+					nIdx := idx - cols
+					grid[nIdx]++
+					if grid[nIdx] > 9 && !flashed[nIdx] {
+						queue[queueTail] = nIdx
+						queueTail++
+					}
+					if j < cols-1 { // Top-right
+						nIdx := idx - cols + 1
+						grid[nIdx]++
+						if grid[nIdx] > 9 && !flashed[nIdx] {
+							queue[queueTail] = nIdx
+							queueTail++
+						}
+					}
+				}
+
+				// Same row
+				if j > 0 { // Left
+					nIdx := idx - 1
+					grid[nIdx]++
+					if grid[nIdx] > 9 && !flashed[nIdx] {
+						queue[queueTail] = nIdx
+						queueTail++
+					}
+				}
+				if j < cols-1 { // Right
+					nIdx := idx + 1
+					grid[nIdx]++
+					if grid[nIdx] > 9 && !flashed[nIdx] {
+						queue[queueTail] = nIdx
+						queueTail++
+					}
+				}
+
+				// Bottom row
+				if i < rows-1 {
+					if j > 0 { // Bottom-left
+						nIdx := idx + cols - 1
+						grid[nIdx]++
+						if grid[nIdx] > 9 && !flashed[nIdx] {
+							queue[queueTail] = nIdx
+							queueTail++
+						}
+					}
+					// Bottom
+					nIdx := idx + cols
+					grid[nIdx]++
+					if grid[nIdx] > 9 && !flashed[nIdx] {
+						queue[queueTail] = nIdx
+						queueTail++
+					}
+					if j < cols-1 { // Bottom-right
+						nIdx := idx + cols + 1
+						grid[nIdx]++
+						if grid[nIdx] > 9 && !flashed[nIdx] {
+							queue[queueTail] = nIdx
 							queueTail++
 						}
 					}
@@ -109,8 +161,8 @@ func Day11(data OctopusGrid, part1 bool) uint {
 		}
 
 		// Reset all flashed octopuses to 0 (only the ones that actually flashed)
-		for _, cell := range flashedCells {
-			grid[cell[0]][cell[1]] = 0
+		for _, idx := range flashedCells {
+			grid[idx] = 0
 		}
 
 		return stepFlashes

@@ -32,27 +32,26 @@ for a solution avoid looking at those.
 | 8  | 1 | TODO
 | 9  | 1 | TODO
 | 10 | 1 | 1
-| 11 |  | 
-| 12 |  | 
-| 13 |  | 
-| 14 |  | 
-| 15 |  | 
-| 16 |  | 
-| 17 |  | 
-| 18 |  | 
-| 19 |  | 
-| 20 |  | 
-| 21 |  | 
-| 22 |  | 
-| 23 |  | 
-| 24 |  | 
-| 25 |  | 
-
+| 11 | 1 | 1
+| 12 |  |
+| 13 |  |
+| 14 |  |
+| 15 |  |
+| 16 |  |
+| 17 |  |
+| 18 |  |
+| 19 |  |
+| 20 | 1 | 1 <1>
+| 21 |  |
+| 22 |  |
+| 23 |  |
+| 24 |  |
+| 25 |  |
 |===
+<1> This one is picked because it is said to be a very good case for GPU optimization
 
 
-----
-      --------Part 1---------   --------Part 2---------
+---- --------Part 1---------   --------Part 2---------
 Day       Time    Rank  Score       Time    Rank  Score
  10   15:36:53   39284      0   16:15:45   37919      0
   9   00:42:38    8385      0          -       -      -
@@ -926,3 +925,9 @@ BenchmarkDay07Part2-8   	     260	   4508358 ns/op	       0 B/op	       0 allocs
 ----
 
 4.5 ms, no allocations.
+
+== Day 20: Trench Maps
+
+TODO: implement, and use as the best available showcase of all aoc puzzles for GPU rewrite.
+Expect 20x to 50x better performance.
+
