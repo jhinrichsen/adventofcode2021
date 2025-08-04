@@ -1,5 +1,18 @@
 # Advent of Code Day NN (YEAR YYYY) Go Implementation Cookbook
 
+The Advent Of Code is a yearly programming contest where participants solve puzzles in a competitive environment. 
+It starts Dec 1st and ends Dec 25th.
+For each day, participants are given a puzzle that they need to solve.
+Puzzles are split into two parts, Part 1 and Part 2.
+
+1. Puzzle description explains the problem and provides one or more examples.
+2. It is your job to implement a test cases for all examples
+3. Once all test cases for examples pass, create a test case for the actual puzzle input. Inputs are user specific, so don't come up with some random guesswork input data. If the puzzle input cannot be located, stop and ask.
+4. Let the test case for part 1 run on the user specific input, and use the calculated value as the expected value for the test case.
+5. Stop here and wait for the value to be verified by the AOC website.
+6. If the value is correct, Part 2 is unlocked.
+7. Repeat Step 2 - 5 for Part 2.
+
 ## Project Structre & Naming conventions
 
 1. Single Package, Two-Digit Day IDs: All solution code resides in the root package (no
@@ -77,7 +90,11 @@ debugging output before final submission. The final code should be clean of prin
 statements and assume the input is correct (no need for excessive defensive checks beyond
 basic error handling on file reads, etc.).
 
-## Solution Implementation (Parts 1 & 2)
+## Solution Implementation (Examples, Part 1, Part 2)
+The puzzle description will contain a clear description of the problem and the expected output.
+If the puzzle description contains more than one example, all examples MUST be used in test cases
+to make sure the real input is solved correctly.
+
 1. Single Solver Function: Implement func DayNN(data ParsedType, part1 bool) uint
 to produce the answer for Part 1 or Part 2 depending on the flag. This function should contain
 the core puzzle logic. Keeping part1 and part2 together (with an if part1 { ... } else
@@ -358,3 +375,12 @@ efficient algorithms. Use Go’s modern features and standard library to write c
 With proper structure, naming, testing, and benchmarking in place, you’ll not only have a solution that
 works for your input, but one that is well-engineered and maintainable. Good luck, and happy coding!
 
+## Dont's
+Here are some additional rules to avoid when implementing a solution:
+
+- looking up solutions online
+- Using a structure that is used to pass parsing results to the solver that has less than three fields. Use fields directly instead.
+- Making the solver function a method. Use a function instead (https://go.dev/doc/effective_go#methods).
+- Use recursion. Never ever use recursion. There's two kind of people in this world: those who use 
+recursion, and those that have been woken up by their pager at 3am because of a stack overflow.
+- guess some puzzle input because the corresponding file in `testdata/day{{DAY}}.txt` doesn't exist. Instead, stop and wait for the input to be available. 
