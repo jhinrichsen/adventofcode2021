@@ -5,9 +5,9 @@ import (
 )
 
 // NewDay13 parses the input lines into dots and fold instructions
-func NewDay13(lines []string) (map[image.Point]struct{}, []int) {
-	dots := make(map[image.Point]struct{})
-	folds := make([]int, 0)
+func NewDay13(lines []string) ([]image.Point, []int) {
+	dots := make([]image.Point, 0, 1024)
+	folds := make([]int, 0, 32)
 	parsingDots := true
 
 	for _, line := range lines {
@@ -34,7 +34,7 @@ func NewDay13(lines []string) (map[image.Point]struct{}, []int) {
 			}
 			if mode == 1 {
 				y = val
-				dots[image.Point{X: x, Y: y}] = struct{}{}
+				dots = append(dots, image.Point{X: x, Y: y})
 			}
 			continue
 		}
@@ -63,59 +63,63 @@ func NewDay13(lines []string) (map[image.Point]struct{}, []int) {
 }
 
 // Day13 solves the transparent origami puzzle
-func Day13(dotsIn map[image.Point]struct{}, folds []int, part1 bool) uint {
-	// Make a copy of dots to avoid modifying original data
-	dots := make(map[image.Point]struct{})
-	for point := range dotsIn {
-		dots[point] = struct{}{}
+func Day13(points []image.Point, folds []int, part1 bool) uint {
+	// Find grid size
+	w, h := 0, 0
+	for _, pt := range points {
+		w = max(w, pt.X)
+		h = max(h, pt.Y)
+	}
+	w++
+	h++
+	gridA := make([][]bool, h)
+	gridB := make([][]bool, h)
+	for i := range gridA {
+		gridA[i] = make([]bool, w)
+		gridB[i] = make([]bool, w)
+	}
+	for _, pt := range points {
+		gridA[pt.Y][pt.X] = true
 	}
 
-	// Apply folds
-	foldsToApply := folds
-	if part1 {
-		// Part 1: only apply the first fold
-		foldsToApply = folds[:1]
-	}
+	grid := &gridA
+	buffer := &gridB
 
-	for _, fold := range foldsToApply {
-		dots = applyFold(dots, fold)
-	}
-
-	return uint(len(dots))
-}
-
-// applyFold applies a single fold to the set of dots
-// Positive value = X fold (vertical); Negative value = Y fold (horizontal)
-func applyFold(dots map[image.Point]struct{}, fold int) map[image.Point]struct{} {
-	newDots := make(map[image.Point]struct{})
-	if fold == 0 {
-		return dots
-	}
-
-	if fold > 0 {
-		// X axis fold at fold=X
-		line := fold
-		for point := range dots {
-			var newPoint image.Point
-			if point.X < line {
-				newPoint = point
-			} else {
-				newPoint = image.Point{X: 2*line - point.X, Y: point.Y}
+	for _, fold := range folds {
+		if fold > 0 {
+			foldX := fold
+			for y := 0; y < h; y++ {
+				for x := 0; x < foldX; x++ {
+					(*buffer)[y][x] = (*grid)[y][x] || (foldX+(foldX-x) < w && (*grid)[y][foldX+(foldX-x)])
+				}
 			}
-			newDots[newPoint] = struct{}{}
+			w = foldX
+		} else {
+			foldY := -fold
+			for y := 0; y < foldY; y++ {
+				for x := 0; x < w; x++ {
+					(*buffer)[y][x] = (*grid)[y][x] || (foldY+(foldY-y) < h && (*grid)[foldY+(foldY-y)][x])
+				}
+			}
+			h = foldY
 		}
-	} else {
-		// Y axis fold at fold=-fold
-		line := -fold
-		for point := range dots {
-			var newPoint image.Point
-			if point.Y < line {
-				newPoint = point
-			} else {
-				newPoint = image.Point{X: point.X, Y: 2*line - point.Y}
-			}
-			newDots[newPoint] = struct{}{}
+		// Swap buffers
+		buffer, grid = grid, buffer
+
+		// apply one fold for part 1
+		if part1 {
+			break
 		}
 	}
-	return newDots
+
+	// Count dots (true values)
+	var count uint
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			if (*grid)[y][x] {
+				count++
+			}
+		}
+	}
+	return count
 }
