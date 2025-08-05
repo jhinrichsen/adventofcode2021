@@ -13,8 +13,7 @@ image:https://gitlab.com/jhinrichsen/adventofcode2021/badges/main/coverage.svg[l
 My take on https://adventofcode.com/2021/ in Go. As usual, i don't particularly
 care if i provide my solutions _fast_, i try to be _correct_ on the first
 answer, and care for being runtime efficient.
-Most, if not all, puzzles are backed by unit testing the examples, and by some
-benchmarks.
+All puzzles are backed by unit testing the examples, and by some benchmarks.
 
 Expected results are hard coded into the unit tests, so unless you are peeking
 for a solution avoid looking at those.
@@ -33,7 +32,7 @@ for a solution avoid looking at those.
 | 9  | 1 | TODO
 | 10 | 1 | 1
 | 11 | 1 | 1
-| 12 |  |
+| 12 | 1 | 1
 | 13 |  |
 | 14 |  |
 | 15 |  |
@@ -66,7 +65,7 @@ Day       Time    Rank  Score       Time    Rank  Score
 ----
 <1> I started on the weekend following Dec 1
 
-== Day 1
+== Day 1: Sonar Sweep
 
 Nice and easy one. Parsing numbers happens so often i extended my helper file
 `input.go` with an additional function that directly returns an array of
@@ -155,7 +154,9 @@ CX is `cap()`. `cap()` is not used in this function, so the compiler uses CX for
 index `i`.
 <3> return result via register, no stack cleanup required
 
-== Day 2
+== Day 2: Dive!
+
+== Day 3: Binary Diagnostic
 
 No brainer. The only noticable piece is maybe the use of closures to avoid deep
 structures surrounded by an `if/else`:
@@ -182,7 +183,7 @@ can be replaced using closures (anonymous inner functions)
 
 which is easier on the eyes.
 
-== Day 4
+== Day 4: Giant Squid
 
 Part 1 Blattschuss.
 
@@ -216,7 +217,7 @@ BenchmarkDay04Part2-8   	     687	   1852821 ns/op	  560245 B/op	    2846 allocs
 
 1.8 ms, excluding I/O, including parsing.
 
-== Day 5
+== Day 5: Hydrothermal Venture
 
 Took me 30 min for part 1 and then another 60 min for part 2. The implementation
 transparently handles both part 1 and part 2 using
@@ -258,7 +259,7 @@ cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
 BenchmarkDay05Part2-8   	      26	  40890804 ns/op	16117340 B/op	    7627 allocs/op
 ----
 
-== Day 6
+== Day 6: Lanternfish
 
 Part 2 blows my machine around day 240/245 of 256 days when using the naive
 approach of counting each lanternfish separate.
@@ -872,7 +873,372 @@ for age := 0; age < groups; age++ {
 
 NOTE: This will probably be the last AARCH64 disassembler, it _really_ is not meant for us humans.
 
-== Day 7
+== Day 7: The Treachery of Whales
+
+== Day 8: Seven Segment Search
+
+== Day 9: Smoke Basin
+
+== Day 10: Syntax Scoring
+
+== Day 11: Dumbo Octopus
+
+== Day 12: Passage Pathing
+
+== Day 13: Transparent Origami
+
+Using Jetbrains' IDEA Ultimate in combination with Junie running Sonnet 4.
+A major pain in the neck.
+I ask for a review of the CONTRIBUTING.md document, and Junie starts refactoring day 11 test cases.
+It always does WAY more than asked for, and acts like a young dog that chews your sofa and pisses on the carpet.
+It needs constant corrections, repeated limits, my experience is really bad.
+
+Like i ask it a question, but i get no answer.
+image::assets/Screenshot From 2025-08-04 19-14-27.png[]
+
+But in the end we have a unit tests for the example, and for part 1.
+image::assets/Screenshot From 2025-08-04 20-09-30.png[]
+
+=== Baseline
+
+These generated sources are our baseline, they are available from this repository in `assets/junie-sonnet4/day13.go resp. day13_test.go.
+
+=== An opinionated source code review created by Junie/ Sonnet4 by a senior Go programmer 
+
+As a prerequisite, Junie was prompted to follow the rules set forth in CONTRIBUTING.md.
+We can argue if performance should have such a high priority, but this is a given prerequisite.
+If your financial controller tells you to cut down on deployments costs, no debates.
+
+==== `day13.go`
+
+----
+// Point represents a coordinate on the transparent paper
+type Point struct {
+	X, Y int
+}
+----
+
+This has vague similarity to Go's image.Point from the stdlib.
+
+----
+type Point struct {
+	X, Y int
+}
+----
+
+The struct is removed, and replaced with an import.
+
+Next is a Fold struct
+----
+// Fold represents a fold instruction
+type Fold struct {
+	Axis  string // "x" or "y"
+	Value int
+}
+----
+
+which is used to hold the fold section in puzzle input
+
+----
+fold along x=655
+fold along y=447
+----
+
+The axis representation as a `string`, well,
+
+----
+		if fold.Axis == "y" {
+----
+
+Given that 
+
+- we have a 2D system, so the only instances are x and y
+- the value is always positive
+
+not very effective.
+Instead, we represent the first axis (X) as positive numbers, and the second axis (Y) as negative numbers.
+
+The section is another struct, 
+
+----
+type Day13Data struct {
+	Dots     map[image.Point]bool
+	Folds    []int
+	DotCount int
+}
+----
+
+Using `Data` as part of the name is kindof DRY, but ok, Day13 is already taken.
+The struct carries the binary representation of the puzzle input from the Parser to the Solver.
+`DotCount` is just `len(Dots)`.
+This is both error prone, and superfluous, and unused.
+Unused - the declaration and the one single initialization can safely be removed.
+This leaves us with a struct holding two fields, in a language like Go that supports multiple return types not necessary.
+
+From
+----
+day13.go:// Day13Data holds the parsed input for Day 13
+day13.go:type Day13Data struct {
+day13.go:func NewDay13(lines []string) Day13Data {
+day13.go:func Day13(data Day13Data, part1 bool) uint {
+----
+
+we refactor to
+
+----
+day13.go:func NewDay13(lines []string) (map[image.Point]bool, []int) {
+day13.go:func Day13(dotsIn map[image.Point]bool, folds []int, part1 bool) uint {
+----
+
+Dots are kept in a sparse map with value type `bool`, which is standard Go Set handling.
+The one disadvantage lies in the interpretation of a map key that exists, but is set to false - is this a Point?
+Good for triple logic, but not required here, so we refactor.
+
+----
+map[image.Point]bool     <1>
+map[image.Point]struct{} <2>
+----
+<1> entry level
+<2> expert level (zero allocation)
+
+So far we have erased everything we came across - the best code is code that is not written.
+Now, for the signature of the Parser, it does not return an `error` type.
+
+----
+func NewDay13(lines []string) (map[image.Point]struct{}, []int) {
+----
+
+which is unusual because even in our well behaved environment (we don't expect malign input) there's always someting going wrong.
+The parsing logic is straightforward, using stdlib's `TrimSpace`, `Split`, `Atoi`, reading the two sections one after another, toggling on the interim empty line.
+But it silently skips handling a couple of conditions that i would not dare to ignore.
+
+----
+if strings.HasPrefix(line "fold along ") {
+    ...
+} <1>
+
+if len(parts) == 2 {
+    ....
+} <1>
+
+value, _ := strconv.Atoi(...) <2> 
+----
+<1> no else condition
+<2> ignore errors
+
+Next in line is `Day13` solver, which looks pretty standard.
+It creates a copy of the input map to avoid modifying original data.
+One nice feature: when passing either one fold or many folds as a slice, `folds[:1`] is like `folds[0]` but a slice.
+
+----
+foldsToApply := folds
+if part1 {
+	// Part 1: only apply the first fold
+	foldsToApply = folds[:1]
+}
+
+for _, fold := range foldsToApply {
+	dots = applyFold(dots, fold)
+}
+---
+
+I find this more concise:
+
+----
+for _, fold := range folds {
+	dots = applyFold(dots, fold)
+	// Part 1: only apply the first fold
+	if part1 {
+		break
+	}
+}
+----
+
+On to `applyFold`, again pretty standard.
+Creates a copy of the input data to avoid modification.
+Then checks for a `0` fold, which is very good, but has no error handling and silenty does nothing
+
+----
+if fold == 0 {
+	return dots
+}
+----
+
+This should rather be an error case in the parser, as it could be an indicator for an unintialized value.
+The folding itself is just a new translated `image.Point`:
+
+----
+newPoint = image.Point{X: 2*line - point.X, Y: point.Y} <1>
+newPoint = image.Point{X: point.X, Y: 2*line - point.Y} <2>
+----
+<1> X axis fold
+<2> Y axis fold
+
+==== `day13_test.go`
+
+Junie created the required examples #1, example #2, and part 1 test cases, and also created the benchmark for part 1.
+The one existing benchmark (for now) calls a `bench13` function, the three existing tests don't use this pattern.
+The `bench13` function's correctly identifies as a test helper function:
+
+----
+func bench13(b *testing.B, part1 bool) {
+	b.Helper()
+----
+
+Junie does not use range-over-int (since Go 1.22) although contributing rules clearly state to use Go's full feature set for the version in `go.mod`.
+
+Junie did not locate the `exampleFilename()` utility function from `input.go` referenced in the contributing rules.
+The test case for the first example uses the correct expected solution, `want := uint(17)` as described in the puzzle example.
+The use of a dedicated variable including a type case is not useful, better use `const want = 17`.
+The puzzle description then uses a second fold, but hints to focus on the first fold only and the expected 17.
+Junie created a second fold and counted 16 points after the second fold.
+Exhaustive, not required, but we all know this will be the upcoming part 2.
+
+=== Optimization
+
+==== P1: remove superfluous fluff (structs and the like)
+
+This is our baseline
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+BenchmarkDay13Part1-16              6394            183056 ns/op          191393 B/op        943 allocs/op
+PASS
+ok      gitlab.com/jhinrichsen/adventofcode2021 1.193s
+----
+
+After refactoring, without any optimization, we get this:
+
+----
+              │  baseline   │               perf1                │
+              │   sec/op    │   sec/op     vs base               │
+Day13Part1-16   183.1µ ± 0%   167.2µ ± 2%  -8.67% (p=0.000 n=10)
+----
+
+We already shaved off 10% by just simplifying, not optimizing.
+Memory consumption has decreased marginally.
+
+==== P2: No stdlib in Parser
+
+Removing the stdlib (`Strip`, `Trim`, `Split`, `Atoi`) from the Parser, and replacing it with an optimized parser for our use case (e.g. no parsing of negative number, no NaN, no -Inf):
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │     p1      │                 p2                 │
+              │   sec/op    │   sec/op     vs base               │
+Day13Part1-16   167.2µ ± 2%   136.1µ ± 2%  -18.62% (p=0.000 n=10)         <1>
+
+              │      p1     │                  p2                │
+              │     B/op    │     B/op      vs base              │
+Day13Part1-16   186.4Ki ± 0%   158.6Ki ± 0%  -14.90% (p=0.000 n=10)       <2>
+
+              │     p1      │                 p2                 │
+              │  allocs/op  │ allocs/op   vs base                │
+Day13Part1-16   943.00 ± 0%   54.00 ± 0%  -94.27% (p=0.000 n=10)          <3>
+----
+<1> Runtime down by 20%
+<2> allocation size down by 15%
+<3> number of allocations down by 95%
+
+==== 3. 2D grid representation of points
+
+Junie decided to keep Pointes in a sparse hashmap.
+We are using image.Point, but the standard library offers no support for flipping images, and we don't want to introduce third party libraries that can do image flipping.
+Using a 2D grid instead of a sparse Hashmap shows a steep decrease in performance:
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │     p2      │                   p3                   │
+              │   sec/op    │    sec/op     vs base                  │
+Day13Part1-16   136.1µ ± 2%   1708.5µ ± 2%  +1155.76% (p=0.000 n=10)
+
+              │      p2      │                  p3                    │
+              │     B/op     │     B/op       vs base                 │
+Day13Part1-16   158.6Ki ± 0%   2517.3Ki ± 0%  +1486.77% (p=0.000 n=10)
+
+              │     p2     │                   p3                   │
+              │ allocs/op  │  allocs/op    vs base                  │
+Day13Part1-16   54.00 ± 0%   1792.00 ± 0%  +3218.52% (p=0.000 n=10)
+----
+
+==== 4. 1D representation
+
+Go does not support 2D arrays, so creating a 2D array is creating a 1D y array and then N times creating 1D x arrays.
+For our use case this can easily create thousands of array allocations.
+As an alternative, we can create a 1D array of size width * height, and use linear access (`y * w + x`):
+
+==== 5. Bitset representation
+
+Using a bit as the underlying datatype, comparable to the bool value, but bool will be packed into a byte, and a bit
+physically is one bit.
+
+==== 6. Bit based calculations based on 64 bit words
+
+This is as close as we get to the CPU, directly use the full 64 bits of a word in the CPU, including native bit operations.
+The algorithm must take extra care of underused and overlapping bits in a word.
+
+----
+
+Time for a short wrapup:
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │   baseline   │                parser                │                   1D                    │                  bits                  │                words                │
+              │    sec/op    │    sec/op     vs base                │    sec/op      vs base                  │    sec/op      vs base                 │   sec/op     vs base                │
+Day13Part1-16   183.06µ ± 0%   136.06µ ± 2%  -25.68% (p=0.000 n=10)   1640.85µ ± 3%  +796.36% (p=0.000 n=10)   1694.78µ ± 1%  +825.83% (p=0.000 n=10)    51.44µ ± 2%  -71.90% (p=0.000 n=10)
+
+              │   baseline   │                parser                │                   1D                    │                 bits                   │                words                │
+              │     B/op     │     B/op      vs base                │     B/op       vs base                  │     B/op      vs base                  │     B/op      vs base               │
+Day13Part1-16   186.9Ki ± 0%   158.6Ki ± 0%  -15.12% (p=0.000 n=10)   2320.3Ki ± 0%  +1141.39% (p=0.000 n=10)   304.2Ki ± 0%  +62.78% (p=0.000 n=10)      168.2Ki ± 0%  -9.98% (p=0.000 n=10)
+
+              │   baseline   │               parser                 │                 1D                      │                bits                    │               words                 │
+              │  allocs/op   │  allocs/op   vs base                 │ allocs/op   vs base                     │ allocs/op   vs base                    │ allocs/op   vs base                 │
+Day13Part1-16    943.000 ± 0%   54.000 ± 0%  -94.27% (p=0.000 n=10)   4.000 ± 0%  -99.58% (p=0.000 n=10)        4.000 ± 0%  -99.58% (p=0.000 n=10)       3.000 ± 0%  -99.68% (p=0.000 n=10)
+----
+
+This shows very nicely the tradeoff betwenn perfect runtime and perfect memory consumption, pick one.
+The sparse hashmap is fast but memory intensive, it creates 943 * 187 KiB for one operation, i.e. 170 MiB/op.
+The optimized parser is slightly faster, it optimizes away some generalizations in string processing that do not exist in our use case.
+The main advantage of the custom parser is it brings down memory consumption from 170 MiB/op down to 8 MiB/op.
+Factor 20 means you can run your service on all working days for a complete month, instead of just one day.
+
+The 1D representation is slower, it has no sparse points as in the hashmap, it needs to churn on the complete virtual grid.
+One memory allocation increases drastically (a complete grid versus a sparse hashmap), but only 4 allocations are required, so memory consumption is 9 MiB/op.
+
+When using bits instead of bool, we are really using one bit to represent a lit point.
+Comparing 1D (bool) to 1D (bits), it shows the same characteristics except for the bytes/alloc.
+We are now packing 8 bits into a byte, so the number of allocations is the same.
+The bytes/op drops from 2320.3 KiB to 204.2 KiB, which is a factor of 7.36, very close to the number of bits we are packing into what we use for bool (8).
+
+As the last alternative, we don't operate on dedicated bits, but use the full CPU length of 64 bit.
+Runtime drops by a factor of 3.5, slight drop in bytes/op of 10%, and a massive drop in number of allocations from 943 to 3, factor 314.
+These factors are cumulative, 3.5 times 314 is 1.100.
+Duplicate this factor, because if GC kicks in we not only need to setup memory, we also need to tear down memory, so we end up with a factor of 2.200.
+If the budget for running the baseline lasts for one day, the optimized version will run for 6 years.
+
+== Day 14: Extended Polymerization
+
+== Day 15: Chiton
+
+== Day 16: Packet Decoder
+
+== Day 17: Trick Shot
+
+== Day 18: Snailfish
+
+== Day 19: Beacon Scanner
 
 Easiest puzzle so far, took me 23 min for both parts.
 Everybody and their mother was fast on this one, so we broke the private
@@ -928,6 +1294,15 @@ BenchmarkDay07Part2-8   	     260	   4508358 ns/op	       0 B/op	       0 allocs
 
 == Day 20: Trench Maps
 
+== Day 21: Dirac Dice
+
+== Day 22: Reactor Reboot
+
+== Day 23: Amphipod
+
+== Day 24: Arithmetic Logic Unit
+
+== Day 25: Sea Cucumber
+
 TODO: implement, and use as the best available showcase of all aoc puzzles for GPU rewrite.
 Expect 20x to 50x better performance.
-
