@@ -2,6 +2,7 @@ package adventofcode2021
 
 import (
 	"image"
+	"slices"
 )
 
 // NewDay13 parses the input lines into dots and fold instructions
@@ -72,16 +73,15 @@ func Day13(points []image.Point, folds []int, part1 bool) uint {
 	}
 	w++
 	h++
-	gridA := make([][]bool, h)
-	gridB := make([][]bool, h)
-	for i := range gridA {
-		gridA[i] = make([]bool, w)
-		gridB[i] = make([]bool, w)
-	}
+	gridA := make([]bool, w*h)
+	gridB := slices.Clone(gridA)
+
+	// fill points
 	for _, pt := range points {
-		gridA[pt.Y][pt.X] = true
+		gridA[pt.Y*w+pt.X] = true
 	}
 
+	// handles for buffer switching
 	grid := &gridA
 	buffer := &gridB
 
@@ -90,7 +90,8 @@ func Day13(points []image.Point, folds []int, part1 bool) uint {
 			foldX := fold
 			for y := 0; y < h; y++ {
 				for x := 0; x < foldX; x++ {
-					(*buffer)[y][x] = (*grid)[y][x] || (foldX+(foldX-x) < w && (*grid)[y][foldX+(foldX-x)])
+					r := 2*foldX - x
+					(*buffer)[y*foldX+x] = (*grid)[y*w+x] || (r < w && (*grid)[y*w+r])
 				}
 			}
 			w = foldX
@@ -98,27 +99,30 @@ func Day13(points []image.Point, folds []int, part1 bool) uint {
 			foldY := -fold
 			for y := 0; y < foldY; y++ {
 				for x := 0; x < w; x++ {
-					(*buffer)[y][x] = (*grid)[y][x] || (foldY+(foldY-y) < h && (*grid)[foldY+(foldY-y)][x])
+					r := 2*foldY - y
+					(*buffer)[y*w+x] = (*grid)[y*w+x] || (r < h && (*grid)[r*w+x])
 				}
 			}
 			h = foldY
 		}
+
 		// Swap buffers
 		buffer, grid = grid, buffer
 
-		// apply one fold for part 1
 		if part1 {
 			break
 		}
+
+		// Clear the buffer
+		for i := range *buffer {
+			(*buffer)[i] = false
+		}
 	}
 
-	// Count dots (true values)
 	var count uint
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			if (*grid)[y][x] {
-				count++
-			}
+	for i := range *grid {
+		if (*grid)[i] {
+			count++
 		}
 	}
 	return count
