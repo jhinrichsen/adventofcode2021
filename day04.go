@@ -6,6 +6,20 @@ import (
 	"strings"
 )
 
+// ParseCommaSeparatedNumbers returns a partial list in case parsing fails.
+func ParseCommaSeparatedNumbers(s string) ([]int, error) {
+	parts := strings.Split(s, ",")
+	is := make([]int, len(parts))
+	var err error
+	for i := range parts {
+		is[i], err = strconv.Atoi(parts[i])
+		if err != nil {
+			return is, err
+		}
+	}
+	return is, nil
+}
+
 func NewDay04(lines []string) ([]int, []Bingo, error) {
 	// first line is comma separated list of numbers
 	draws, err := ParseCommaSeparatedNumbers(lines[0])

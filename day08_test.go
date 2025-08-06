@@ -14,6 +14,7 @@ func day08(t *testing.T, filename string, part1 bool, want uint) {
 }
 
 func TestDay08Part1Example(t *testing.T) {
+	// "In the above example, there are 26 instances of digits that use a unique number of segments"
 	day08(t, exampleFilename(8), true, 26)
 }
 
@@ -21,13 +22,23 @@ func TestDay08Part1(t *testing.T) {
 	day08(t, filename(8), true, 255)
 }
 
-/* TODO
 func TestDay08Part2Example(t *testing.T) {
 	day08(t, exampleFilename(8), false, 61229)
 }
 
 func TestDay08Part2(t *testing.T) {
-	day08(t, filename(8), false, 0)
+	day08(t, filename(8), false, 982158)
+}
+
+func BenchmarkDay08Part1(b *testing.B) {
+	lines, err := linesFromFilename(filename(8))
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for range b.N {
+		_ = Day08(lines, true)
+	}
 }
 
 func BenchmarkDay08Part2(b *testing.B) {
@@ -35,15 +46,8 @@ func BenchmarkDay08Part2(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-
-	is, err := ParseCommaSeparatedNumbers(lines[0])
-	if err != nil {
-		b.Fatal(err)
-	}
-
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = Day08(is, false)
+	for range b.N {
+		_ = Day08(lines, false)
 	}
 }
-*/

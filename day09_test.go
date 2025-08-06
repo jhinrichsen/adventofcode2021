@@ -16,23 +16,32 @@ func day09(t *testing.T, filename string, part1 bool, want uint) {
 	}
 }
 
-/*
 func TestDay09Part1Example(t *testing.T) {
+	// "The sum of the risk levels of all low points in the heightmap is therefore 15"
 	day09(t, exampleFilename(9), true, 15)
 }
-*/
 
 func TestDay09Part1(t *testing.T) {
 	day09(t, filename(9), true, 514)
 }
 
-/*
 func TestDay09Part2Example(t *testing.T) {
-	day09(t, exampleFilename(9), false, 61229)
+	day09(t, exampleFilename(9), false, 1134)
 }
 
 func TestDay09Part2(t *testing.T) {
-	day09(t, filename(9), false, 0)
+	day09(t, filename(9), false, 1134)
+}
+
+func BenchmarkDay09Part1(b *testing.B) {
+	lines, err := linesFromFilename(filename(9))
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for range b.N {
+		_, _ = Day09(lines, true)
+	}
 }
 
 func BenchmarkDay09Part2(b *testing.B) {
@@ -40,15 +49,8 @@ func BenchmarkDay09Part2(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-
-	is, err := ParseCommaSeparatedNumbers(lines[0])
-	if err != nil {
-		b.Fatal(err)
-	}
-
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = Day09(is, false)
+	for range b.N {
+		_, _ = Day09(lines, false)
 	}
 }
-*/

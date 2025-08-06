@@ -3,6 +3,7 @@ package adventofcode2021
 import "testing"
 
 func TestDay01Part1Example(t *testing.T) {
+	// "In this example, there are 7 measurements that are larger than the previous measurement."
 	const want = 7
 	ns, err := numbersFromFilename(exampleFilename(1))
 	if err != nil {

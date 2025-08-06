@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"strings"
 )
 
 func linesFromFilename(filename string) ([]string, error) {
@@ -35,6 +34,21 @@ func filename(day int) string {
 	return fmt.Sprintf("testdata/day%02d.txt", day)
 }
 
+// example1Filename returns the filename for day NN example 1
+func example1Filename(day int) string {
+	return fmt.Sprintf("testdata/day%02d_example1.txt", day)
+}
+
+// example2Filename returns the filename for day NN example 2
+func example2Filename(day int) string {
+	return fmt.Sprintf("testdata/day%02d_example2.txt", day)
+}
+
+// example3Filename returns the filename for day NN example 3
+func example3Filename(day int) string {
+	return fmt.Sprintf("testdata/day%02d_example3.txt", day)
+}
+
 // linesAsNumber converts strings into integer.
 func linesAsNumbers(lines []string) ([]int, error) {
 	var is []int
@@ -55,18 +69,4 @@ func numbersFromFilename(filename string) ([]int, error) {
 		return nil, err
 	}
 	return linesAsNumbers(ls)
-}
-
-// ParseCommaSeparatedNumbers returns a partial list in case parsing fails.
-func ParseCommaSeparatedNumbers(s string) ([]int, error) {
-	parts := strings.Split(s, ",")
-	is := make([]int, len(parts))
-	var err error
-	for i := range parts {
-		is[i], err = strconv.Atoi(parts[i])
-		if err != nil {
-			return is, err
-		}
-	}
-	return is, nil
 }

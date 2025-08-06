@@ -17,6 +17,7 @@ func day05(t *testing.T, f func([]string, bool) (int, error), filename string, p
 }
 
 func TestDay05Part1Example(t *testing.T) {
+	// "In the above example, this is anywhere in the diagram with a 2 or larger - a total of 5 points."
 	day05(t, Day05Int, exampleFilename(5), true, 5)
 	day05(t, Day05Cmplx, exampleFilename(5), true, 5)
 }

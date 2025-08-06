@@ -1,7 +1,5 @@
 package adventofcode2021
 
-import "fmt"
-
 func Day09(lines []string, part1 bool) (uint, error) {
 	Y := len(lines)
 	X := len(lines[0])
@@ -14,7 +12,6 @@ func Day09(lines []string, part1 bool) (uint, error) {
 	for y := range lines {
 		for x := range lines[y] {
 			h := height(x, y)
-			fmt.Printf("(%d/%d) = %d", x, y, h)
 
 			low := true
 			// N
@@ -39,18 +36,14 @@ func Day09(lines []string, part1 bool) (uint, error) {
 			}
 			if low {
 				lows = append(lows, h)
-				fmt.Printf(" <")
 			}
-			fmt.Println()
 		}
 	}
 
-	fmt.Printf("%d low points\n", len(lows))
 	var risk uint
 	for i := range lows {
 		risk += uint(lows[i]) + 1
 	}
 	// risk += uint(len(lows)) // risk = height + 1
-	fmt.Printf("%d risk\n", risk)
 	return risk, nil
 }
