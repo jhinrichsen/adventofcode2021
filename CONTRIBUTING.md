@@ -6,7 +6,7 @@ For each day, participants are given a puzzle that they need to solve.
 Puzzles are split into two parts, Part 1 and Part 2.
 
 1. Puzzle description explains the problem and provides one or more examples.
-2. It is your job to implement a test cases for all examples
+2. It is your job to implement test cases for all examples. Use quotes in comments to back reference expected values.
 3. Once all test cases for examples pass, create a test case for the actual puzzle input. Inputs are user specific, so don't come up with some random guesswork input data. If the puzzle input cannot be located, stop and ask.
 4. Let the test case for part 1 run on the user specific input, and use the calculated value as the expected value for the test case.
 5. Stop here and wait for the value to be verified by the AOC website.
@@ -43,10 +43,6 @@ into a suitable in-memory representation (data structure).
 flag to distinguish Part 1 vs Part 2 logic 3 . By using a boolean parameter, you avoid duplicate
 code and keep a single solve function that can handle both puzzle parts 3 . For example:
 func Day08(data SomeType, part1 bool) uint .
-- No Global State: Ensure that NewDayNN returns the parsed data which gets passed into
-DayNN . Avoid global variables or package-level state to hold input or results; this makes testing
-easier and prevents cross-test interference. Each test or run should explicitly parse and then
-solve using these functions.
 
 ## Input Parsing Efficiently
 
@@ -368,6 +364,11 @@ multiple days have similar grid processing, you might be tempted to abstract a h
 that for this project. Keep the code self-contained for Day NN. This also means if Part 2 can be
 handled with a quick tweak to Part 1’s logic, just implement that tweak inline (controlled by the
 part1 flag) rather than building an elaborate framework.
+
+5. No Global State: avoid global variables or package-level state to hold input or results; this makes testing
+easier and prevents cross-test interference. Each test or run should explicitly parse and then
+solve using these functions.
+
 
 ## Dont's
 Here are some additional rules to avoid when implementing a solution:
