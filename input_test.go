@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"strings"
 )
 
 func linesFromFilename(filename string) ([]string, error) {
@@ -70,18 +69,4 @@ func numbersFromFilename(filename string) ([]int, error) {
 		return nil, err
 	}
 	return linesAsNumbers(ls)
-}
-
-// ParseCommaSeparatedNumbers returns a partial list in case parsing fails.
-func ParseCommaSeparatedNumbers(s string) ([]int, error) {
-	parts := strings.Split(s, ",")
-	is := make([]int, len(parts))
-	var err error
-	for i := range parts {
-		is[i], err = strconv.Atoi(parts[i])
-		if err != nil {
-			return is, err
-		}
-	}
-	return is, nil
 }
