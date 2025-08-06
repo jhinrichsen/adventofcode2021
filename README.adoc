@@ -34,7 +34,7 @@ for a solution avoid looking at those.
 | 11 | 1 | 1
 | 12 | 1 | 1
 | 13 |  |
-| 14 |  |
+| 14 | 1 |
 | 15 |  |
 | 16 |  |
 | 17 |  |
@@ -903,7 +903,7 @@ image::assets/Screenshot From 2025-08-04 20-09-30.png[]
 
 These generated sources are our baseline, they are available from this repository in `assets/junie-sonnet4/day13.go resp. day13_test.go.
 
-=== An opinionated source code review created by Junie/ Sonnet4 by a senior Go programmer 
+=== An opinionated source code review created by Junie/ Sonnet4 by a senior Go programmer
 
 As a prerequisite, Junie was prompted to follow the rules set forth in CONTRIBUTING.md.
 We can argue if performance should have such a high priority, but this is a given prerequisite.
@@ -950,7 +950,7 @@ The axis representation as a `string`, well,
 		if fold.Axis == "y" {
 ----
 
-Given that 
+Given that
 
 - we have a 2D system, so the only instances are x and y
 - the value is always positive
@@ -958,7 +958,7 @@ Given that
 not very effective.
 Instead, we represent the first axis (X) as positive numbers, and the second axis (Y) as negative numbers.
 
-The section is another struct, 
+The section is another struct,
 
 ----
 type Day13Data struct {
@@ -1021,7 +1021,7 @@ if len(parts) == 2 {
     ....
 } <1>
 
-value, _ := strconv.Atoi(...) <2> 
+value, _ := strconv.Atoi(...) <2>
 ----
 <1> no else condition
 <2> ignore errors
@@ -1229,6 +1229,35 @@ Duplicate this factor, because if GC kicks in we not only need to setup memory, 
 If the budget for running the baseline lasts for one day, the optimized version will run for 6 years.
 
 == Day 14: Extended Polymerization
+
+Environment: Windsurf, Cascade, Qwen3-Coder Fast
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+BenchmarkDay14Part1-16    	    1996	    546649 ns/op	  165118 B/op	     100 allocs/op
+BenchmarkDay14Part1-16    	    2018	    548640 ns/op	  165121 B/op	     100 allocs/op
+BenchmarkDay14Part1-16    	    1956	    550210 ns/op	  165118 B/op	     100 allocs/op
+BenchmarkDay14Part1-16    	    1963	    545281 ns/op	  165118 B/op	     100 allocs/op
+BenchmarkDay14Part1-16    	    2001	    543381 ns/op	  165118 B/op	     100 allocs/op
+BenchmarkDay14Part1-16    	    2037	    572696 ns/op	  165118 B/op	     100 allocs/op
+BenchmarkDay14Part1-16    	    2026	    552087 ns/op	  165118 B/op	     100 allocs/op
+BenchmarkDay14Part1-16    	    1938	    557649 ns/op	  165118 B/op	     100 allocs/op
+BenchmarkDay14Part1-16    	    2002	    547242 ns/op	  165118 B/op	     100 allocs/op
+BenchmarkDay14Part1-16    	    2010	    540044 ns/op	  165118 B/op	     100 allocs/op
+BenchmarkDay14Part2-16    	    2727	    380288 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part2-16    	    2854	    387332 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part2-16    	    2750	    375476 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part2-16    	    2877	    375769 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part2-16    	    2750	    376570 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part2-16    	    2750	    374897 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part2-16    	    2685	    377764 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part2-16    	    2974	    380639 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part2-16    	    2857	    382654 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part2-16    	    2820	    375643 ns/op	  295361 B/op	    6453 allocs/op
+----
 
 == Day 15: Chiton
 
