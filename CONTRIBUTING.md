@@ -13,6 +13,12 @@ Puzzles are split into two parts, Part 1 and Part 2.
 6. If the value is correct, Part 2 is unlocked.
 7. Repeat Step 2 - 5 for Part 2.
 
+Do not implement code for puzzle parts that haven't been explicitly unlocked by the user.
+Wait for the user to provide specific requirements and test cases for each part
+Focus exclusively on the currently requested puzzle part rather than anticipating future requirements.
+Do not implement part 1 when asked to implement the examples.
+Do not implement part 2 when asked to implement part 1.
+
 ## Project Structre & Naming conventions
 
 1. Single Package, Two-Digit Day IDs: All solution code resides in the root package (no
@@ -362,18 +368,6 @@ multiple days have similar grid processing, you might be tempted to abstract a h
 that for this project. Keep the code self-contained for Day NN. This also means if Part 2 can be
 handled with a quick tweak to Part 1’s logic, just implement that tweak inline (controlled by the
 part1 flag) rather than building an elaborate framework.
-
-5. Utilize Comments Wisely: Document any non-obvious optimizations or tricky parts of the code.
-For instance, if you use an unusual data structure for performance (like bit-fiddling or a memory
-pooling technique), leave a comment explaining it, so future maintainers (or your future self)
-understand the intent. Clear code with explanatory comments is easier to verify for correctness –
-very important for AoC where one subtle bug can lead to a wrong answer.
-
-By following this cookbook, you set up a robust foundation for solving Advent of Code Day NN,
-Year YYYY in Go. Emphasize correct results first, then high performance through low allocations and
-efficient algorithms. Use Go’s modern features and standard library to write clean and fast code.
-With proper structure, naming, testing, and benchmarking in place, you’ll not only have a solution that
-works for your input, but one that is well-engineered and maintainable. Good luck, and happy coding!
 
 ## Dont's
 Here are some additional rules to avoid when implementing a solution:
