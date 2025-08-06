@@ -77,14 +77,6 @@ func NewDay20(lines []string) (*TrenchMap, error) {
 	}, nil
 }
 
-// Constants for Day20 implementation
-const (
-	neighborhood = 3 * 3
-	darkPixel    = 0
-	lightPixel   = 1
-	outOfBounds  = -1 // Marker for out-of-bounds pixels
-)
-
 // Day20 runs 2 enhancement steps if part1==true, else 50, returning lit-pixel count.
 func Day20(tm *TrenchMap, part1 bool) int {
 	steps := 50
