@@ -2,7 +2,10 @@ package adventofcode2021
 
 import (
 	"image"
+	"image/color"
+	"image/png"
 	"math/bits"
+	"os"
 )
 
 // BitImage represents a 2D bit image stored as a flat array of uint64 words
@@ -11,6 +14,7 @@ type BitImage struct {
 	width       int
 	height      int
 	wordsPerRow int
+	rect        image.Rectangle
 }
 
 // NewBitImage creates a new BitImage with the given dimensions
@@ -22,6 +26,7 @@ func NewBitImage(width, height int) *BitImage {
 		width:       width,
 		height:      height,
 		wordsPerRow: wordsPerRow,
+		rect:        image.Rect(0, 0, width, height),
 	}
 }
 
@@ -51,6 +56,24 @@ func (img *BitImage) Clear() {
 	}
 }
 
+// ColorModel returns the BitImage's color model
+func (img *BitImage) ColorModel() color.Model {
+	return color.GrayModel
+}
+
+// Bounds returns the BitImage's bounds
+func (img *BitImage) Bounds() image.Rectangle {
+	return img.rect
+}
+
+// At returns the color at the given coordinates
+func (img *BitImage) At(x, y int) color.Color {
+	if img.Get(x, y) {
+		return color.Gray{Y: 0} // Black pixel
+	}
+	return color.Gray{Y: 255} // White pixel
+}
+
 // Count returns the number of set bits in the image
 func (img *BitImage) Count() uint {
 	var count uint
@@ -60,6 +83,35 @@ func (img *BitImage) Count() uint {
 	return count
 }
 
+// ToPNG saves the BitImage as a PNG file
+// Set bits are rendered as black pixels (0), unset bits as white pixels (255)
+// This provides optimal contrast for OCR scanning
+func (img *BitImage) ToPNG(filename string) error {
+	// Create a grayscale image
+	grayImg := image.NewGray(image.Rect(0, 0, img.width, img.height))
+
+	// Fill the image: set bits = black (0), unset bits = white (255)
+	for y := 0; y < img.height; y++ {
+		for x := 0; x < img.width; x++ {
+			if img.Get(x, y) {
+				grayImg.SetGray(x, y, color.Gray{Y: 0}) // Black for set bits
+			} else {
+				grayImg.SetGray(x, y, color.Gray{Y: 255}) // White for unset bits
+			}
+		}
+	}
+
+	// Create the output file
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Encode as PNG
+	return png.Encode(file, grayImg)
+}
+
 // reverseBits64 reverses the bits in a 64-bit word
 func reverseBits64(x uint64) uint64 {
 	x = (x>>1)&0x5555555555555555 | (x&0x5555555555555555)<<1
@@ -67,7 +119,7 @@ func reverseBits64(x uint64) uint64 {
 	x = (x>>4)&0x0F0F0F0F0F0F0F0F | (x&0x0F0F0F0F0F0F0F0F)<<4
 	x = (x>>8)&0x00FF00FF00FF00FF | (x&0x00FF00FF00FF00FF)<<8
 	x = (x>>16)&0x0000FFFF0000FFFF | (x&0x0000FFFF0000FFFF)<<16
-	x = (x>>32) | (x<<32)
+	x = (x >> 32) | (x << 32)
 	return x
 }
 
@@ -245,7 +297,51 @@ func NewDay13(lines []string) ([]image.Point, []int) {
 }
 
 // Day13 solves the transparent origami puzzle
-func Day13(points []image.Point, folds []int, part1 bool) uint {
+func Day13(points []image.Point, folds []int, part1 bool) (uint, image.Image) {
+	if part1 {
+		// For part 1, we only need to apply the first fold and count dots
+		// Use a simple map-based approach for speed
+		dotSet := make(map[image.Point]bool)
+		for _, pt := range points {
+			dotSet[pt] = true
+		}
+
+		// Apply only the first fold
+		if len(folds) > 0 {
+			fold := folds[0]
+			newDotSet := make(map[image.Point]bool)
+			if fold > 0 {
+				// Vertical fold (fold along x=fold)
+				for pt := range dotSet {
+					if pt.X > fold {
+						// Fold left - mirror the point
+						newX := 2*fold - pt.X
+						newDotSet[image.Point{X: newX, Y: pt.Y}] = true
+					} else {
+						// Keep as is
+						newDotSet[pt] = true
+					}
+				}
+			} else {
+				// Horizontal fold (fold along y=-fold)
+				fold = -fold
+				for pt := range dotSet {
+					if pt.Y > fold {
+						// Fold up - mirror the point
+						newY := 2*fold - pt.Y
+						newDotSet[image.Point{X: pt.X, Y: newY}] = true
+					} else {
+						// Keep as is
+						newDotSet[pt] = true
+					}
+				}
+			}
+			return uint(len(newDotSet)), nil
+		}
+		return uint(len(dotSet)), nil
+	}
+
+	// For part 2, use the BitImage implementation to generate an image
 	// Find grid size
 	w, h := 0, 0
 	for _, pt := range points {
@@ -263,6 +359,7 @@ func Day13(points []image.Point, folds []int, part1 bool) uint {
 		img.Set(pt.X, pt.Y)
 	}
 
+	// Apply all folds
 	for _, fold := range folds {
 		if fold > 0 {
 			// Vertical fold (fold along x=fold)
@@ -271,11 +368,10 @@ func Day13(points []image.Point, folds []int, part1 bool) uint {
 			// Horizontal fold (fold along y=-fold)
 			img.FoldHorizontal(-fold)
 		}
-
-		if part1 {
-			break
-		}
 	}
 
-	return img.Count()
+	// Generate the image file for OCR scanning
+	_ = img.ToPNG("day13_part2.png")
+
+	return img.Count(), img
 }

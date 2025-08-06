@@ -27,7 +27,7 @@ func TestDay13Part1(t *testing.T) {
 	}
 
 	dots, folds := NewDay13(lines)
-	got := Day13(dots, folds, true) // Part 1: only first fold
+	got, _ := Day13(dots, folds, true) // Part 1: only first fold
 	// Expected result for Part 1 with the given input
 	want := uint(729)
 	if got != want {
@@ -43,7 +43,7 @@ func TestDay13Example1(t *testing.T) {
 	}
 
 	dots, folds := NewDay13(lines)
-	got := Day13(dots, folds, true) // Part 1: only first fold
+	got, _ := Day13(dots, folds, true) // Part 1: only first fold
 	want := uint(17)                // After first fold, 17 dots are visible
 	if got != want {
 		t.Errorf("Day13() part1 = %d, want %d", got, want)
@@ -58,7 +58,7 @@ func TestDay13Example2(t *testing.T) {
 	}
 
 	dots, folds := NewDay13(lines)
-	got := Day13(dots, folds, false) // Part 2: all folds
+	got, _ := Day13(dots, folds, false) // Part 2: all folds
 	// After both folds, we get a 5x7 square pattern
 	// The puzzle shows it forms a square, let's count the dots in the final pattern
 	// Looking at the final pattern: #####, #...#, #...#, #...#, #####, ....., .....
@@ -67,4 +67,21 @@ func TestDay13Example2(t *testing.T) {
 	if got != want {
 		t.Errorf("Day13() part2 = %d, want %d", got, want)
 	}
+}
+
+// TestDay13Part2 tests the actual puzzle input for Part 2
+func TestDay13Part2(t *testing.T) {
+	const want = 668
+	lines, err := linesFromFilename(filename(13))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dots, folds := NewDay13(lines)
+	got, _ := Day13(dots, folds, false)
+	if got != want {
+		t.Errorf("Day13() part1 = %d, want %d", got, want)
+	}
+
+	// we need to OCR the final 'image'
 }
