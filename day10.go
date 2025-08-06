@@ -61,13 +61,14 @@ func Day10(lines []string, part1 bool) uint {
 		for j := len(line) - 1; j >= 0; j-- {
 			b := line[j]
 			total *= 5
-			if b == '(' {
+			switch b {
+			case '(':
 				total += 1
-			} else if b == '[' {
+			case '[':
 				total += 2
-			} else if b == '{' {
+			case '{':
 				total += 3
-			} else {
+			default:
 				total += 4
 			}
 		}
