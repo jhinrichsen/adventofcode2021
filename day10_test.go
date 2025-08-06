@@ -37,7 +37,7 @@ func bench10(b *testing.B, part1 bool) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = Day10(lines, true)
+		_ = Day10(lines, part1)
 	}
 }
 
