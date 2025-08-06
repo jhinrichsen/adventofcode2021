@@ -28,6 +28,7 @@ func day04(t *testing.T, filename string, part1 bool, want int) {
 }
 
 func TestDay04Part1Example(t *testing.T) {
+	// "the final score, 188 * 24 = 4512."
 	day04(t, exampleFilename(4), true, 4512)
 }
 

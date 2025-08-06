@@ -14,6 +14,7 @@ func day10(t *testing.T, filename string, part1 bool, want uint) {
 }
 
 func TestDay10Part1Example(t *testing.T) {
+	// "In the above example, an illegal ) was found twice (2*3 = 6 points), an illegal ] was found once (57 points), an illegal } was found once (1197 points), and an illegal > was found once (25137 points). So, the total syntax error score for this file is 6+57+1197+25137 = 26397 points!"
 	day10(t, exampleFilename(10), true, 26397)
 }
 

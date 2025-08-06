@@ -29,6 +29,7 @@ func TestDay12Part1Example1(t *testing.T) {
 	connections := NewDay12(lines)
 
 	got := Day12(connections, true)
+	// "Given these rules, there are 10 paths through this example cave system:"
 	want := uint(10)
 	if got != want {
 		t.Errorf("Day12Part1() = %d, want %d", got, want)
@@ -44,6 +45,7 @@ func TestDay12Part1Example2(t *testing.T) {
 	connections := NewDay12(lines)
 
 	got := Day12(connections, true)
+	// "The 19 paths through it are as follows:"
 	want := uint(19)
 	if got != want {
 		t.Errorf("Day12Part1() = %d, want %d", got, want)
@@ -59,6 +61,7 @@ func TestDay12Part1Example3(t *testing.T) {
 	connections := NewDay12(lines)
 
 	got := Day12(connections, true)
+	// "Finally, this even larger example has 226 paths through it:"
 	want := uint(226)
 	if got != want {
 		t.Errorf("Day12Part1() = %d, want %d", got, want)

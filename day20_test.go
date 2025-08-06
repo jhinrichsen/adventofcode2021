@@ -14,6 +14,7 @@ func TestDay20Part1Example(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := Day20(tm, true) // part1
+	// "After enhancing the original input image twice, 35 pixels are lit."
 	want := 35
 	if got != want {
 		t.Fatalf("Part1 example: got %d, want %d", got, want)

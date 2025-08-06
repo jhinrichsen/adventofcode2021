@@ -18,6 +18,7 @@ func day07(t *testing.T, filename string, part1 bool, want int) {
 }
 
 func TestDay07Part1Example(t *testing.T) {
+	// "This costs a total of 37 fuel."
 	day07(t, exampleFilename(7), true, 37)
 }
 

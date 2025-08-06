@@ -36,6 +36,7 @@ func BenchmarkDay11Part2(b *testing.B) {
 }
 
 func TestDay11Part1Example(t *testing.T) {
+	// "After 100 steps, there have been a total of 1656 flashes."
 	day11(t, exampleFilename(11), true, 1656)
 }
 

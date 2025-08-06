@@ -24,7 +24,7 @@ func TestDay14Part1Example(t *testing.T) {
 		{2, "NBCCNBBBCBHCB", 0},
 		{3, "NBBBCNCCNBBNBNBBCHBHHBCHB", 0},
 		{4, "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB", 0},
-		{10, "", 1588}, // Only check the difference for step 10
+		{10, "", 1588}, // "After step 10, B occurs 1749 times, C occurs 298 times, H occurs 161 times, and N occurs 865 times; taking the quantity of the most common element (B, 1749) and subtracting the quantity of the least common element (H, 161) produces 1749 - 161 = 1588."
 	}
 
 	for _, tt := range tests {

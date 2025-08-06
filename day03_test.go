@@ -17,6 +17,7 @@ func day03(t *testing.T, filename string, part1 bool, want int) {
 }
 
 func TestDay03Part1Example(t *testing.T) {
+	// "Multiplying the gamma rate (22) by the epsilon rate (9) produces the power consumption, 198."
 	day03(t, exampleFilename(3), true, 198)
 }
 
@@ -30,4 +31,26 @@ func TestDay03Part2Example(t *testing.T) {
 
 func TestDay03Part2(t *testing.T) {
 	day03(t, filename(3), false, 4273224)
+}
+
+func BenchmarkDay03Part1(b *testing.B) {
+	lines, err := linesFromFilename(filename(3))
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for range b.N {
+		_, _ = Day03(lines, true)
+	}
+}
+
+func BenchmarkDay03Part2(b *testing.B) {
+	lines, err := linesFromFilename(filename(3))
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for range b.N {
+		_, _ = Day03(lines, false)
+	}
 }

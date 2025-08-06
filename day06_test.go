@@ -29,6 +29,9 @@ func asUint(is []int) []uint {
 }
 
 func TestDay06Part1Example(t *testing.T) {
+	// "In this example, after 18 days, there are a total of 26 fish."
+	day06(t, exampleFilename(6), 18, 26)
+	// " After 80 days, there would be a total of 5934."
 	day06(t, exampleFilename(6), 80, 5934)
 }
 
