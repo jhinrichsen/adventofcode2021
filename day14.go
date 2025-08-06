@@ -25,52 +25,13 @@ func NewDay14(lines []string) (string, map[string]string) {
 	return template, rules
 }
 
-// Day14 solves day 14 part 1 with 10 steps
-func Day14(template string, rules map[string]string) uint {
-	return Day14Part1(template, rules, 10)
-}
-
-// Day14PolymerAfterSteps returns the polymer string after applying the given number of steps
-// This is a helper function for testing the step-by-step progression
-func Day14PolymerAfterSteps(template string, rules map[string]string, steps int) string {
-	polymer := template
-	for step := 0; step < steps; step++ {
-		var newPolymer strings.Builder
-		for i := 0; i < len(polymer)-1; i++ {
-			pair := polymer[i : i+2]
-			newPolymer.WriteByte(polymer[i])
-			if insert, exists := rules[pair]; exists {
-				newPolymer.WriteString(insert)
-			}
-		}
-		newPolymer.WriteByte(polymer[len(polymer)-1])
-		polymer = newPolymer.String()
-	}
-	return polymer
-}
-
-// Day14Part1 solves day 14 part 1
-func Day14Part1(template string, rules map[string]string, steps int) uint {
-	polymer := Day14PolymerAfterSteps(template, rules, steps)
-
-	// Count elements
-	counts := make(map[byte]uint)
-	for i := 0; i < len(polymer); i++ {
-		counts[polymer[i]]++
+// Day14 solves day 14 part 1 or part 2 depending on the part1 flag
+func Day14(template string, rules map[string]string, part1 bool) uint {
+	steps := 40
+	if part1 {
+		steps = 10
 	}
 
-	var maxCount, minCount uint
-	minCount = math.MaxUint
-	for _, count := range counts {
-		maxCount = max(maxCount, count)
-		minCount = min(minCount, count)
-	}
-
-	return maxCount - minCount
-}
-
-// Day14Part2 solves day 14 part 2 using optimized approach
-func Day14Part2(template string, rules map[string]string, steps int) uint {
 	// Count pairs instead of building the full polymer
 	pairCounts := make(map[string]uint)
 	for i := 0; i < len(template)-1; i++ {
@@ -95,22 +56,24 @@ func Day14Part2(template string, rules map[string]string, steps int) uint {
 		pairCounts = newPairCounts
 	}
 
-	// Count elements - each element is counted in two pairs except the first and last
+	// Count elements from pairs
 	elementCounts := make(map[byte]uint)
 	for pair, count := range pairCounts {
+		// Each pair contributes to the count of both its elements
 		elementCounts[pair[0]] += count
 		elementCounts[pair[1]] += count
 	}
 
-	// Correct the counts - each element was counted twice, so divide by 2
-	// But first and last elements were only counted once, so add them back
+	// Add 1 to first and last elements to account for them being counted only once
+	firstElement := template[0]
+	lastElement := template[len(template)-1]
+	elementCounts[firstElement]++
+	elementCounts[lastElement]++
+
+	// Now divide all counts by 2
 	for element := range elementCounts {
 		elementCounts[element] /= 2
 	}
-
-	// Add back the first and last elements which should not be divided
-	elementCounts[template[0]]++
-	elementCounts[template[len(template)-1]]++
 
 	// Find most and least common elements
 	var maxCount, minCount uint
@@ -121,4 +84,23 @@ func Day14Part2(template string, rules map[string]string, steps int) uint {
 	}
 
 	return maxCount - minCount
+}
+
+// Day14PolymerAfterSteps returns the polymer string after applying the given number of steps
+// This is a helper function for testing the step-by-step progression
+func Day14PolymerAfterSteps(template string, rules map[string]string, steps int) string {
+	polymer := template
+	for step := 0; step < steps; step++ {
+		var newPolymer strings.Builder
+		for i := 0; i < len(polymer)-1; i++ {
+			pair := polymer[i : i+2]
+			newPolymer.WriteByte(polymer[i])
+			if insert, exists := rules[pair]; exists {
+				newPolymer.WriteString(insert)
+			}
+		}
+		newPolymer.WriteByte(polymer[len(polymer)-1])
+		polymer = newPolymer.String()
+	}
+	return polymer
 }

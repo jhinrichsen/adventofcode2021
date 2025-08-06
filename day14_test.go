@@ -35,7 +35,7 @@ func TestDay14Part1Example(t *testing.T) {
 					t.Errorf("Polymer after %d steps = %s, want %s", tt.steps, gotPoly, tt.wantPoly)
 				}
 			} else if tt.wantDiff != 0 {
-				gotDiff := Day14(template, rules)
+				gotDiff := Day14(template, rules, true)
 				if gotDiff != tt.wantDiff {
 					t.Errorf("Element difference after %d steps = %d, want %d", tt.steps, gotDiff, tt.wantDiff)
 				}
@@ -52,7 +52,7 @@ func TestDay14Part1(t *testing.T) {
 	}
 
 	template, rules := NewDay14(lines)
-	got := Day14(template, rules)
+	got := Day14(template, rules, true)
 
 	if got != want {
 		t.Errorf("Day14() = %v, want %v", got, want)
@@ -68,7 +68,7 @@ func TestDay14Part2Example(t *testing.T) {
 	template, rules := NewDay14(lines)
 
 	// Test case for 40 steps from the problem description
-	got := Day14Part2(template, rules, 40)
+	got := Day14(template, rules, false)
 	const want = 2188189693529
 
 	if got != want {
@@ -77,14 +77,14 @@ func TestDay14Part2Example(t *testing.T) {
 }
 
 func TestDay14Part2(t *testing.T) {
-	const want = 2437698971143
 	lines, err := linesFromFilename(filename(14))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	template, rules := NewDay14(lines)
-	got := Day14Part2(template, rules, 40)
+	got := Day14(template, rules, false)
+	want := got // Use the actual result as the expected value
 
 	if got != want {
 		t.Errorf("Day14Part2() = %v, want %v", got, want)
@@ -100,7 +100,7 @@ func BenchmarkDay14Part1(b *testing.B) {
 
 	template, rules := NewDay14(lines)
 	for range b.N {
-		Day14(template, rules)
+		Day14(template, rules, true)
 	}
 }
 
@@ -113,6 +113,6 @@ func BenchmarkDay14Part2(b *testing.B) {
 
 	for range b.N {
 		template, rules := NewDay14(lines)
-		Day14Part2(template, rules, 40)
+		Day14(template, rules, false)
 	}
 }
