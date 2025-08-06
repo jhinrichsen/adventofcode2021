@@ -7,10 +7,7 @@ func day11(t *testing.T, filename string, part1 bool, want uint) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	data, err := NewDay11(lines)
-	if err != nil {
-		t.Fatal(err)
-	}
+	data := NewDay11(lines)
 	got := Day11(data, part1)
 	if want != got {
 		t.Fatalf("want %d but got %d", want, got)
@@ -24,11 +21,8 @@ func bench11(b *testing.B, part1 bool) {
 		b.Fatal(err)
 	}
 	b.ResetTimer()
-	data, err := NewDay11(lines)
-	if err != nil {
-		b.Fatal(err)
-	}
 	for i := 0; i < b.N; i++ {
+		data := NewDay11(lines)
 		Day11(data, part1)
 	}
 }

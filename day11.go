@@ -1,10 +1,7 @@
 package adventofcode2021
 
-// OctopusGrid represents the grid of octopus energy levels
-type OctopusGrid [][]int
-
 // NewDay11 parses the input lines into an octopus energy grid
-func NewDay11(lines []string) (OctopusGrid, error) {
+func NewDay11(lines []string) [][]int {
 	// Filter out empty lines
 	var validLines []string
 	for _, line := range lines {
@@ -20,11 +17,11 @@ func NewDay11(lines []string) (OctopusGrid, error) {
 			grid[i][j] = int(char - '0')
 		}
 	}
-	return OctopusGrid(grid), nil
+	return grid
 }
 
 
-func Day11(data OctopusGrid, part1 bool) uint {
+func Day11(data [][]int, part1 bool) uint {
 	rows, cols := len(data), len(data[0])
 	totalFlashes := uint(0)
 
