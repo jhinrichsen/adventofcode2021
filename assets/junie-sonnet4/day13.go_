@@ -1,0 +1,123 @@
+package adventofcode2021
+
+import (
+	"strconv"
+	"strings"
+)
+
+// Point represents a coordinate on the transparent paper
+type Point struct {
+	X, Y int
+}
+
+// Fold represents a fold instruction
+type Fold struct {
+	Axis  string // "x" or "y"
+	Value int
+}
+
+// Day13Data holds the parsed input for Day 13
+type Day13Data struct {
+	Dots     map[Point]bool
+	Folds    []Fold
+	DotCount int
+}
+
+// NewDay13 parses the input lines into dots and fold instructions
+func NewDay13(lines []string) Day13Data {
+	data := Day13Data{
+		Dots:  make(map[Point]bool),
+		Folds: make([]Fold, 0),
+	}
+
+	parsingDots := true
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			parsingDots = false
+			continue
+		}
+
+		if parsingDots {
+			// Parse dot coordinates: "x,y"
+			parts := strings.Split(line, ",")
+			if len(parts) == 2 {
+				x, _ := strconv.Atoi(parts[0])
+				y, _ := strconv.Atoi(parts[1])
+				data.Dots[Point{X: x, Y: y}] = true
+			}
+		} else {
+			// Parse fold instructions: "fold along x=5" or "fold along y=7"
+			if strings.HasPrefix(line, "fold along ") {
+				instruction := strings.TrimPrefix(line, "fold along ")
+				parts := strings.Split(instruction, "=")
+				if len(parts) == 2 {
+					axis := parts[0]
+					value, _ := strconv.Atoi(parts[1])
+					data.Folds = append(data.Folds, Fold{Axis: axis, Value: value})
+				}
+			}
+		}
+	}
+
+	// Set the dot count
+	data.DotCount = len(data.Dots)
+
+	return data
+}
+
+// Day13 solves the transparent origami puzzle
+func Day13(data Day13Data, part1 bool) uint {
+	// Make a copy of dots to avoid modifying original data
+	dots := make(map[Point]bool)
+	for point := range data.Dots {
+		dots[point] = true
+	}
+
+	// Apply folds
+	foldsToApply := data.Folds
+	if part1 {
+		// Part 1: only apply the first fold
+		foldsToApply = data.Folds[:1]
+	}
+
+	for _, fold := range foldsToApply {
+		dots = applyFold(dots, fold)
+	}
+
+	return uint(len(dots))
+}
+
+// applyFold applies a single fold to the set of dots
+func applyFold(dots map[Point]bool, fold Fold) map[Point]bool {
+	newDots := make(map[Point]bool)
+
+	for point := range dots {
+		var newPoint Point
+
+		if fold.Axis == "y" {
+			// Horizontal fold: fold up
+			if point.Y < fold.Value {
+				// Point is above the fold line, keep as is
+				newPoint = point
+			} else {
+				// Point is below the fold line, reflect it up
+				newPoint = Point{X: point.X, Y: 2*fold.Value - point.Y}
+			}
+		} else { // fold.Axis == "x"
+			// Vertical fold: fold left
+			if point.X < fold.Value {
+				// Point is left of the fold line, keep as is
+				newPoint = point
+			} else {
+				// Point is right of the fold line, reflect it left
+				newPoint = Point{X: 2*fold.Value - point.X, Y: point.Y}
+			}
+		}
+
+		newDots[newPoint] = true
+	}
+
+	return newDots
+}
