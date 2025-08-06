@@ -28,7 +28,7 @@ for a solution avoid looking at those.
 | 6  | 1 | 1
 | 7  | 1 | 1
 | 8  | 1 | 1
-| 9  | 1 | TODO
+| 9  | 1 | 1
 | 10 | 1 | 1
 | 11 | 1 | 1
 | 12 | 1 | 1
@@ -908,6 +908,37 @@ BenchmarkDay08Part2-8                302           3363069 ns/op          525598
 ----
 
 == Day 9: Smoke Basin
+
+Blattschuss.
+
+Unoptimized baseline:
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay09Part1-8               8635            139883 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part1-8               8571            148263 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part1-8               8067            164977 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part1-8               7538            158550 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part1-8               7488            151905 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part1-8               8006            168425 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part1-8               7527            159553 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part1-8               7312            163341 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part1-8               6976            159976 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part1-8               9613            147398 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part2-8                718           1640672 ns/op          424538 B/op       1302 allocs/op
+BenchmarkDay09Part2-8                775           1655258 ns/op          424530 B/op       1302 allocs/op
+BenchmarkDay09Part2-8                753           1471706 ns/op          424529 B/op       1302 allocs/op
+BenchmarkDay09Part2-8                688           1469833 ns/op          424530 B/op       1302 allocs/op
+BenchmarkDay09Part2-8                675           1563862 ns/op          424530 B/op       1302 allocs/op
+BenchmarkDay09Part2-8               1076           1552923 ns/op          424531 B/op       1302 allocs/op
+BenchmarkDay09Part2-8                836           1557950 ns/op          424531 B/op       1302 allocs/op
+BenchmarkDay09Part2-8                768           1559524 ns/op          424530 B/op       1302 allocs/op
+BenchmarkDay09Part2-8                760           1489713 ns/op          424531 B/op       1302 allocs/op
+BenchmarkDay09Part2-8                835           1632204 ns/op          424531 B/op       1302 allocs/op
+----
 
 == Day 10: Syntax Scoring
 

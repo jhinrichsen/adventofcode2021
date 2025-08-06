@@ -26,11 +26,12 @@ func TestDay09Part1(t *testing.T) {
 }
 
 func TestDay09Part2Example(t *testing.T) {
+	// "The product of the sizes of the three largest basins is 1134"
 	day09(t, exampleFilename(9), false, 1134)
 }
 
 func TestDay09Part2(t *testing.T) {
-	day09(t, filename(9), false, 1134)
+	day09(t, filename(9), false, 1103130)
 }
 
 func BenchmarkDay09Part1(b *testing.B) {
