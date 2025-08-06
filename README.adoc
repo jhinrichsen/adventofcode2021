@@ -20,7 +20,6 @@ for a solution avoid looking at those.
 
 |===
 | Day | Number of tries for part 1 | Number of tries for part 2
-
 | 1  | 1 | 1
 | 2  | 1 | 1
 | 3  | 1 | 1
@@ -28,7 +27,7 @@ for a solution avoid looking at those.
 | 5  | 1 | 1
 | 6  | 1 | 1
 | 7  | 1 | 1
-| 8  | 1 | TODO
+| 8  | 1 | 1
 | 9  | 1 | TODO
 | 10 | 1 | 1
 | 11 | 1 | 1
@@ -49,7 +48,7 @@ for a solution avoid looking at those.
 |===
 <1> This one is picked because it is said to be a very good case for GPU optimization
 
-
+----
 ---- --------Part 1---------   --------Part 2---------
 Day       Time    Rank  Score       Time    Rank  Score
  10   15:36:53   39284      0   16:15:45   37919      0
@@ -620,7 +619,7 @@ Verification:
 26         }
 ----
 
-Now, there's a shortcut for checking for bound checking.
+Now, there is a shortcut for checking for bound checking.
 Instead of looking at the disassembly, one can
 
 ----
@@ -877,6 +876,37 @@ NOTE: This will probably be the last AARCH64 disassembler, it _really_ is not me
 
 == Day 8: Seven Segment Search
 
+Blattschuss.
+
+Unoptimized baseline:
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics    
+BenchmarkDay08Part1-8                441           3028729 ns/op          525595 B/op      14200 allocs/op
+BenchmarkDay08Part1-8                374           3358154 ns/op          525596 B/op      14200 allocs/op
+BenchmarkDay08Part1-8                324           3171079 ns/op          525594 B/op      14200 allocs/op
+BenchmarkDay08Part1-8                337           3221648 ns/op          525596 B/op      14200 allocs/op
+BenchmarkDay08Part1-8                412           3401636 ns/op          525595 B/op      14200 allocs/op
+BenchmarkDay08Part1-8                342           3166377 ns/op          525594 B/op      14200 allocs/op
+BenchmarkDay08Part1-8                367           2764552 ns/op          525595 B/op      14200 allocs/op
+BenchmarkDay08Part1-8                346           3031235 ns/op          525595 B/op      14200 allocs/op
+BenchmarkDay08Part1-8                408           3401207 ns/op          525594 B/op      14200 allocs/op
+BenchmarkDay08Part1-8                337           3243895 ns/op          525596 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                481           3135885 ns/op          525596 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                333           3434885 ns/op          525595 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                400           3287830 ns/op          525597 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                427           3388885 ns/op          525595 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                366           3269840 ns/op          525594 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                386           3433469 ns/op          525596 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                390           3642740 ns/op          525595 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                346           3435272 ns/op          525595 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                361           3496073 ns/op          525595 B/op      14200 allocs/op
+BenchmarkDay08Part2-8                302           3363069 ns/op          525598 B/op      14200 allocs/op
+----
+
 == Day 9: Smoke Basin
 
 == Day 10: Syntax Scoring
@@ -887,7 +917,7 @@ NOTE: This will probably be the last AARCH64 disassembler, it _really_ is not me
 
 == Day 13: Transparent Origami
 
-Using Jetbrains' IDEA Ultimate in combination with Junie running Sonnet 4.
+Using Jetbrains IDEA Ultimate in combination with Junie running Sonnet 4.
 A major pain in the neck.
 I ask for a review of the CONTRIBUTING.md document, and Junie starts refactoring day 11 test cases.
 It always does WAY more than asked for, and acts like a young dog that chews your sofa and pisses on the carpet.
@@ -901,7 +931,7 @@ image::assets/Screenshot From 2025-08-04 20-09-30.png[]
 
 === Baseline
 
-These generated sources are our baseline, they are available from this repository in `assets/junie-sonnet4/day13.go resp. day13_test.go.
+These generated sources are our baseline, they are available from this repository in `assets/junie-sonnet4/day13.go` resp. `assets/junie-sonnet4/day13_test.go`.
 
 === An opinionated source code review created by Junie/ Sonnet4 by a senior Go programmer
 
@@ -911,6 +941,7 @@ If your financial controller tells you to cut down on deployments costs, no deba
 
 ==== `day13.go`
 
+[source,go]
 ----
 // Point represents a coordinate on the transparent paper
 type Point struct {
@@ -918,8 +949,9 @@ type Point struct {
 }
 ----
 
-This has vague similarity to Go's image.Point from the stdlib.
+This has vague similarity to `image.Point` from the stdlib.
 
+[source,go]
 ----
 type Point struct {
 	X, Y int
@@ -929,6 +961,8 @@ type Point struct {
 The struct is removed, and replaced with an import.
 
 Next is a Fold struct
+
+[source,go]
 ----
 // Fold represents a fold instruction
 type Fold struct {
@@ -946,6 +980,7 @@ fold along y=447
 
 The axis representation as a `string`, well,
 
+[source,go]
 ----
 		if fold.Axis == "y" {
 ----
@@ -960,6 +995,7 @@ Instead, we represent the first axis (X) as positive numbers, and the second axi
 
 The section is another struct,
 
+[source,go]
 ----
 type Day13Data struct {
 	Dots     map[image.Point]bool
@@ -976,6 +1012,8 @@ Unused - the declaration and the one single initialization can safely be removed
 This leaves us with a struct holding two fields, in a language like Go that supports multiple return types not necessary.
 
 From
+
+[source,go]
 ----
 day13.go:// Day13Data holds the parsed input for Day 13
 day13.go:type Day13Data struct {
@@ -985,6 +1023,7 @@ day13.go:func Day13(data Day13Data, part1 bool) uint {
 
 we refactor to
 
+[source,go]
 ----
 day13.go:func NewDay13(lines []string) (map[image.Point]bool, []int) {
 day13.go:func Day13(dotsIn map[image.Point]bool, folds []int, part1 bool) uint {
@@ -994,6 +1033,7 @@ Dots are kept in a sparse map with value type `bool`, which is standard Go Set h
 The one disadvantage lies in the interpretation of a map key that exists, but is set to false - is this a Point?
 Good for triple logic, but not required here, so we refactor.
 
+[source,go]
 ----
 map[image.Point]bool     <1>
 map[image.Point]struct{} <2>
@@ -1004,14 +1044,16 @@ map[image.Point]struct{} <2>
 So far we have erased everything we came across - the best code is code that is not written.
 Now, for the signature of the Parser, it does not return an `error` type.
 
+[source,go]
 ----
 func NewDay13(lines []string) (map[image.Point]struct{}, []int) {
 ----
 
-which is unusual because even in our well behaved environment (we don't expect malign input) there's always someting going wrong.
-The parsing logic is straightforward, using stdlib's `TrimSpace`, `Split`, `Atoi`, reading the two sections one after another, toggling on the interim empty line.
+which is unusual because even in our well behaved environment (we do not expect malign input) there is always something going wrong.
+The parsing logic is straightforward, using stdlib `TrimSpace`, `Split`, `Atoi`, reading the two sections one after another, toggling on the interim empty line.
 But it silently skips handling a couple of conditions that i would not dare to ignore.
 
+[source,go]
 ----
 if strings.HasPrefix(line "fold along ") {
     ...
@@ -1030,6 +1072,7 @@ Next in line is `Day13` solver, which looks pretty standard.
 It creates a copy of the input map to avoid modifying original data.
 One nice feature: when passing either one fold or many folds as a slice, `folds[:1`] is like `folds[0]` but a slice.
 
+[source,go]
 ----
 foldsToApply := folds
 if part1 {
@@ -1044,6 +1087,7 @@ for _, fold := range foldsToApply {
 
 I find this more concise:
 
+[source,go]
 ----
 for _, fold := range folds {
 	dots = applyFold(dots, fold)
@@ -1058,6 +1102,7 @@ On to `applyFold`, again pretty standard.
 Creates a copy of the input data to avoid modification.
 Then checks for a `0` fold, which is very good, but has no error handling and silenty does nothing
 
+[source,go]
 ----
 if fold == 0 {
 	return dots
@@ -1067,6 +1112,7 @@ if fold == 0 {
 This should rather be an error case in the parser, as it could be an indicator for an unintialized value.
 The folding itself is just a new translated `image.Point`:
 
+[source,go]
 ----
 newPoint = image.Point{X: 2*line - point.X, Y: point.Y} <1>
 newPoint = image.Point{X: point.X, Y: 2*line - point.Y} <2>
@@ -1077,15 +1123,16 @@ newPoint = image.Point{X: point.X, Y: 2*line - point.Y} <2>
 ==== `day13_test.go`
 
 Junie created the required examples #1, example #2, and part 1 test cases, and also created the benchmark for part 1.
-The one existing benchmark (for now) calls a `bench13` function, the three existing tests don't use this pattern.
-The `bench13` function's correctly identifies as a test helper function:
+The one existing benchmark (for now) calls a `bench13` function, the three existing tests do not use this pattern.
+The `bench13` function correctly identifies as a test helper function:
 
+[source,go]
 ----
 func bench13(b *testing.B, part1 bool) {
 	b.Helper()
 ----
 
-Junie does not use range-over-int (since Go 1.22) although contributing rules clearly state to use Go's full feature set for the version in `go.mod`.
+Junie does not use range-over-int (since Go 1.22) although contributing rules clearly state to use the full feature set for the version in `go.mod`.
 
 Junie did not locate the `exampleFilename()` utility function from `input.go` referenced in the contributing rules.
 The test case for the first example uses the correct expected solution, `want := uint(17)` as described in the puzzle example.
@@ -1149,7 +1196,7 @@ Day13Part1-16   943.00 ± 0%   54.00 ± 0%  -94.27% (p=0.000 n=10)          <3>
 ==== 3. 2D grid representation of points
 
 Junie decided to keep Pointes in a sparse hashmap.
-We are using image.Point, but the standard library offers no support for flipping images, and we don't want to introduce third party libraries that can do image flipping.
+We are using image.Point, but the standard library offers no support for flipping images, and we do not want to introduce third party libraries that can do image flipping.
 Using a 2D grid instead of a sparse Hashmap shows a steep decrease in performance:
 
 ----
@@ -1222,7 +1269,7 @@ Comparing 1D (bool) to 1D (bits), it shows the same characteristics except for t
 We are now packing 8 bits into a byte, so the number of allocations is the same.
 The bytes/op drops from 2320.3 KiB to 204.2 KiB, which is a factor of 7.36, very close to the number of bits we are packing into what we use for bool (8).
 
-As the last alternative, we don't operate on dedicated bits, but use the full CPU length of 64 bit.
+As the last alternative, we do not operate on dedicated bits, but use the full CPU length of 64 bit.
 Runtime drops by a factor of 3.5, slight drop in bytes/op of 10%, and a massive drop in number of allocations from 943 to 3, factor 314.
 These factors are cumulative, 3.5 times 314 is 1.100.
 Duplicate this factor, because if GC kicks in we not only need to setup memory, we also need to tear down memory, so we end up with a factor of 2.200.
@@ -1276,6 +1323,7 @@ leaderboard :-).
 Mysteriously, i had no off-by-one in this puzzle, and avoided my typical
 mistakes:
 
+[source,go]
 ----
 	burn := func(dist int) int {
 		if part1 {
