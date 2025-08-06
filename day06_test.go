@@ -12,6 +12,9 @@ func day06(t *testing.T, filename string, days uint, want uint) {
 		t.Fatal(err)
 	}
 	got, err := Day06(asUint(fishes), days)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if want != got {
 		t.Fatalf("want %d but got %d", want, got)
 	}
