@@ -3,6 +3,7 @@ package adventofcode2021
 import (
 	"container/heap"
 	"errors"
+	"math"
 )
 
 // Day15 computes the lowest total risk of any path from the top left to the bottom right.
@@ -12,14 +13,17 @@ import (
 // lines is the raw grid input. part1 selects Part 1 vs Part 2 logic. Only Part 1 is implemented here.
 func Day15(lines []string, part1 bool) (uint, error) {
 	// Filter out empty lines
-	var gridLines []string
-	for _, line := range lines {
-		if len(line) > 0 {
-			gridLines = append(gridLines, line)
+	/*
+		var gridLines []string
+		for _, line := range lines {
+			if len(line) > 0 {
+				gridLines = append(gridLines, line)
+			}
 		}
-	}
-	baseRows := len(gridLines)
-	baseCols := len(gridLines[0])
+	*/
+
+	baseRows := len(lines)
+	baseCols := len(lines[0])
 
 	rows, cols := baseRows, baseCols
 	if !part1 {
@@ -32,7 +36,7 @@ func Day15(lines []string, part1 bool) (uint, error) {
 	weights := make([]byte, N)
 	if part1 {
 		for r := 0; r < rows; r++ {
-			row := gridLines[r]
+			row := lines[r]
 			for c := 0; c < cols; c++ {
 				weights[r*cols+c] = row[c] - '0'
 			}
@@ -43,7 +47,7 @@ func Day15(lines []string, part1 bool) (uint, error) {
 				br := r % baseRows
 				bc := c % baseCols
 				inc := (r / baseRows) + (c / baseCols)
-				base := int(gridLines[br][bc] - '0')
+				base := int(lines[br][bc] - '0')
 				// wrap risk: 1..9
 				v := ((base - 1 + inc) % 9) + 1
 				weights[r*cols+c] = byte(v)
@@ -52,8 +56,8 @@ func Day15(lines []string, part1 bool) (uint, error) {
 	}
 
 	// Dijkstra on a 2D grid using a min-heap.
-	const inf = int(^uint(0) >> 1) // max int
-	dist := make([]int, N)
+	const inf = int32(math.MaxInt32)
+	dist := make([]int32, N)
 	for i := range dist {
 		dist[i] = inf
 	}
@@ -63,8 +67,6 @@ func Day15(lines []string, part1 bool) (uint, error) {
 
 	pq := &minHeap{}
 	heap.Push(pq, node{idx: start, dist: 0})
-
-	inBounds := func(r, c int) bool { return r >= 0 && r < rows && c >= 0 && c < cols }
 
 	for pq.Len() > 0 {
 		n := heap.Pop(pq).(node)
@@ -76,38 +78,37 @@ func Day15(lines []string, part1 bool) (uint, error) {
 			continue
 		}
 		r, c := n.idx/cols, n.idx%cols
-		// 4 neighbors
 		// Up
-		if rr, cc := r-1, c; inBounds(rr, cc) {
+		if rr, cc := r-1, c; rr >= 0 {
 			ni := rr*cols + cc
-			nd := n.dist + int(weights[ni])
+			nd := n.dist + int32(weights[ni])
 			if nd < dist[ni] {
 				dist[ni] = nd
 				heap.Push(pq, node{idx: ni, dist: nd})
 			}
 		}
 		// Down
-		if rr, cc := r+1, c; inBounds(rr, cc) {
+		if rr, cc := r+1, c; rr < rows {
 			ni := rr*cols + cc
-			nd := n.dist + int(weights[ni])
+			nd := n.dist + int32(weights[ni])
 			if nd < dist[ni] {
 				dist[ni] = nd
 				heap.Push(pq, node{idx: ni, dist: nd})
 			}
 		}
 		// Left
-		if rr, cc := r, c-1; inBounds(rr, cc) {
+		if rr, cc := r, c-1; cc >= 0 {
 			ni := rr*cols + cc
-			nd := n.dist + int(weights[ni])
+			nd := n.dist + int32(weights[ni])
 			if nd < dist[ni] {
 				dist[ni] = nd
 				heap.Push(pq, node{idx: ni, dist: nd})
 			}
 		}
 		// Right
-		if rr, cc := r, c+1; inBounds(rr, cc) {
+		if rr, cc := r, c+1; cc < cols {
 			ni := rr*cols + cc
-			nd := n.dist + int(weights[ni])
+			nd := n.dist + int32(weights[ni])
 			if nd < dist[ni] {
 				dist[ni] = nd
 				heap.Push(pq, node{idx: ni, dist: nd})
@@ -121,7 +122,7 @@ func Day15(lines []string, part1 bool) (uint, error) {
 // node represents a position in the grid with its current best-known distance.
 type node struct {
 	idx  int
-	dist int
+	dist int32
 }
 
 type minHeap []node

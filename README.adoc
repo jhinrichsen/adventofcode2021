@@ -1900,10 +1900,113 @@ not elegant in Go
 <8> + from the puzzle spec: initial node has no distance
 <9> - repeating identical code four times for the C4 neighbors 
 
-All in all, very nice. I'd give it a 90% score.
+----
+$ cloc day*.go
+       2 text files.
+       2 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 2.02  T=0.01 s (329.5 files/s, 32455.2 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Go                               2             20             22            155
+----
+
+155 SLOC, all in all, very nice. I'd give it a 90% score.
 Very clean implementation, straightforward, easy to read, the right algo selection
 And let's not forget, twice the correct results.
 Well, that's more a 95%.
+
+Usually, i lead the optimization phase, but this time i let the AI do it.
+
+----
+Me:
+
+yes
+----
+
+The optimization is more a refactoring, showing a 5% increase in runtime, identical memory consumption, and 12% decrease in SLOC.
+
+- introducing math.MaxInt suggesting the agent spies on your typing.
+- inlining the `inBounds` function
+- using predefined C4 directions, and a single block for all neighbors
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │  baseline   │            iteration#1             │
+              │   sec/op    │   sec/op     vs base               │
+Day15Part1-16   1.016m ± 1%   1.084m ± 1%  +6.72% (p=0.000 n=10)
+Day15Part2-16   32.40m ± 1%   33.89m ± 1%  +4.62% (p=0.000 n=10)
+geomean         5.736m        6.061m       +5.66%
+
+              │   baseline   │             iteration#1             │
+              │     B/op     │     B/op      vs base               │
+Day15Part1-16   414.8Ki ± 0%   414.8Ki ± 0%       ~ (p=1.000 n=10)
+Day15Part2-16   9.838Mi ± 0%   9.838Mi ± 0%  +0.00% (p=0.036 n=10)
+geomean         1.996Mi        1.996Mi       +0.00%
+
+              │  baseline   │             iteration#1              │
+              │  allocs/op  │  allocs/op   vs base                 │
+Day15Part1-16   20.02k ± 0%   20.02k ± 0%       ~ (p=1.000 n=10) ¹
+Day15Part2-16   500.0k ± 0%   500.0k ± 0%       ~ (p=1.000 n=10) ¹
+geomean         100.0k        100.0k       +0.00%
+¹ all samples are equal
+----
+
+Starting second optimization iteration, this time heavy thinking...
+
+NOTE:Optimizing code without buffers
+I'm thinking about optimizing some code without using external preallocated buffers. I want to reduce allocations by avoiding pushing too many stale entries. We're currently pushing as a standard improvement, but could add a visited boolean once we pop the target to avoid continuing. We're already skipping stale ones via a distance check.
+I should also consider using int32 for distances and packing weights as uint8 while ensuring the max path length fits within int32. I realize that in a grid up to 500x500, paths can stay within limits for int32 usage.
+Adjusting optimizations and imports
+I'm considering adjustments to my approach, specifically regarding error imports. I think we can avoid using them, but I'll need to confirm that.
+Another optimization could be using an array of neighbor offsets with integers to compute the indices directly, avoiding the need for repetitive calculations. Instead of storing the directions as a slice in every call, I could use a local array literal, which would be fine.
+Also, I’m contemplating implementing a custom binary heap that supports DecreaseKey, though replacing the current heap may not be necessary. For distance calculations, switching to int32 values and using a large constant like MaxInt32 should work; I may just need to import the math package for this change.
+Revising optimization strategy
+I'm considering how to manage the node with an int32 distance for comparisons, which seems okay. When checking return values, I must convert them to uint for proper handling.
+To optimize neighbor processing, I want to avoid slice allocations; maybe using fixed arrays or unrolling the neighbor checks could help. Although unrolling previously slowed things down, benchmarks suggest it's faster. So, I think reverting to explicit four if-blocks and keeping math.MaxInt could regain speed.
+I’ll aim to replace the loop with local variables to reduce redundancy, and I might cut down on pushes by marking finalized nodes as visited.
+Optimizing processing of neighbors
+We currently have a mechanism to avoid reprocessing neighbors when they're popped, using a boolean flag. To enhance this, I could implement a visited array of booleans, marking nodes as visited once they are popped. This would help us skip any future processing of those nodes.
+However, I realize the stale check already prevents unnecessary checks. Minor optimizations include computing baseCols, and I’m contemplating pre-sizing the minHeap to avoid reallocations. While larger preallocation might increase memory, it’s often not necessary. I'll implement these changes and run tests afterward.
+
+So, after using `int32` instead of `int`, and unrolling the neighbor again, 
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │   baseline   │             iteration#1             │            iteration#2             │
+              │    sec/op    │    sec/op     vs base               │   sec/op     vs base               │
+Day15Part1-16   1015.6µ ± 1%   1083.8µ ± 1%  +6.72% (p=0.000 n=10)   989.7µ ± 2%  -2.55% (p=0.000 n=10)
+Day15Part2-16    32.40m ± 1%    33.89m ± 1%  +4.62% (p=0.000 n=10)   31.03m ± 1%  -4.22% (p=0.000 n=10)
+geomean          5.736m         6.061m       +5.66%   
+0000               5.542m       -3.39%
+
+              │   baseline   │             iteration#1             │             iteration#2             │
+              │     B/op     │     B/op      vs base               │     B/op      vs base               │
+Day15Part1-16   414.8Ki ± 0%   414.8Ki ± 0%       ~ (p=1.000 n=10)   374.8Ki ± 0%  -9.64% (p=0.000 n=10)
+Day15Part2-16   9.838Mi ± 0%   9.838Mi ± 0%  +0.00% (p=0.036 n=10)   8.885Mi ± 0%  -9.69% (p=0.000 n=10)
+geomean         1.996Mi        1.996Mi       +0.00%                  1.803Mi       -9.67%
+
+              │  baseline   │             iteration#1              │             iteration#2              │
+              │  allocs/op  │  allocs/op   vs base                 │  allocs/op   vs base                 │
+Day15Part1-16   20.02k ± 0%   20.02k ± 0%       ~ (p=1.000 n=10) ¹   20.02k ± 0%       ~ (p=1.000 n=10) ¹
+Day15Part2-16   500.0k ± 0%   500.0k ± 0%       ~ (p=1.000 n=10) ¹   500.0k ± 0%       ~ (p=1.000 n=10) ¹
+geomean         100.0k        100.0k       +0.00%                    100.0k       +0.00%
+¹ all samples are equal
+----
+
+a slightly better runtime (2%) and less memory allocations (10%).
+Removing the section that looped over the lines to remove empty lines yields no measurable difference.
+
+
+
 
 == Day 16: Packet Decoder
 
