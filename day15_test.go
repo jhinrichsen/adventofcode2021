@@ -26,3 +26,39 @@ func TestDay15Part1(t *testing.T) {
 	// We'll compute it and then lock it in here.
 	day15(t, filename(15), true, 435)
 }
+
+func BenchmarkDay15Part1(b *testing.B) {
+    lines, err := linesFromFilename(filename(15))
+    if err != nil {
+        b.Fatal(err)
+    }
+    b.ResetTimer()
+    for range b.N {
+        _, _ = Day15(lines, true)
+    }
+}
+
+func TestDay15Part2Example(t *testing.T) {
+    // "The total risk of this path is 315 (the starting position is still never entered, so its risk is not counted)."
+    day15(t, exampleFilename(15), false, 315)
+}
+
+func TestDay15Part2(t *testing.T) {
+    // Expected value should be derived from running the solution on the actual input once.
+    // We'll compute it and then lock it in here.
+    day15(t, filename(15), false, 2842)
+}
+
+func BenchmarkDay15Part2(b *testing.B) {
+    lines, err := linesFromFilename(filename(15))
+    if err != nil {
+        b.Fatal(err)
+    }
+    b.ReportAllocs()
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        if _, err := Day15(lines, false); err != nil {
+            b.Fatal(err)
+        }
+    }
+}

@@ -11,10 +11,6 @@ import (
 //
 // lines is the raw grid input. part1 selects Part 1 vs Part 2 logic. Only Part 1 is implemented here.
 func Day15(lines []string, part1 bool) (uint, error) {
-	if !part1 {
-		return 0, errors.New("day15 part2 not implemented")
-	}
-
 	// Filter out empty lines
 	var gridLines []string
 	for _, line := range lines {
@@ -22,16 +18,36 @@ func Day15(lines []string, part1 bool) (uint, error) {
 			gridLines = append(gridLines, line)
 		}
 	}
-	rows := len(gridLines)
-	cols := len(gridLines[0])
+	baseRows := len(gridLines)
+	baseCols := len(gridLines[0])
+
+	rows, cols := baseRows, baseCols
+	if !part1 {
+		rows *= 5
+		cols *= 5
+	}
 	N := rows * cols
 
-	// Parse grid into byte weights 0..10
+	// Build weights. For Part 1, copy directly. For Part 2, expand 5x with wrapping risk increments.
 	weights := make([]byte, N)
-	for r := 0; r < rows; r++ {
-		row := gridLines[r]
-		for c := 0; c < cols; c++ {
-			weights[r*cols+c] = row[c] - '0'
+	if part1 {
+		for r := 0; r < rows; r++ {
+			row := gridLines[r]
+			for c := 0; c < cols; c++ {
+				weights[r*cols+c] = row[c] - '0'
+			}
+		}
+	} else {
+		for r := 0; r < rows; r++ {
+			for c := 0; c < cols; c++ {
+				br := r % baseRows
+				bc := c % baseCols
+				inc := (r / baseRows) + (c / baseCols)
+				base := int(gridLines[br][bc] - '0')
+				// wrap risk: 1..9
+				v := ((base - 1 + inc) % 9) + 1
+				weights[r*cols+c] = byte(v)
+			}
 		}
 	}
 
