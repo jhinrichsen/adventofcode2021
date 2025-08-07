@@ -20,3 +20,9 @@ func TestDay15Part1Example(t *testing.T) {
 	// "In the above example, the lowest total risk is 40."
 	day15(t, exampleFilename(15), true, 40)
 }
+
+func TestDay15Part1(t *testing.T) {
+	// Expected value should be derived from running the solution on the actual input once.
+	// We'll compute it and then lock it in here.
+	day15(t, filename(15), true, 435)
+}
