@@ -1339,6 +1339,572 @@ BenchmarkDay14Part2-16    	    2820	    375643 ns/op	  295361 B/op	    6453 allo
 
 == Day 15: Chiton
 
+Using Windsurf 1.11.3 and the brand new GPT-5 (low reasoning).
+As usual, the first prompt after starting Windsurf is
+
+----
+Me
+
+implement adventofcode 2021 day 15 part 1 examples following the rules in contributing.md.
+just all given  examples for part 1, nothing else.
+----
+
+Off we go. Thought processes (you can actually look into GPT-5's brain, it's transparent) are marked as notes:
+
+NOTE: Planning example tests for AoC
+I need to implement example tests for AoC 2021 Day 15 Part 1, following the contributing guidelines.
+I'll add the tests with quoted comments that include expected values.
+Since the repo is available locally, I'll edit the necessary code files.
+I'll use tools to search for day15 files and tests and likely add the example tests in day15_test.go.
+It’s crucial not to implement a solution since the user only asked for examples.
+I'll inspect the repo to check for any existing solution code.
+
+----
+Assistant:
+
+I'll search the repository for existing Day 15 files and tests to add the Part 1 example tests in the proper place following your CONTRIBUTING guidelines.
+----
+
+NOTE: Implementing tests for AoC 2021
+I need to add example tests for AoC 2021 Day 15 Part 1, sticking to the contributing guidelines.
+This means I should create a tests file called day15_test.go that includes example tests with concise comments referencing the puzzle text.
+It’s crucial to check the previous days for proper test naming patterns to keep consistency.
+I'll also explore the repository structure using a file search command to ensure I’m on the right track.
+
+NOTE: Implementing example tests
+I need to implement tests for AoC 2021 Day 15 Part 1, following the guidelines in CONTRIBUTING.md.
+I'll include concise quoted comments from the puzzle description along with the expected values.
+I'll create a file named day15_test.go for these tests, even though day15.go doesn’t exist yet.
+I’m considering the naming conventions and will check examples from other days, like day09_test.go or day10_test.go, to ensure consistency in style.
+
+NOTE: Clarifying test implementation
+I'm trying to figure out how to add tests for unimplemented days without referencing them directly.
+One thought is to use a commented-out build tag or t.Skip("not implemented"), but that still touches on Day15.
+I'd want the test to compile while avoiding direct references to Day15.
+However, I see potential inconsistency with previous contributions where tests were added when implementations were not complete.
+The user wants part 1 examples for Day 15, and I need to ensure I adhere to the guidelines.
+
+NOTE: Planning test implementations
+The user specified to provide examples for part 1 only, without creating stubs, focusing solely on tests and example inputs.
+I think about the risk of breaking the build, but it seems acceptable.
+First, I need to confirm if the repository follows the DayNN(filename) pattern. For instance, in day09_test.go, they already call the implemented Day09.
+I'll create a file named day15_example.txt with a specific 10x10 grid example and ensure the expected output is clearly stated as 40, along with the required quote. After that, I'll structure day15_test.go similarly to day09, ensuring everything is well-organized. Lastly, I’ll implement writing the two necessary files.
+Understanding file creation and testing
+I see that the write tool advises against overwriting existing files, which is good since those files don't exist yet. I plan to craft the day15_test.go file, following the structure of previous tests. However, it will reference Day15, which isn't implemented yet, so that could lead to compile errors. While the user didn't specify to run tests, the guidelines suggest running go test after making changes. To avoid potential issues, I think it's a smart move to avoid running the tests for now. Let's proceed with creating the test file.
+
+NOTE: I'll add a new day15_test.go with a Part 1 example test and create the corresponding testdata/day15_example.txt containing the official example grid.
+This follows the existing test structure and CONTRIBUTING.md guidelines.
+
+NOTE: Implementing tests for Day 15 Part 1
+I need to set up Day 15 Part 1 example tests. I already created an example input file, so now I’m adding day15_test.go for the actual tests. The prompt specifies using all given examples for part 1, which means I need to focus on the 10x10 grid example that has the expected lowest risk of 40. I think this is the only official example for part 1, so I'll implement TestDay15Part1Example accordingly, quoting the relevant comment succinctly.
+
+NOTE: Creating helper functions for Day 15 tests
+I need to set up a helper function for Day 15, similar to other days, since it seems that's the pattern.
+The user only requested examples for part 1, so I'll focus on creating day15_test.go with the helper function day15 and TestDay15Part1Example.
+There won't be a real Part 1 test with actual input. The guidance says I can use either a literal or test data file, and since we created a file, I’ll utilize that. I must also note that without a day15.go solver, the tests won’t compile, but this aligns with the user’s request.
+
+NOTE: Setting up Day 15 tests
+I want to follow the pattern established in the other day test files by incorporating a generic helper function called day15(t,...).
+I'll focus on only adding the example test with a concise quoted comment. I’ll create day15_test.go following the structure of day09_test.go, but without any benchmarks this time. I need to ensure the package name is adventofcode2021 and import the testing library. The return type should be uint, expecting a value of 40. Now, it’s time to implement the file creation!
+
+----
+Assistant:
+
+To add the Part 1 example tests for Day 15 following your repository's conventions, I'll create a new day15_test.go containing a helper and a single TestDay15Part1Example that reads 
+testdata/day15_example.txt
+ and asserts the expected value with a concise quoted comment from the puzzle.
+----
+
+NOTE: Evaluating file needs
+I'm thinking that they might not need any additional files due to the risk it poses.
+However, the Day15.go compilation is crucial for the entire repository, so perhaps they're not planning to run tests right now.
+I should check if there are more Part 1 examples beyond the main 10x10 grid for Day 15.
+I found just one additional example with an expected lowest total risk of 40.
+I’ll summarize this and keep my comments concise.
+
+----
+I added the Day 15 Part 1 example test and its input file.
+
+Files created:
+
+- `testdata/day15_example.txt`
+    Contains the official 10x10 example grid from the puzzle.
+- `day15_test.go`
+    Adds helper `day15(...)` and `TestDay15Part1Example` with a concise quoted comment:
+    "In the above example, the lowest total risk is 40."
+    Calls `day15(t, exampleFilename(15), true, 40)`.
+
+Notes:
+
+This follows your established test structure and CONTRIBUTING.md guidance (example test with quoted justification).
+There is currently no day15.go implementation in the repo; tests will not compile/run until a `Day15` function
+stub/implementation exists. If you want, I can add a minimal stub that returns a “not implemented” error so the suite compiles.
+----
+
+Earlier agents always went all-in, creating part 2 implementations purely on guesswork, as the puzzle hasn't even been opened 
+for part 2, that's why i wanted to limit the scope of the first implementation to only the examples in part 1.
+I was thinking that a working test case requires working code itself, but yes, this chain of thought is valid.
+I need to more clearly express my expectations.
+
+----
+Me:
+
+a working test case requires a working implementation in day15.go, 'Day15' func
+----
+
+NOTE: Implementing Day15 function
+I need to create the Day15 solver function in day15.go, focusing on the minimum requirements for Part 1 of the example.
+The user initially requested only example implementations, but now they want a working solution.
+I think I should implement NewDay15 and Day15 with a parser and solver, including a boolean flag for Part 1.
+I'll make sure Part 1 only processes when the flag is true and return an error if false.
+For the implementation, I'll use Dijkstra's algorithm on a risk grid and include the necessary helper functions to handle input.
+
+NOTE: Searching Day11 signature
+I'm noticing that in other files, NewDayXX functions accept different input types; for instance, Day09 takes unparsed lines, which is quite interesting. It seems that Day09's test calls Day09(lines, part1). In this repository, it looks like DayXX functions handle raw lines and do the parsing internally. Additionally, Day14 utilizes templates and rules, while the test helper for Day09 passes lines.
+Now, I should search for the signature of Day11 to see how it handles data.
+
+Now this is an interesting move. Not only is the assistant following the rules in CONTRIBUTING.md, but it's also trying to blend in.
+This could be wrong, as other days could have been implemented years ago, but here this results in better overall consistency.
+
+NOTE: I'm looking at the implementation of day15.go and the tests we've set up.
+The next step is to verify that the examples pass by running the tests.
+I’ll use the command go test -run Day15 -v to keep the output limited and focused, making sure I'm in the correct repository.
+This feels like a safe approach. Alright, let’s run the tests and see how they perform!
+
+The command to run a test case is spot on. Other assistants have WAY more difficulties running a single go test case, and come up
+with all kind of weird commands that don't really work.
+
+----
+Assistant:
+
+
+
+Auto-run
+Day 15 Part 1 example is now fully implemented and passing.
+
+What I did:
+
+Created 
+testdata/day15_example.txt
+ with the official 10x10 example.
+Added 
+day15_test.go
+ with 
+TestDay15Part1Example
+ and a concise quoted comment from the puzzle.
+Implemented 
+day15.go
+:
+Day15(lines []string, part1 bool) (uint, error)
+ uses Dijkstra’s algorithm on the grid.
+Counts only the risk of entered cells (start not counted).
+Returns a clear error if called with part1=false (Part 2 not implemented yet).
+Verification:
+
+Ran go test -run Day15 -v and the example test passed.
+If you want, I can proceed to:
+
+Add any additional Part 1 example variants (if AoC lists more than one) or edge cases.
+Implement Part 2 when you’re ready.
+----
+
+Code looks really good, let's move on to part 1.
+
+----
+Me:
+
+write a testcase for part 1 using puzzle input from testdata/day15.txt
+----
+
+NOTE: 'll add a Part 1 test for the real puzzle input in `day15_test.go`.
+First, I'll create the test with a placeholder expected value to compute the actual result, run it to capture the "got" value, then update the test to use that as the expected value per your workflow.
+
+NOTE: Running tests and updates
+I need to run tests to compute a value and then adjust the test to reflect that.
+Earlier notes remind me that for Day14 Part1, the value used was based on the actual value, not a constant.
+However, many other days have used direct numeric values. For Part1, the expected value should come from the actual puzzle input.
+So, I’ll run the command go test -run TestDay15Part1 to see what it returns and then update the test accordingly.
+
+Again, this is something i have not seen before.
+GPT-5 understands the bootstrap process
+
+- start without a solution
+- run the test
+- use the result as the solution reference
+- take the solution to the aoc website as puzzle input, and verify
+
+Repeat for any errors in algorithm, and only then have a correct, working test case.
+
+----
+Assistant:
+
+Added the Part 1 puzzle-input test and set the expected value.
+
+Changes:
+
+Updated 
+day15_test.go
+:
+Added 
+TestDay15Part1
+ which reads 
+testdata/day15.txt
+.
+Set expected to 435, derived by running the solution.
+Verified by running:
+Example test passes.
+Puzzle input test now passes with expected 435.
+If you want benchmarks for Day 15 Part 1 similar to other days, I can add them next.
+----
+
+Why not, while we're at it?
+
+----
+Me:
+
+yes, add a benchmark for part 1
+----
+
+NOTE: Running benchmarks
+I think it's time to run some benchmarks since I added it.
+The instructions mention proactively executing terminal commands when relevant.
+I should probably run go test -bench BenchmarkDay15Part1, but typically, I run the command with -bench Day15 -benchmem for better data.
+It feels safe to do this, so I’ll go ahead and execute the command now. Let's see what the results show!
+
+GPT-5 getting emotional here...
+
+----
+Assistant:
+
+Added a benchmark for Day 15 Part 1.
+
+Changes:
+
+Appended 
+BenchmarkDay15Part1
+ in 
+day15_test.go
+:
+Loads 
+testdata/day15.txt
+Runs 
+Day15(lines, true)
+ inside the benchmark loop with b.ResetTimer()
+Result:
+
+Ran go test -bench BenchmarkDay15Part1 -benchmem
+BenchmarkDay15Part1-16 1076 1047924 ns/op 424760 B/op 20016 allocs/op
+If you want, I can investigate allocations and optimize the implementation to reduce B/op and allocs/op.
+----
+
+In the meantime, i verified that test case, and the solution for part 1 is correct.
+How long did it take, overall a couple of minutes?
+But before we dive into optimization, let's see if we can get part 2 running, so we have a complete baseline.
+
+----
+Me:
+
+look at the puzzle description in doc/day15part2.txt and implement a test for the example(s) given
+----
+
+ERROR: Error while reading doc
+MCP server not found: _filesystem_
+
+Oooopsie - but nothing breaks, seems as if transparently retried and worked?
+
+NOTE: Implementing tests for examples
+I need to implement tests for Part 2 examples from the specified document. I’ve noted that there's an issue with the current implementation that returns an error when part1=false. The user has specifically asked for these tests, even if they might fail due to incomplete implementation, which I find acceptable.
+Since we used a structure for Part 1, perhaps I should create a similar test input file for Part 2. I’ll consider naming conventions based on the repository practices.
+
+NOTE: Creating test data files
+It looks like CONTRIBUTING prefers that I create testdata files, so I plan to create testdata/day15_part2_example.txt with the full 5x grid from the document. I need to add a test case in day15_test.go called TestDay15Part2Example, including a quote about the total risk being 315.
+Hmm, I notice that the document has the 5x full grid mentioned twice. I'll need to extract the exact content from the file using view_line_range to ensure I get the precise lines. It seems the first full map block starts around line 13, so I’ll confirm that.
+
+NOTE: Fetching content for test data
+I see there's another section titled "Equipped with the full map..." that repeats the same 50 lines. To avoid mistakes, I should retrieve the file content directly. I can search for the line that indicates the start of the grid using grep_search, then grab the following 50 lines.
+Hmm, since the entire file has 124 lines, I could read the whole thing at once with view_line_range. My plan is to create the new file testdata/day15_part2_example.txt with the extracted 50 lines from that grid. I’ll focus on the first occurrence of “116375...” and ensure I count out those 50 lines.
+
+NOTE: Modifying test function
+I’m planning to modify day15_test.go to add a test function that loads the file and calls day15 with part1 set to false, expecting a total risk of 315. However, since the Day15 function currently returns an error for part 2, the test will fail.
+I think marking the test with t.Skip until implementation is complete might be appropriate, especially since the user is okay with adding it but recognizes it isn’t yet functional. I’ll include a note about this, so it’s clear why it’s skipped.
+
+NOTE: Implementing the test function
+I see that previous guidance indicated that tests should compile, and I believe the code will compile fine because Day15 will only be called if the test isn't skipped. If I place t.Skip at the start, it won’t reference Day15, allowing it to compile properly.
+I'm thinking of creating a new helper function, day15p2. Alternatively, I can use t.Skip right at the start of the test. I’ll implement TestDay15Part2Example with a skip message, while also including the quoted comment and the call commented out afterward. I need to create the testdata file next, so I’ll use view_line_range to grab the content and write the file. Then, I’ll modify day15_test.go accordingly.
+
+The whole mumble jumble goes on, clearly indicating what the current state of affairs is.
+GPT-5 reads the puzzle description, extracts a 5x5 grid from the document, and creates a testdata file with the grid.
+It then un-`Skip()`s the test case, removes the fast-return for part 2 in Day15(), and runs the test.
+A single re-iteration on a bad test value is required:
+
+----
+=== RUN   TestDay15Part2Example
+    day15_test.go:15: want 315 but got 1468
+--- FAIL: TestDay15Part2Example (0.01s)
+FAIL
+----
+
+The example for part 2 is working, time for the real thing.
+GPT-5 again understands (and remembers) the bootstrap process, runs a single test, and hardcodes the result as expected result.
+Final benchmark for part 2, done.
+
+And the expected result is also correct, two correct results in the first try, GPT-5 goes brrrr.
+
+Other assistants feel more like walking up a sandy dune, two steps, slide down one step, repeat.
+
+Here's the benchmark baseline.
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics     
+BenchmarkDay15Part1-16    	    1093	   1030707 ns/op	  424760 B/op	   20016 allocs/op
+BenchmarkDay15Part1-16    	    1081	   1009188 ns/op	  424760 B/op	   20016 allocs/op
+BenchmarkDay15Part1-16    	    1092	   1012713 ns/op	  424764 B/op	   20016 allocs/op
+BenchmarkDay15Part1-16    	    1138	    997470 ns/op	  424760 B/op	   20016 allocs/op
+BenchmarkDay15Part1-16    	    1135	   1013479 ns/op	  424760 B/op	   20016 allocs/op
+BenchmarkDay15Part1-16    	    1125	   1005196 ns/op	  424760 B/op	   20016 allocs/op
+BenchmarkDay15Part1-16    	    1130	   1019221 ns/op	  424760 B/op	   20016 allocs/op
+BenchmarkDay15Part1-16    	    1107	   1017751 ns/op	  424760 B/op	   20016 allocs/op
+BenchmarkDay15Part1-16    	    1080	   1031162 ns/op	  424760 B/op	   20016 allocs/op
+BenchmarkDay15Part1-16    	    1072	   1030696 ns/op	  424760 B/op	   20016 allocs/op
+BenchmarkDay15Part2-16    	      31	  32767353 ns/op	10315883 B/op	  500022 allocs/op
+BenchmarkDay15Part2-16    	      31	  32299264 ns/op	10315886 B/op	  500022 allocs/op
+BenchmarkDay15Part2-16    	      37	  32396585 ns/op	10315892 B/op	  500022 allocs/op
+BenchmarkDay15Part2-16    	      37	  32598493 ns/op	10315880 B/op	  500022 allocs/op
+BenchmarkDay15Part2-16    	      32	  32098892 ns/op	10315880 B/op	  500022 allocs/op
+BenchmarkDay15Part2-16    	      31	  32452456 ns/op	10315883 B/op	  500022 allocs/op
+BenchmarkDay15Part2-16    	      33	  32642563 ns/op	10315888 B/op	  500022 allocs/op
+BenchmarkDay15Part2-16    	      37	  32291750 ns/op	10315885 B/op	  500022 allocs/op
+BenchmarkDay15Part2-16    	      36	  32399414 ns/op	10315893 B/op	  500022 allocs/op
+BenchmarkDay15Part2-16    	      32	  32186199 ns/op	10315889 B/op	  500022 allocs/op
+----
+
+Given that part 2 is 5x5 times bigger, and that both runtime and allocations increase by the same factor, the implementation is O(n), 
+which is extremely strong.
+
+GPT-5 is already suggesting
+
+----
+Assistant:
+
+If you want, I can explore quick optimizations next:
+
+Use a reusable byte slice and int32 distances.
+Replace heap entries with a custom queue + decrease-key via in-place update structures.
+Avoid recomputing neighbor indices and bounds.
+----
+
+But let's look at some code first.
+
+[source,go]
+----
+package adventofcode2021
+
+import "testing"
+
+func day15(t *testing.T, filename string, part1 bool, want uint) { <1>
+	lines, err := linesFromFilename(filename)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := Day15(lines, part1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want != got {
+		t.Fatalf("want %d but got %d", want, got)
+	}
+}
+
+func TestDay15Part1Example(t *testing.T) {
+	// "In the above example, the lowest total risk is 40." <2>
+	day15(t, exampleFilename(15), true, 40)
+}
+
+func TestDay15Part1(t *testing.T) {
+	// Expected value should be derived from running the solution on the actual input once. <3>
+	// We'll compute it and then lock it in here.
+	day15(t, filename(15), true, 435)
+}
+
+func BenchmarkDay15Part1(b *testing.B) {
+    lines, err := linesFromFilename(filename(15))
+    if err != nil {
+        b.Fatal(err)
+    }
+    b.ResetTimer() <4>
+    for range b.N {
+        _, _ = Day15(lines, true)
+    }
+}
+
+…
+< repeat for part 2>
+…
+----
+<1> + A little helper to reduce boilerplate code
+<2> + quoted original requirements from puzzle description
+<3> + The comment is not required after bootstrapping but shows that GPT-5 understood the process
+<4> + Reset the timer to exclude I/O
+
+Exactly what i would have typed manually.
+
+Here's the solver.
+
+[source,go]
+----
+package adventofcode2021
+
+import (
+	"container/heap" <1>
+	"errors"
+)
+
+// Day15 computes the lowest total risk of any path from the top left to the bottom right.
+// The risk of a path is the sum of the risk levels of each position you enter; the starting
+// position is not counted.
+//
+// lines is the raw grid input. part1 selects Part 1 vs Part 2 logic. Only Part 1 is implemented here.
+func Day15(lines []string, part1 bool) (uint, error) { <2>
+	// Filter out empty lines <3>
+	var gridLines []string
+	for _, line := range lines {
+		if len(line) > 0 {
+			gridLines = append(gridLines, line)
+		}
+	}
+	baseRows := len(gridLines)
+	baseCols := len(gridLines[0])
+
+	rows, cols := baseRows, baseCols
+	if !part1 {
+		rows *= 5
+		cols *= 5
+	}
+	N := rows * cols <4>
+
+	// Build weights. For Part 1, copy directly. For Part 2, expand 5x with wrapping risk increments.
+	weights := make([]byte, N)
+	if part1 {
+		for r := 0; r < rows; r++ {
+			row := gridLines[r]
+			for c := 0; c < cols; c++ {
+				weights[r*cols+c] = row[c] - '0' <5>
+			}
+		}
+	} else {
+		for r := 0; r < rows; r++ {
+			for c := 0; c < cols; c++ {
+				br := r % baseRows
+				bc := c % baseCols
+				inc := (r / baseRows) + (c / baseCols)
+				base := int(gridLines[br][bc] - '0')
+				// wrap risk: 1..9
+				v := ((base - 1 + inc) % 9) + 1
+				weights[r*cols+c] = byte(v)
+			}
+		}
+	}
+
+	// Dijkstra on a 2D grid using a min-heap.
+	const inf = int(^uint(0) >> 1) // max int <6>
+	dist := make([]int, N)
+	for i := range dist {
+		dist[i] = inf  <7>
+	}
+	start := 0
+	target := N - 1
+	dist[start] = 0 <8>
+
+	pq := &minHeap{}
+	heap.Push(pq, node{idx: start, dist: 0})
+
+	inBounds := func(r, c int) bool { return r >= 0 && r < rows && c >= 0 && c < cols } <11>
+
+	for pq.Len() > 0 {
+		n := heap.Pop(pq).(node)
+		if n.idx == target {
+			return uint(n.dist), nil
+		}
+		// If this entry is stale, skip
+		if n.dist != dist[n.idx] {
+			continue
+		}
+		r, c := n.idx/cols, n.idx%cols
+		// 4 neighbors <9>
+		// Up
+		if rr, cc := r-1, c; inBounds(rr, cc) {
+			ni := rr*cols + cc
+			nd := n.dist + int(weights[ni])
+			if nd < dist[ni] {
+				dist[ni] = nd
+				heap.Push(pq, node{idx: ni, dist: nd})
+			}
+		}
+		// Down
+		if rr, cc := r+1, c; inBounds(rr, cc) {
+			ni := rr*cols + cc
+			nd := n.dist + int(weights[ni])
+			if nd < dist[ni] {
+				dist[ni] = nd
+				heap.Push(pq, node{idx: ni, dist: nd})
+			}
+		}
+		// Left
+		if rr, cc := r, c-1; inBounds(rr, cc) {
+			ni := rr*cols + cc
+			nd := n.dist + int(weights[ni])
+			if nd < dist[ni] {
+				dist[ni] = nd
+				heap.Push(pq, node{idx: ni, dist: nd})
+			}
+		}
+		// Right
+		if rr, cc := r, c+1; inBounds(rr, cc) {
+			ni := rr*cols + cc
+			nd := n.dist + int(weights[ni])
+			if nd < dist[ni] {
+				dist[ni] = nd
+				heap.Push(pq, node{idx: ni, dist: nd})
+			}
+		}
+	}
+
+	return 0, errors.New("no path found")
+}
+
+// node represents a position in the grid with its current best-known distance.
+type node struct {
+	idx  int
+	dist int
+}
+
+type minHeap []node
+
+func (h minHeap) Len() int           { return len(h) }
+func (h minHeap) Less(i, j int) bool { return h[i].dist < h[j].dist }
+func (h minHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *minHeap) Push(x any)        { *h = append(*h, x.(node)) }
+func (h *minHeap) Pop() any          { old := *h; n := len(old); x := old[n-1]; *h = old[:n-1]; return x }
+----
+<1> + using the Go heap package, not many know Go has one
+<2> + correct uint usage as specified in contributing rules
+<3> - this is not required, don't know why this happens
+<4> + smart, use a 1D grid to avoid complicated 2D array of arrays, which is 
+not elegant in Go
+<5> + `y * width + x` to translate from 2D to 1D
+<6> - remove this line altogether...
+<7> - ... and better use math.MaxInt directly
+<8> + from the puzzle spec: initial node has no distance
+<9> - repeating identical code four times for the C4 neighbors 
+
+All in all, very nice. I'd give it a 90% score.
+Very clean implementation, straightforward, easy to read, the right algo selection
+And let's not forget, twice the correct results.
+Well, that's more a 95%.
+
 == Day 16: Packet Decoder
 
 == Day 17: Trick Shot
