@@ -1,7 +1,6 @@
 package adventofcode2021
 
 import (
-	"container/heap"
 	"errors"
 	"math"
 )
@@ -55,63 +54,97 @@ func Day15(lines []string, part1 bool) (uint, error) {
 		}
 	}
 
-	// Dijkstra on a 2D grid using a min-heap.
+	// Dijkstra on a 2D grid using Dial's algorithm (bucketed for weights 1..9).
 	const inf = int32(math.MaxInt32)
 	dist := make([]int32, N)
 	for i := range dist {
 		dist[i] = inf
 	}
+	visited := make([]bool, N)
 	start := 0
 	target := N - 1
 	dist[start] = 0
 
-	pq := &minHeap{}
-	heap.Push(pq, node{idx: start, dist: 0})
+	const C = 9 // max edge weight
+	B := C * (rows + cols) // safe upper bound on shortest-path cost
+	buckets := make([][]int, B)
+	buckets[0] = append(buckets[0], start)
+	var curDist int32 = 0
+	processed := 0
 
-	for pq.Len() > 0 {
-		n := heap.Pop(pq).(node)
-		if n.idx == target {
-			return uint(n.dist), nil
+	for processed < N {
+		// advance to next non-empty bucket; if we run out, no path
+		for int(curDist) < B && len(buckets[curDist]) == 0 {
+			curDist++
 		}
-		// If this entry is stale, skip
-		if n.dist != dist[n.idx] {
+		if int(curDist) >= B {
+			break
+		}
+		b := &buckets[curDist]
+		// pop from bucket (LIFO is fine)
+		idx := (*b)[len(*b)-1]
+		*b = (*b)[:len(*b)-1]
+
+		if visited[idx] || dist[idx] != curDist {
 			continue
 		}
-		r, c := n.idx/cols, n.idx%cols
+		visited[idx] = true
+		processed++
+		if idx == target {
+			return uint(dist[idx]), nil
+		}
+
+		r, c := idx/cols, idx%cols
 		// Up
 		if rr, cc := r-1, c; rr >= 0 {
 			ni := rr*cols + cc
-			nd := n.dist + int32(weights[ni])
-			if nd < dist[ni] {
-				dist[ni] = nd
-				heap.Push(pq, node{idx: ni, dist: nd})
+			if !visited[ni] {
+				nd := curDist + int32(weights[ni])
+				if nd < dist[ni] {
+					dist[ni] = nd
+					if int(nd) < B {
+						buckets[nd] = append(buckets[nd], ni)
+					}
+				}
 			}
 		}
 		// Down
 		if rr, cc := r+1, c; rr < rows {
 			ni := rr*cols + cc
-			nd := n.dist + int32(weights[ni])
-			if nd < dist[ni] {
-				dist[ni] = nd
-				heap.Push(pq, node{idx: ni, dist: nd})
+			if !visited[ni] {
+				nd := curDist + int32(weights[ni])
+				if nd < dist[ni] {
+					dist[ni] = nd
+					if int(nd) < B {
+						buckets[nd] = append(buckets[nd], ni)
+					}
+				}
 			}
 		}
 		// Left
 		if rr, cc := r, c-1; cc >= 0 {
 			ni := rr*cols + cc
-			nd := n.dist + int32(weights[ni])
-			if nd < dist[ni] {
-				dist[ni] = nd
-				heap.Push(pq, node{idx: ni, dist: nd})
+			if !visited[ni] {
+				nd := curDist + int32(weights[ni])
+				if nd < dist[ni] {
+					dist[ni] = nd
+					if int(nd) < B {
+						buckets[nd] = append(buckets[nd], ni)
+					}
+				}
 			}
 		}
 		// Right
 		if rr, cc := r, c+1; cc < cols {
 			ni := rr*cols + cc
-			nd := n.dist + int32(weights[ni])
-			if nd < dist[ni] {
-				dist[ni] = nd
-				heap.Push(pq, node{idx: ni, dist: nd})
+			if !visited[ni] {
+				nd := curDist + int32(weights[ni])
+				if nd < dist[ni] {
+					dist[ni] = nd
+					if int(nd) < B {
+						buckets[nd] = append(buckets[nd], ni)
+					}
+				}
 			}
 		}
 	}
@@ -119,16 +152,9 @@ func Day15(lines []string, part1 bool) (uint, error) {
 	return 0, errors.New("no path found")
 }
 
-// node represents a position in the grid with its current best-known distance.
-type node struct {
-	idx  int
-	dist int32
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
-
-type minHeap []node
-
-func (h minHeap) Len() int           { return len(h) }
-func (h minHeap) Less(i, j int) bool { return h[i].dist < h[j].dist }
-func (h minHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-func (h *minHeap) Push(x any)        { *h = append(*h, x.(node)) }
-func (h *minHeap) Pop() any          { old := *h; n := len(old); x := old[n-1]; *h = old[:n-1]; return x }

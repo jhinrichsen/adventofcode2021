@@ -2005,8 +2005,105 @@ geomean         100.0k        100.0k       +0.00%                    100.0k     
 a slightly better runtime (2%) and less memory allocations (10%).
 Removing the section that looped over the lines to remove empty lines yields no measurable difference.
 
+Looks like we have reached some kind of limit here.
+Time for a little hint.
 
+----
+Me:
 
+What about A*?
+----
+
+Couple of minutes later
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │   baseline   │               iter#3               │                iter#4                │
+              │    sec/op    │   sec/op     vs base               │    sec/op     vs base                │
+Day15Part1-16   1015.6µ ± 1%   997.2µ ± 1%  -1.81% (p=0.000 n=10)   1205.5µ ± 1%  +18.69% (p=0.000 n=10)
+Day15Part2-16    32.40m ± 1%   31.06m ± 1%  -4.14% (p=0.000 n=10)    35.12m ± 1%   +8.40% (p=0.000 n=10)
+geomean          5.736m        5.565m       -2.98%                   6.506m       +13.43%
+
+              │   baseline   │                iter#3                │               iter#4                │
+              │     B/op     │     B/op      vs base                │     B/op      vs base               │
+Day15Part1-16   414.8Ki ± 0%   370.4Ki ± 0%  -10.69% (p=0.000 n=10)   402.1Ki ± 0%  -3.07% (p=0.000 n=10)
+Day15Part2-16   9.838Mi ± 0%   8.881Mi ± 0%   -9.73% (p=0.000 n=10)   9.323Mi ± 0%  -5.23% (p=0.000 n=10)
+geomean         1.996Mi        1.792Mi       -10.21%                  1.913Mi       -4.15%
+
+              │  baseline   │               iter#3               │               iter#4               │
+              │  allocs/op  │  allocs/op   vs base               │  allocs/op   vs base               │
+Day15Part1-16   20.02k ± 0%   20.01k ± 0%  -0.04% (p=0.000 n=10)   21.52k ± 0%  +7.52% (p=0.000 n=10)
+Day15Part2-16   500.0k ± 0%   500.0k ± 0%  -0.00% (p=0.000 n=10)   529.0k ± 0%  +5.80% (p=0.000 n=10)
+geomean         100.0k        100.0k       -0.02%                  106.7k       +6.66%
+----
+
+clearly slower, higher memory consumption, and more allocations.
+A signal for a bad `h()`.
+
+----
+Me:
+
+We need stronger heuristics. Can't we deduct something smart because we know all 5x5 grids are the same except for the wrapped 9?
+----
+
+interacting back and forth, but it seems we cannot deduct any sensible, bullet-proof heuristic by knowing we are using 25 nearly identical subrectangles.
+
+----
+Me:
+
+what about dial?
+----
+
+A couple of minutes later
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │   Dikjstra   │                  A*                  │                Dial                 │
+              │    sec/op    │    sec/op     vs base                │   sec/op     vs base                │
+Day15Part1-16    997.2µ ± 1%   1205.5µ ± 1%  +20.88% (p=0.000 n=10)   282.3µ ± 2%  -71.69% (p=0.000 n=10)
+Day15Part2-16   31.057m ± 1%   35.118m ± 1%  +13.08% (p=0.000 n=10)   8.354m ± 1%  -73.10% (p=0.000 n=10)
+geomean          5.565m         6.506m       +16.91%                  1.536m       -72.41%
+
+              │   Dikjstra   │                 A*                  │                 Dial                 │
+              │     B/op     │     B/op      vs base               │     B/op      vs base                │
+Day15Part1-16   370.4Ki ± 0%   402.1Ki ± 0%  +8.54% (p=0.000 n=10)   324.3Ki ± 0%  -12.45% (p=0.000 n=10)
+Day15Part2-16   8.881Mi ± 0%   9.323Mi ± 0%  +4.99% (p=0.000 n=10)   7.343Mi ± 0%  -17.31% (p=0.000 n=10)
+geomean         1.792Mi        1.913Mi       +6.75%                  1.525Mi       -14.92%
+
+              │   Dikjstra   │                 A*                  │                Dial                 │
+              │  allocs/op   │  allocs/op    vs base               │  allocs/op   vs base                │
+Day15Part1-16   20.008k ± 0%   21.522k ± 0%  +7.57% (p=0.000 n=10)   2.363k ± 0%  -88.19% (p=0.000 n=10)
+Day15Part2-16   500.01k ± 0%   529.03k ± 0%  +5.80% (p=0.000 n=10)   21.46k ± 0%  -95.71% (p=0.000 n=10)
+geomean          100.0k         106.7k       +6.68%                  7.122k       -92.88%
+----
+
+Now we are talking.
+Just to put those number into perspective, we have a grid of more than 2_500 positions.
+Each grid has four neighbors, i.e. 10_000 edges.
+The Dial algorithm needs 8 ms to find the shortest path.
+And i have not written a single line of code.
+
+Final step: check out how we are doing globally.
+
+----
+Me:
+
+find solutions that are faster then 8 ms for part 2, taking into account that 80 ms on a ESP32 would be faster.
+----
+
+ https://www.reddit.com/r/adventofcode/comments/rgqzt5/2021_day_15_solutions/[Reddit Day 15 solutions megathread]
+
+ https://github.com/maneatingape/advent-of-code-rust[Highly optimized Rust repo]
+
+ https://programsareproofs.com/articles/aoc-2021/[Programs are proofs]
+
+ 
 
 == Day 16: Packet Decoder
 
