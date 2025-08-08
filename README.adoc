@@ -1735,7 +1735,7 @@ func BenchmarkDay15Part1(b *testing.B) {
         b.Fatal(err)
     }
     b.ResetTimer() <4>
-    for range b.N {
+    for range b.N { <5>
         _, _ = Day15(lines, true)
     }
 }
@@ -1748,6 +1748,8 @@ func BenchmarkDay15Part1(b *testing.B) {
 <2> + quoted original requirements from puzzle description
 <3> + The comment is not required after bootstrapping but shows that GPT-5 understood the process
 <4> + Reset the timer to exclude I/O
+<5> + Range-over-int, introduced in Go 1.21. Many assistants are untrained to use it. You change a classical `for` loop to range-over-int,
+it gets wiped out and replaced with traditional `for` loops during the next AI edit operation.
 
 Exactly what i would have typed manually.
 
