@@ -1587,7 +1587,7 @@ Me:
 look at the puzzle description in doc/day15part2.txt and implement a test for the example(s) given
 ----
 
-ERROR: Error while reading doc
+CAUTION: Error while reading doc
 MCP server not found: _filesystem_
 
 Oooopsie - but nothing breaks, seems as if transparently retried and worked?
