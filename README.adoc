@@ -2090,6 +2090,9 @@ If you are sceptical about the 95%, just follow along for a side-by-side compari
 
 == Day 16: Packet Decoder
 
+NOTE: tldr; SWE-1 is free (promo), but it loses track easily, needs constant corrections.
+However, it does understand the puzzle and comes up with two correct solutions.
+
 Using Windsurf 1.11.3 and their SWE-1.
 
 ----
@@ -2433,7 +2436,7 @@ func BenchmarkDay16(b *testing.B) {
 goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
-cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics     
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
 BenchmarkDay16-16    	    2138	    497054 ns/op	 4075410 B/op	    1923 allocs/op
 BenchmarkDay16-16    	    2077	    515426 ns/op	 4075411 B/op	    1923 allocs/op
 BenchmarkDay16-16    	    2014	    505410 ns/op	 4075408 B/op	    1923 allocs/op
@@ -2445,6 +2448,193 @@ BenchmarkDay16-16    	    2193	    644431 ns/op	 4075409 B/op	    1923 allocs/op
 BenchmarkDay16-16    	    1746	    708832 ns/op	 4075410 B/op	    1923 allocs/op
 BenchmarkDay16-16    	    1362	    782393 ns/op	 4075411 B/op	    1923 allocs/op
 ----
+
+=== Part 2
+
+----
+Me:
+
+use the puzzle description in {{ local file }} to implement part 2
+----
+
+SWE-1 takes off, implements the examples, part 2, and no benchmark.
+
+Again, it does not understand the zero value-run-solution cycle, and implements
+
+[source,go]
+----
+_ = Day16(hexStr, false) // Just run it to make sure it doesn't panic
+----
+
+which is even more useless than logging the result, because it just ignores the result.
+
+
+So instead of waiting to verify that part 2 is solved correctly,
+
+----
+Assistant:
+
+Great! All tests are passing. Let's run the benchmark to ensure our implementation is performant:
+----
+
+SWE-1 is running the benchmark (for part 1) using `go test -bench=. -run=^$ -benchmem -benchtime=10s`
+which is bad because it is running all benchmarks, not just Day 16.
+In a paid CPU use environment (such as CI/CD), this will burn a hole into your pocket.
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+BenchmarkDay01Part2-16          14278542               838.3 ns/op             0 B/op          0 allocs/op
+BenchmarkDay02Part1-16            382554             31663 ns/op           32000 B/op       1000 allocs/op
+BenchmarkDay02Part2-16            366232             31812 ns/op           32000 B/op       1000 allocs/op
+BenchmarkDay03Part1-16           1230877              9436 ns/op             208 B/op         22 allocs/op
+BenchmarkDay03Part2-16             40380            301583 ns/op          218032 B/op         44 allocs/op
+BenchmarkDay04Part2-16             18492            659055 ns/op          641409 B/op       2450 allocs/op
+BenchmarkDay05Part2Int-16            682          18618890 ns/op        14051344 B/op       3543 allocs/op
+BenchmarkDay05Part2Cmplx-16          553          21555126 ns/op        14051343 B/op       3543 allocs/op
+BenchmarkDay06Part2-16          15199287               861.7 ns/op             0 B/op          0 allocs/op
+BenchmarkDay07Part2-16              7530           1585945 ns/op               0 B/op          0 allocs/op
+BenchmarkDay08Part1-16             15092            844582 ns/op          525593 B/op      14200 allocs/op
+BenchmarkDay08Part2-16             15079            814423 ns/op          525593 B/op      14200 allocs/op
+BenchmarkDay09Part1-16            379580             31262 ns/op            8176 B/op          9 allocs/op
+BenchmarkDay09Part2-16             28564            416309 ns/op          424528 B/op       1302 allocs/op
+BenchmarkDay10Part1-16             22710            528145 ns/op          239320 B/op       3704 allocs/op
+BenchmarkDay10Part2-16             22362            523477 ns/op          239760 B/op       3707 allocs/op
+BenchmarkDay11Part1-16            529520             22757 ns/op           11632 B/op         20 allocs/op
+BenchmarkDay11Part2-16            211557             55240 ns/op           11632 B/op         20 allocs/op
+BenchmarkDay12Part1-16              1441           8604249 ns/op         9342436 B/op      75515 allocs/op
+BenchmarkDay12Part2-16                28         405762669 ns/op        343905381 B/op   3691254 allocs/op
+BenchmarkDay13Part1-16            106680            106610 ns/op          124432 B/op         32 allocs/op
+BenchmarkDay14Part1-16            136461             92181 ns/op           64872 B/op       1332 allocs/op
+BenchmarkDay14Part2-16             29736            395668 ns/op          295361 B/op       6453 allocs/op
+BenchmarkDay15Part1-16             42102            285638 ns/op          332105 B/op       2363 allocs/op
+BenchmarkDay15Part2-16              1351           8538168 ns/op         7699984 B/op      21464 allocs/op
+BenchmarkDay16-16                  22654            652852 ns/op         4075405 B/op       1923 allocs/op <1>
+BenchmarkDay20Part1-16             10000           1047553 ns/op          164416 B/op          5 allocs/op
+BenchmarkDay20Part2-16               566          21074771 ns/op         3048001 B/op          6 allocs/op
+----
+<1> This is the only one we are looking for.
+
+In addition, it did not recognize that `BenchmarkDay16()` is for part 1, and neither did it create one for part 2.
+SWE-1 does in no way inspect the result, it just prints the benchmark to its terminal.
+It then tries to run the test for part 2, but forgot how to:
+
+----
+Assistant:
+
+Let me check the main package to see how to run the solution:
+----
+
+And then we lose SWE-1
+
+----
+Assistant:
+
+Let's create a simple main package to run the Day 16 solution:
+Created main.go
+
+go run cmd/day16/main.go
+Error reading input file ../../input/day16.txt
+Updating main.go
+go run cmd/day16/main.go
+Error reading input file: ../../testdata/day16.txt
+----
+
+CAUTION: Better hit CTRL-C now, before SWE-1 does something stupid.
+
+Switching from SWE-1 to GPT-5 (low reasoning), and we get
+
+----
+I will first log the computed Part 2 result from your input to capture the correct expected value
+locally (no internet access), then I'll replace it with a hard assertion using that value to align
+with CONTRIBUTING.md.
+----
+
+This is the way to go.
+
+=== Optimizing
+
+The implementation has not changed between part 1 and part 2.
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │     b01      │              b02               │
+              │    sec/op    │    sec/op     vs base          │
+Day16Part1-16   505.1µ ± 40%   511.0µ ± 40%  ~ (p=0.579 n=10)
+
+              │     b01      │              b02               │
+              │     B/op     │     B/op      vs base          │
+Day16Part1-16   3.887Mi ± 0%   3.887Mi ± 0%  ~ (p=0.607 n=10)
+
+              │     b01     │               b02               │
+              │  allocs/op  │  allocs/op   vs base            │
+Day16Part1-16   1.923k ± 0%   1.923k ± 0%  ~ (p=1.000 n=10) ¹
+¹ all samples are equal
+----
+
+==== Baseline (b0)
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics     
+BenchmarkDay16Part1-16    	    2041	    491685 ns/op	 4075414 B/op	    1923 allocs/op
+BenchmarkDay16Part1-16    	    2074	    500062 ns/op	 4075413 B/op	    1923 allocs/op
+BenchmarkDay16Part1-16    	    1982	    525900 ns/op	 4075409 B/op	    1923 allocs/op
+BenchmarkDay16Part1-16    	    2062	    512569 ns/op	 4075409 B/op	    1923 allocs/op
+BenchmarkDay16Part1-16    	    2288	    500002 ns/op	 4075407 B/op	    1923 allocs/op
+BenchmarkDay16Part1-16    	    2058	    506342 ns/op	 4075410 B/op	    1923 allocs/op
+BenchmarkDay16Part1-16    	    2050	    509392 ns/op	 4075408 B/op	    1923 allocs/op
+BenchmarkDay16Part1-16    	    2179	    558262 ns/op	 4075408 B/op	    1923 allocs/op
+BenchmarkDay16Part1-16    	    1627	    717108 ns/op	 4075409 B/op	    1923 allocs/op
+BenchmarkDay16Part1-16    	    1717	    720079 ns/op	 4075408 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1544	    676372 ns/op	 4075409 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1466	    711421 ns/op	 4075412 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1647	    725274 ns/op	 4075410 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1593	    772236 ns/op	 4075409 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1530	    698725 ns/op	 4075411 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1772	    762678 ns/op	 4075408 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1609	    755391 ns/op	 4075411 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1668	    726316 ns/op	 4075411 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1542	    749609 ns/op	 4075411 B/op	    1923 allocs/op
+BenchmarkDay16Part2-16    	    1548	    736563 ns/op	 4075410 B/op	    1923 allocs/op
+----
+
+Switch back from GPT-5 to SWE-1, and start the optimizing process.
+
+----
+Me:
+
+optimize day 16 for runtime and memory allocation, including but not limited to contributing.md
+
+Assistant:
+
+I'll analyze the current implementation and suggest optimizations following the project's guidelines. Here are the key areas for improvement:
+
+String Concatenation: The current implementation uses string concatenation in hexToBin and parseLiteralValue , which is inefficient.
+Memory Allocations: Multiple string allocations occur during parsing and conversion.
+Recursive Parsing: The recursive parsing approach can be optimized to use an iterative method.
+Binary Parsing: The current implementation converts the entire hex string to a binary string, which is memory-intensive.
+----
+
+So why do we need an extra optimization step if SWE-1 more or less knows about critical sections?
+SWE-1 performs some changes, and re-runs the benchmarks, this time correctly for day 16 only.
+It then re-runs the benchmarks with a higher count (`--count=5`).
+Then we lose it again, it creates a complete new benchmark suite to run original and optimized versions side by side in `benchmark_compare_test.go`.
+Nice try if this would work, but in the meantime it forgot how to run benchmarks, and wants to re-run _all_ days 5 times.
+This definitely takes too long, and i step in and abort.
+SWE-1 moved critical parts of Day16 to the (illegal) benchmark_compare_test file, so all tests for part 2 are broken.
+After `fixing`, 
+
+----
+----
+
 
 
 == Day 17: Trick Shot

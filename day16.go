@@ -16,28 +16,25 @@ type Packet struct {
 	SubPackets []Packet
 }
 
-// NewDay16 parses the input data for Day 16.
+// NewDay16 parses the input data for Day 16 and returns a Packet.
 // The input is a single line containing a hexadecimal string.
-func NewDay16(input string) (string, error) {
-	// For now, just return the input as is
-	// We'll do the actual parsing in the Day16 function
-	return input, nil
+func NewDay16(input string) (Packet, error) {
+	// Convert hex string to binary
+	binStr := hexToBin(input)
+
+	// Parse the packet
+	packet, _ := parsePacket(binStr)
+	return packet, nil
 }
 
 // Day16 solves the Day 16 puzzle.
 // part1 flag indicates whether to solve part 1 (true) or part 2 (false).
 func Day16(hexStr string, part1 bool) uint {
-	// Convert hex string to binary
-	binStr := hexToBin(hexStr)
-	
-	// Parse the packet
-	packet, _ := parsePacket(binStr)
-	
+	packet, _ := NewDay16(hexStr)
 	if part1 {
 		return sumVersions(packet)
 	}
-	// Part 2 will be implemented later
-	return 0
+	return evaluatePacket(packet)
 }
 
 // hexToBin converts a hexadecimal string to a binary string
@@ -69,6 +66,7 @@ func hexToBin(hexStr string) string {
 }
 
 // parsePacket parses a binary string into a Packet
+// This is an internal helper function used by NewDay16
 // Returns the packet and the number of bits consumed
 func parsePacket(binStr string) (Packet, int) {
 	if len(binStr) < 6 { // Minimum packet size is 6 bits (version + type)
@@ -78,7 +76,7 @@ func parsePacket(binStr string) (Packet, int) {
 	// Parse version (first 3 bits)
 	version := binToUint(binStr[0:3])
 	typeID := binToUint(binStr[3:6])
-	
+
 	var p Packet
 	p.Version = version
 	p.TypeID = typeID
@@ -174,4 +172,89 @@ func sumVersions(p Packet) uint {
 		sum += sumVersions(subPkt)
 	}
 	return sum
+}
+
+// evaluatePacket evaluates the packet expression based on its type ID
+func evaluatePacket(p Packet) uint {
+	switch p.TypeID {
+	case 0: // sum
+		sum := uint(0)
+		for _, subPkt := range p.SubPackets {
+			sum += evaluatePacket(subPkt)
+		}
+		return sum
+
+	case 1: // product
+		if len(p.SubPackets) == 0 {
+			return 0
+		}
+		product := uint(1)
+		for _, subPkt := range p.SubPackets {
+			product *= evaluatePacket(subPkt)
+		}
+		return product
+
+	case 2: // minimum
+		if len(p.SubPackets) == 0 {
+			return 0
+		}
+		min := evaluatePacket(p.SubPackets[0])
+		for _, subPkt := range p.SubPackets[1:] {
+			if val := evaluatePacket(subPkt); val < min {
+				min = val
+			}
+		}
+		return min
+
+	case 3: // maximum
+		if len(p.SubPackets) == 0 {
+			return 0
+		}
+		max := evaluatePacket(p.SubPackets[0])
+		for _, subPkt := range p.SubPackets[1:] {
+			if val := evaluatePacket(subPkt); val > max {
+				max = val
+			}
+		}
+		return max
+
+	case 4: // literal
+		return p.Value
+
+	case 5: // greater than
+		if len(p.SubPackets) != 2 {
+			return 0
+		}
+		a := evaluatePacket(p.SubPackets[0])
+		b := evaluatePacket(p.SubPackets[1])
+		if a > b {
+			return 1
+		}
+		return 0
+
+	case 6: // less than
+		if len(p.SubPackets) != 2 {
+			return 0
+		}
+		a := evaluatePacket(p.SubPackets[0])
+		b := evaluatePacket(p.SubPackets[1])
+		if a < b {
+			return 1
+		}
+		return 0
+
+	case 7: // equal
+		if len(p.SubPackets) != 2 {
+			return 0
+		}
+		a := evaluatePacket(p.SubPackets[0])
+		b := evaluatePacket(p.SubPackets[1])
+		if a == b {
+			return 1
+		}
+		return 0
+
+	default:
+		return 0
+	}
 }
