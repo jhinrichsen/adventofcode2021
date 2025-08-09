@@ -78,9 +78,9 @@ goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay01Part2-8   	 1204111	      1033 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDay01Part2-8        1204111          1033 ns/op           0 B/op           0 allocs/op
 PASS
-ok  	gitlab.com/jhinrichsen/adventofcode2021	1.673s
+ok      gitlab.com/jhinrichsen/adventofcode2021    1.673s
 ----
 
 To put 1.33 ns/op in perspective: without I/O, meaning excluding time for
@@ -95,13 +95,13 @@ in one function this is not a real difference to previous Go releases.
 package adventofcode2021
 
 func Day01Part1(ns []int) int {
-	count := 0
-	for i := 1; i < len(ns); i++ {
-		if ns[i] > ns[i-1] {
-			count++
-		}
-	}
-	return count
+    count := 0
+    for i := 1; i < len(ns); i++ {
+        if ns[i] > ns[i-1] {
+            count++
+        }
+    }
+    return count
 }
 ----
 
@@ -117,7 +117,7 @@ JLS]:
 
 [source,go]
 ----
-	instructions["JLS"] = x86.AJLS  /* lower or same (unsigned) (CF = 1 || ZF = 1) */
+    instructions["JLS"] = x86.AJLS  /* lower or same (unsigned) (CF = 1 || ZF = 1) */
 ----
 
 The https://go.dev/doc/asm[Quick Guide to Go's assembler] is a useful read to
@@ -126,24 +126,24 @@ understand this snippet.
 [source,assembler]
 ----
 "".Day01Part1 STEXT nosplit size=46 args=0x18 locals=0x0 funcid=0x0
-	0x0000 00000 (day01.go:3)	TEXT	"".Day01Part1(SB), NOSPLIT|ABIInternal, $0-24
-	0x0000 00000 (day01.go:3)	MOVQ	AX, "".ns+8(FP)
-	0x0005 00005 (day01.go:3)	FUNCDATA	$0, gclocals·1a65e721a2ccc325b382662e7ffee780(SB)
-	0x0005 00005 (day01.go:3)	FUNCDATA	$1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
-	0x0005 00005 (day01.go:3)	FUNCDATA	$5, "".Day01Part1.arginfo1(SB)
-	0x0005 00005 (day01.go:6)	MOVL	$1, CX            ; i := 1
-	0x000a 00010 (day01.go:6)	XORL	DX, DX            ; count := 0
-	0x000c 00012 (day01.go:5)	JMP	37
-	0x000e 00014 (day01.go:6)	MOVQ	(AX)(CX*8), SI    ; ns[i] <1>
-	0x0012 00018 (day01.go:6)	MOVQ	-8(AX)(CX*8), DI  ; ns[i-1] <1>
-	0x0017 00023 (day01.go:7)	LEAQ	1(DX), R8
-	0x001b 00027 (day01.go:6)	CMPQ	DI, SI
-	0x001e 00030 (day01.go:7)	CMOVQLT	R8, DX
-	0x0022 00034 (day01.go:5)	INCQ	CX                ; i++
-	0x0025 00037 (day01.go:5)	CMPQ	BX, CX            ; len(ns) > i <2>
-	0x0028 00040 (day01.go:5)	JGT	14
-	0x002a 00042 (day01.go:10)	MOVQ	DX, AX            ; return count <3>
-	0x002d 00045 (day01.go:10)	RET
+    0x0000 00000 (day01.go:3)    TEXT    "".Day01Part1(SB), NOSPLIT|ABIInternal, $0-24
+    0x0000 00000 (day01.go:3)    MOVQ    AX, "".ns+8(FP)
+    0x0005 00005 (day01.go:3)    FUNCDATA    $0, gclocals·1a65e721a2ccc325b382662e7ffee780(SB)
+    0x0005 00005 (day01.go:3)    FUNCDATA    $1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+    0x0005 00005 (day01.go:3)    FUNCDATA    $5, "".Day01Part1.arginfo1(SB)
+    0x0005 00005 (day01.go:6)    MOVL    $1, CX            ; i := 1
+    0x000a 00010 (day01.go:6)    XORL    DX, DX            ; count := 0
+    0x000c 00012 (day01.go:5)    JMP    37
+    0x000e 00014 (day01.go:6)    MOVQ    (AX)(CX*8), SI    ; ns[i] <1>
+    0x0012 00018 (day01.go:6)    MOVQ    -8(AX)(CX*8), DI  ; ns[i-1] <1>
+    0x0017 00023 (day01.go:7)    LEAQ    1(DX), R8
+    0x001b 00027 (day01.go:6)    CMPQ    DI, SI
+    0x001e 00030 (day01.go:7)    CMOVQLT    R8, DX
+    0x0022 00034 (day01.go:5)    INCQ    CX                ; i++
+    0x0025 00037 (day01.go:5)    CMPQ    BX, CX            ; len(ns) > i <2>
+    0x0028 00040 (day01.go:5)    JGT    14
+    0x002a 00042 (day01.go:10)    MOVQ    DX, AX            ; return count <3>
+    0x002d 00045 (day01.go:10)    RET
 ----
 <1> The index loop is easy enough for the compiler to reason it needs no bounds
 checking, no panic()
@@ -163,10 +163,10 @@ structures surrounded by an `if/else`:
 ----
     if part1 {
         // 10 lines of complicated business logic
-	// including more indent levels
+    // including more indent levels
     } else {
         // 15 lines of complicated business logic
-	// including more indent levels
+    // including more indent levels
     }
 ----
 
@@ -196,11 +196,11 @@ when passed via pointer receiver.
 
 ----
 type S struct {
-	A []int
+    A []int
 }
 
 func (a *S) add(i int) {
-	a.A = append(a.A, i) // does not work
+    a.A = append(a.A, i) // does not work
 }
 ----
 
@@ -211,7 +211,7 @@ goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay04Part2-8   	     687	   1852821 ns/op	  560245 B/op	    2846 allocs/op
+BenchmarkDay04Part2-8            687       1852821 ns/op      560245 B/op        2846 allocs/op
 ----
 
 1.8 ms, excluding I/O, including parsing.
@@ -241,7 +241,7 @@ goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay05Part2-8   	      22	  46896856 ns/op	16126620 B/op	    7643 allocs/op
+BenchmarkDay05Part2-8             22      46896856 ns/op    16126620 B/op        7643 allocs/op
 ----
 
 That is 46 ms for part 2, excluding I/O, including parsing, for 500 lines and a
@@ -255,7 +255,7 @@ goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay05Part2-8   	      26	  40890804 ns/op	16117340 B/op	    7627 allocs/op
+BenchmarkDay05Part2-8             26      40890804 ns/op    16117340 B/op        7627 allocs/op
 ----
 
 == Day 6: Lanternfish
@@ -268,7 +268,7 @@ goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay06Part2-8   	   60168	     19808 ns/op	    5880 B/op	       8 allocs/op
+BenchmarkDay06Part2-8          60168         19808 ns/op        5880 B/op           8 allocs/op
 ----
 
 20 μs, this time including I/O and parsing, or 50_000 solutions per second.
@@ -285,26 +285,26 @@ although we only expect one single line of comma separated values:
 
 ----
 "".Day06 STEXT size=350 args=0x20 locals=0x60 funcid=0x0
-	0x0000 00000 (day06.go:21)	TEXT	"".Day06(SB), ABIInternal, $96-32
-	0x0000 00000 (day06.go:21)	CMPQ	SP, 16(R14)
-	0x0004 00004 (day06.go:21)	PCDATA	$0, $-2
-	0x0004 00004 (day06.go:21)	JLS	296
-	0x000a 00010 (day06.go:21)	PCDATA	$0, $-1
-	0x000a 00010 (day06.go:21)	SUBQ	$96, SP
-	0x000e 00014 (day06.go:21)	MOVQ	BP, 88(SP)
-	0x0013 00019 (day06.go:21)	LEAQ	88(SP), BP
-	0x0018 00024 (day06.go:21)	MOVQ	AX, "".lines+104(FP)
-	0x001d 00029 (day06.go:21)	FUNCDATA	$0, gclocals·1a65e721a2ccc325b382662e7ffee780(SB)
-	0x001d 00029 (day06.go:21)	FUNCDATA	$1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
-	0x001d 00029 (day06.go:21)	FUNCDATA	$5, "".Day06.arginfo1(SB)
-	0x001d 00029 (day06.go:21)	NOP
-	0x0020 00032 (day06.go:22)	TESTQ	BX, BX <1>
-	0x0023 00035 (day06.go:22)	JLS	285 <2>
+    0x0000 00000 (day06.go:21)    TEXT    "".Day06(SB), ABIInternal, $96-32
+    0x0000 00000 (day06.go:21)    CMPQ    SP, 16(R14)
+    0x0004 00004 (day06.go:21)    PCDATA    $0, $-2
+    0x0004 00004 (day06.go:21)    JLS    296
+    0x000a 00010 (day06.go:21)    PCDATA    $0, $-1
+    0x000a 00010 (day06.go:21)    SUBQ    $96, SP
+    0x000e 00014 (day06.go:21)    MOVQ    BP, 88(SP)
+    0x0013 00019 (day06.go:21)    LEAQ    88(SP), BP
+    0x0018 00024 (day06.go:21)    MOVQ    AX, "".lines+104(FP)
+    0x001d 00029 (day06.go:21)    FUNCDATA    $0, gclocals·1a65e721a2ccc325b382662e7ffee780(SB)
+    0x001d 00029 (day06.go:21)    FUNCDATA    $1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+    0x001d 00029 (day06.go:21)    FUNCDATA    $5, "".Day06.arginfo1(SB)
+    0x001d 00029 (day06.go:21)    NOP
+    0x0020 00032 (day06.go:22)    TESTQ    BX, BX <1>
+    0x0023 00035 (day06.go:22)    JLS    285 <2>
 
 
-	0x011d 00285 (day06.go:22)	XORL	AX, AX
-	0x011f 00287 (day06.go:22)	MOVQ	BX, CX
-	0x0122 00290 (day06.go:22)	CALL	runtime.panicIndex(SB)
+    0x011d 00285 (day06.go:22)    XORL    AX, AX
+    0x011f 00287 (day06.go:22)    MOVQ    BX, CX
+    0x0122 00290 (day06.go:22)    CALL    runtime.panicIndex(SB)
 ----
 <1> lines passed via AX, len(lines) passed via BX
 <2> JLS translates to JBE, 'Jump if below or equal' (BX <= 0)
@@ -314,7 +314,7 @@ goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay06Part2-8   	   60613	     19137 ns/op	    7552 B/op	       2 allocs/op
+BenchmarkDay06Part2-8          60613         19137 ns/op        7552 B/op           2 allocs/op
 ----
 
 If we expect exactly one line, it should be part of the function's signature.
@@ -334,7 +334,7 @@ goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay06Part2-8   	 1006672	      1076 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDay06Part2-8        1006672          1076 ns/op           0 B/op           0 allocs/op
 ----
 
 So instead of 20 μs, we are down to 1 μs, and reduced 8 allocations to 0.
@@ -347,19 +347,19 @@ Ready for some ARM Opcodes? Let's Go...
 
 a|
 ----
-0x0000 00000 (day06.go:21)	TEXT	"".Day06(SB), ABIInternal, $112-56
-0x0000 00000 (day06.go:21)	MOVD	16(g), R1
-0x0004 00004 (day06.go:21)	PCDATA	$0, $-2
-0x0004 00004 (day06.go:21)	MOVD	RSP, R2
-0x0008 00008 (day06.go:21)	CMP	R1, R2
-0x000c 00012 (day06.go:21)	BLS	268
-0x0010 00016 (day06.go:21)	PCDATA	$0, $-1
-0x0010 00016 (day06.go:21)	MOVD.W	R30, -112(RSP)
-0x0014 00020 (day06.go:21)	MOVD	R29, -8(RSP)
-0x0018 00024 (day06.go:21)	SUB	$8, RSP, R29
-0x001c 00028 (day06.go:21)	FUNCDATA	ZR, gclocals·564c88c798e834d77927d2fafb0b5dca(SB)
-0x001c 00028 (day06.go:21)	FUNCDATA	$1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
-0x001c 00028 (day06.go:21)	FUNCDATA	$5, "".Day06.arginfo1(SB)
+0x0000 00000 (day06.go:21)    TEXT    "".Day06(SB), ABIInternal, $112-56
+0x0000 00000 (day06.go:21)    MOVD    16(g), R1
+0x0004 00004 (day06.go:21)    PCDATA    $0, $-2
+0x0004 00004 (day06.go:21)    MOVD    RSP, R2
+0x0008 00008 (day06.go:21)    CMP    R1, R2
+0x000c 00012 (day06.go:21)    BLS    268
+0x0010 00016 (day06.go:21)    PCDATA    $0, $-1
+0x0010 00016 (day06.go:21)    MOVD.W    R30, -112(RSP)
+0x0014 00020 (day06.go:21)    MOVD    R29, -8(RSP)
+0x0018 00024 (day06.go:21)    SUB    $8, RSP, R29
+0x001c 00028 (day06.go:21)    FUNCDATA    ZR, gclocals·564c88c798e834d77927d2fafb0b5dca(SB)
+0x001c 00028 (day06.go:21)    FUNCDATA    $1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+0x001c 00028 (day06.go:21)    FUNCDATA    $5, "".Day06.arginfo1(SB)
 ----
 
 a|
@@ -368,11 +368,11 @@ func Day06(fishes []int, days int) (uint, error) {
 ----
 a|
 ----
-0x001c 00028 (day06.go:23)	STP	(ZR, ZR), "".ages-72(SP)
-0x0020 00032 (day06.go:23)	STP	(ZR, ZR), "".ages-56(SP)
-0x0024 00036 (day06.go:23)	STP	(ZR, ZR), "".ages-40(SP)
-0x0028 00040 (day06.go:23)	STP	(ZR, ZR), "".ages-24(SP)
-0x002c 00044 (day06.go:23)	MOVD	ZR, "".ages-8(SP)
+0x001c 00028 (day06.go:23)    STP    (ZR, ZR), "".ages-72(SP)
+0x0020 00032 (day06.go:23)    STP    (ZR, ZR), "".ages-56(SP)
+0x0024 00036 (day06.go:23)    STP    (ZR, ZR), "".ages-40(SP)
+0x0028 00040 (day06.go:23)    STP    (ZR, ZR), "".ages-24(SP)
+0x002c 00044 (day06.go:23)    MOVD    ZR, "".ages-8(SP)
 ----
 
 a|
@@ -381,10 +381,10 @@ var ages [groups]uint
 ----
 a|
 ----
-0x0030 00048 (day06.go:24)	MOVD	"".fishes+8(FP), R2
-0x0034 00052 (day06.go:24)	MOVD	"".fishes(FP), R3
-0x0038 00056 (day06.go:24)	MOVD	ZR, R0
-0x003c 00060 (day06.go:24)	JMP	84
+0x0030 00048 (day06.go:24)    MOVD    "".fishes+8(FP), R2
+0x0034 00052 (day06.go:24)    MOVD    "".fishes(FP), R3
+0x0038 00056 (day06.go:24)    MOVD    ZR, R0
+0x003c 00060 (day06.go:24)    JMP    84
 ----
 
 a|
@@ -393,10 +393,10 @@ for i := 0; i < len(fishes); i++ {
 ----
 a|
 ----
-0x0040 00064 (day06.go:25)	MOVD	$"".ages-72(SP), R5
-0x0044 00068 (day06.go:25)	MOVD	(R5)(R4<<3), R6
-0x0048 00072 (day06.go:25)	ADD	$1, R6, R6
-0x004c 00076 (day06.go:25)	MOVD	R6, (R5)(R4<<3)
+0x0040 00064 (day06.go:25)    MOVD    $"".ages-72(SP), R5
+0x0044 00068 (day06.go:25)    MOVD    (R5)(R4<<3), R6
+0x0048 00072 (day06.go:25)    ADD    $1, R6, R6
+0x004c 00076 (day06.go:25)    MOVD    R6, (R5)(R4<<3)
 ----
 
 a|
@@ -405,9 +405,9 @@ ages[fishes[i]]++
 ----
 a|
 ----
-0x0050 00080 (day06.go:24)	ADD	$1, R0, R0
-0x0054 00084 (day06.go:24)	CMP	R0, R2
-0x0058 00088 (day06.go:24)	BLE	108
+0x0050 00080 (day06.go:24)    ADD    $1, R0, R0
+0x0054 00084 (day06.go:24)    CMP    R0, R2
+0x0058 00088 (day06.go:24)    BLE    108
 ----
 
 a|
@@ -416,10 +416,10 @@ for i := 0; i < len(fishes); i++ {
 ----
 a|
 ----
-0x005c 00092 (day06.go:25)	MOVD	(R3)(R0<<3), R4
-0x0060 00096 (day06.go:25)	CMP	$9, R4
-0x0064 00100 (day06.go:25)	BLO	64
-0x0068 00104 (day06.go:25)	JMP	252
+0x005c 00092 (day06.go:25)    MOVD    (R3)(R0<<3), R4
+0x0060 00096 (day06.go:25)    CMP    $9, R4
+0x0064 00100 (day06.go:25)    BLO    64
+0x0068 00104 (day06.go:25)    JMP    252
 ----
 
 a|
@@ -428,9 +428,9 @@ ages[fishes[i]]++
 ----
 a|
 ----
-0x006c 00108 (day06.go:24)	MOVD	"".days+24(FP), R0
-0x0070 00112 (day06.go:24)	MOVD	ZR, R1
-0x0074 00116 (day06.go:24)	JMP	140
+0x006c 00108 (day06.go:24)    MOVD    "".days+24(FP), R0
+0x0070 00112 (day06.go:24)    MOVD    ZR, R1
+0x0074 00116 (day06.go:24)    JMP    140
 ----
 
 a|
@@ -439,9 +439,9 @@ for i := 0; i < len(fishes); i++ {
 ----
 a|
 ----
-0x0078 00120 (day06.go:33)	MOVD	"".ages-24(SP), R3
-0x007c 00124 (day06.go:33)	ADD	R2, R3, R3
-0x0080 00128 (day06.go:33)	MOVD	R3, "".ages-24(SP)
+0x0078 00120 (day06.go:33)    MOVD    "".ages-24(SP), R3
+0x007c 00124 (day06.go:33)    ADD    R2, R3, R3
+0x0080 00128 (day06.go:33)    MOVD    R3, "".ages-24(SP)
 ----
 
 a|
@@ -450,7 +450,7 @@ ages[6] += babies
 ----
 a|
 ----
-0x0084 00132 (day06.go:34)	MOVD	R2, "".ages-8(SP)
+0x0084 00132 (day06.go:34)    MOVD    R2, "".ages-8(SP)
 ----
 
 a|
@@ -459,9 +459,9 @@ ages[8] = babies
 ----
 a|
 ----
-0x0088 00136 (day06.go:28)	ADD	$1, R1, R1
-0x008c 00140 (day06.go:28)	CMP	R1, R0
-0x0090 00144 (day06.go:28)	BLE	160
+0x0088 00136 (day06.go:28)    ADD    $1, R1, R1
+0x008c 00140 (day06.go:28)    CMP    R1, R0
+0x0090 00144 (day06.go:28)    BLE    160
 ----
 
 a|
@@ -470,8 +470,8 @@ for day := 0; day < days; day++ {
 ----
 a|
 ----
-0x0094 00148 (day06.go:29)	MOVD	"".ages-72(SP), R2
-0x0098 00152 (day06.go:29)	MOVD	ZR, R3
+0x0094 00148 (day06.go:29)    MOVD    "".ages-72(SP), R2
+0x0098 00152 (day06.go:29)    MOVD    ZR, R3
 ----
 
 a|
@@ -480,9 +480,9 @@ babies := ages[0]
 ----
 a|
 ----
-0x009c 00156 (day06.go:30)	JMP	240
-0x00a0 00160 (day06.go:30)	MOVD	ZR, R0
-0x00a4 00164 (day06.go:30)	MOVD	ZR, R1
+0x009c 00156 (day06.go:30)    JMP    240
+0x00a0 00160 (day06.go:30)    MOVD    ZR, R0
+0x00a4 00164 (day06.go:30)    MOVD    ZR, R1
 ----
 
 a|
@@ -491,7 +491,7 @@ for age := 0; age < groups-1; age++ {
 ----
 a|
 ----
-0x00a8 00168 (day06.go:28)	JMP	192
+0x00a8 00168 (day06.go:28)    JMP    192
 ----
 
 a|
@@ -500,7 +500,7 @@ for day := 0; day < days; day++ {
 ----
 a|
 ----
-0x00ac 00172 (day06.go:38)	ADD	$1, R0, R2
+0x00ac 00172 (day06.go:38)    ADD    $1, R0, R2
 ----
 
 a|
@@ -509,9 +509,9 @@ for i := range ages {
 ----
 a|
 ----
-0x00b0 00176 (day06.go:39)	MOVD	$"".ages-72(SP), R3
-0x00b4 00180 (day06.go:39)	MOVD	(R3)(R0<<3), R3
-0x00b8 00184 (day06.go:39)	ADD	R3, R1, R1
+0x00b0 00176 (day06.go:39)    MOVD    $"".ages-72(SP), R3
+0x00b4 00180 (day06.go:39)    MOVD    (R3)(R0<<3), R3
+0x00b8 00184 (day06.go:39)    ADD    R3, R1, R1
 ----
 
 a|
@@ -520,9 +520,9 @@ sum += ages[i]
 ----
 a|
 ----
-0x00bc 00188 (day06.go:38)	MOVD	R2, R0
-0x00c0 00192 (day06.go:38)	CMP	$9, R0
-0x00c4 00196 (day06.go:38)	BLT	172
+0x00bc 00188 (day06.go:38)    MOVD    R2, R0
+0x00c0 00192 (day06.go:38)    CMP    $9, R0
+0x00c4 00196 (day06.go:38)    BLT    172
 ----
 
 a|
@@ -531,11 +531,11 @@ for i := range ages {
 ----
 a|
 ----
-0x00c8 00200 (day06.go:41)	MOVD	R1, "".~r2+32(FP)
-0x00cc 00204 (day06.go:41)	STP	(ZR, ZR), "".~r3+40(FP)
-0x00d0 00208 (day06.go:41)	MOVD	-8(RSP), R29
-0x00d4 00212 (day06.go:41)	MOVD.P	112(RSP), R30
-0x00d8 00216 (day06.go:41)	RET	(R30)
+0x00c8 00200 (day06.go:41)    MOVD    R1, "".~r2+32(FP)
+0x00cc 00204 (day06.go:41)    STP    (ZR, ZR), "".~r3+40(FP)
+0x00d0 00208 (day06.go:41)    MOVD    -8(RSP), R29
+0x00d4 00212 (day06.go:41)    MOVD.P    112(RSP), R30
+0x00d8 00216 (day06.go:41)    RET    (R30)
 ----
 
 a|
@@ -544,10 +544,10 @@ return sum, nil
 ----
 a|
 ----
-0x00dc 00220 (day06.go:31)	ADD	$1, R3, R4
-0x00e0 00224 (day06.go:31)	MOVD	$"".ages-72(SP), R5
-0x00e4 00228 (day06.go:31)	MOVD	(R5)(R4<<3), R6
-0x00e8 00232 (day06.go:31)	MOVD	R6, (R5)(R3<<3)
+0x00dc 00220 (day06.go:31)    ADD    $1, R3, R4
+0x00e0 00224 (day06.go:31)    MOVD    $"".ages-72(SP), R5
+0x00e4 00228 (day06.go:31)    MOVD    (R5)(R4<<3), R6
+0x00e8 00232 (day06.go:31)    MOVD    R6, (R5)(R3<<3)
 ----
 
 a|
@@ -556,10 +556,10 @@ ages[age] = ages[age+1]
 ----
 a|
 ----
-0x00ec 00236 (day06.go:30)	MOVD	R4, R3
-0x00f0 00240 (day06.go:30)	CMP	$8, R3
-0x00f4 00244 (day06.go:30)	BLT	220
-0x00f8 00248 (day06.go:30)	JMP	120
+0x00ec 00236 (day06.go:30)    MOVD    R4, R3
+0x00f0 00240 (day06.go:30)    CMP    $8, R3
+0x00f4 00244 (day06.go:30)    BLT    220
+0x00f8 00248 (day06.go:30)    JMP    120
 ----
 
 a|
@@ -568,12 +568,12 @@ for age := 0; age < groups-1; age++ {
 ----
 a|
 ----
-0x00fc 00252 (day06.go:25)	MOVD	R4, R0
-0x0100 00256 (day06.go:25)	MOVD	$9, R1
-0x0104 00260 (day06.go:25)	PCDATA	$1, $1
-0x0104 00260 (day06.go:25)	CALL	runtime.panicIndex(SB) <1>
-0x0108 00264 (day06.go:25)	HINT	ZR
-0x010c 00268 (day06.go:25)	NOP
+0x00fc 00252 (day06.go:25)    MOVD    R4, R0
+0x0100 00256 (day06.go:25)    MOVD    $9, R1
+0x0104 00260 (day06.go:25)    PCDATA    $1, $1
+0x0104 00260 (day06.go:25)    CALL    runtime.panicIndex(SB) <1>
+0x0108 00264 (day06.go:25)    HINT    ZR
+0x010c 00268 (day06.go:25)    NOP
 ----
 
 a|
@@ -582,12 +582,12 @@ ages[fishes[i]]++
 ----
 a|
 ----
-0x010c 00268 (day06.go:21)	PCDATA	$1, $-1
-0x010c 00268 (day06.go:21)	PCDATA	$0, $-2
-0x010c 00268 (day06.go:21)	MOVD	R30, R3
-0x0110 00272 (day06.go:21)	CALL	runtime.morestack_noctxt(SB)
-0x0114 00276 (day06.go:21)	PCDATA	$0, $-1
-0x0114 00276 (day06.go:21)	JMP	0
+0x010c 00268 (day06.go:21)    PCDATA    $1, $-1
+0x010c 00268 (day06.go:21)    PCDATA    $0, $-2
+0x010c 00268 (day06.go:21)    MOVD    R30, R3
+0x0110 00272 (day06.go:21)    CALL    runtime.morestack_noctxt(SB)
+0x0114 00276 (day06.go:21)    PCDATA    $0, $-1
+0x0114 00276 (day06.go:21)    JMP    0
 ----
 
 a|
@@ -671,13 +671,13 @@ Great, no more bound checking.
 
 a|
 ----
-0x0000 00000 (day06.go:21)	TEXT	"".Day06(SB), NOSPLIT|LEAF|ABIInternal, $96-56
-0x0000 00000 (day06.go:21)	MOVD.W	R30, -96(RSP)
-0x0004 00004 (day06.go:21)	MOVD	R29, -8(RSP)
-0x0008 00008 (day06.go:21)	SUB	$8, RSP, R29
-0x000c 00012 (day06.go:21)	FUNCDATA	ZR, gclocals·564c88c798e834d77927d2fafb0b5dca(SB)
-0x000c 00012 (day06.go:21)	FUNCDATA	$1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
-0x000c 00012 (day06.go:21)	FUNCDATA	$5, "".Day06.arginfo1(SB)
+0x0000 00000 (day06.go:21)    TEXT    "".Day06(SB), NOSPLIT|LEAF|ABIInternal, $96-56
+0x0000 00000 (day06.go:21)    MOVD.W    R30, -96(RSP)
+0x0004 00004 (day06.go:21)    MOVD    R29, -8(RSP)
+0x0008 00008 (day06.go:21)    SUB    $8, RSP, R29
+0x000c 00012 (day06.go:21)    FUNCDATA    ZR, gclocals·564c88c798e834d77927d2fafb0b5dca(SB)
+0x000c 00012 (day06.go:21)    FUNCDATA    $1, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+0x000c 00012 (day06.go:21)    FUNCDATA    $5, "".Day06.arginfo1(SB)
 ----
 
 a|
@@ -686,11 +686,11 @@ func Day06(fishes []uint, days uint) (uint, error) {
 ----
 a|
 ----
-0x000c 00012 (day06.go:23)	STP	(ZR, ZR), "".ages-72(SP)
-0x0010 00016 (day06.go:23)	STP	(ZR, ZR), "".ages-56(SP)
-0x0014 00020 (day06.go:23)	STP	(ZR, ZR), "".ages-40(SP)
-0x0018 00024 (day06.go:23)	STP	(ZR, ZR), "".ages-24(SP)
-0x001c 00028 (day06.go:23)	MOVD	ZR, "".ages-8(SP)
+0x000c 00012 (day06.go:23)    STP    (ZR, ZR), "".ages-72(SP)
+0x0010 00016 (day06.go:23)    STP    (ZR, ZR), "".ages-56(SP)
+0x0014 00020 (day06.go:23)    STP    (ZR, ZR), "".ages-40(SP)
+0x0018 00024 (day06.go:23)    STP    (ZR, ZR), "".ages-24(SP)
+0x001c 00028 (day06.go:23)    MOVD    ZR, "".ages-8(SP)
 ----
 
 a|
@@ -699,10 +699,10 @@ var ages [groups + 1]uint // 0..7 plus babies in 8
 ----
 a|
 ----
-0x0020 00032 (day06.go:24)	MOVD	"".fishes+8(FP), R0
-0x0024 00036 (day06.go:24)	MOVD	"".fishes(FP), R1
-0x0028 00040 (day06.go:24)	MOVD	ZR, R2
-0x002c 00044 (day06.go:24)	JMP	76
+0x0020 00032 (day06.go:24)    MOVD    "".fishes+8(FP), R0
+0x0024 00036 (day06.go:24)    MOVD    "".fishes(FP), R1
+0x0028 00040 (day06.go:24)    MOVD    ZR, R2
+0x002c 00044 (day06.go:24)    JMP    76
 ----
 
 a|
@@ -711,12 +711,12 @@ for i := 0; i < len(fishes); i++ {
 ----
 a|
 ----
-0x0030 00048 (day06.go:25)	MOVD	(R1)(R2<<3), R3
-0x0034 00052 (day06.go:25)	UBFIZ	$3, R3, $3, R3
-0x0038 00056 (day06.go:25)	MOVD	$"".ages-72(SP), R4
-0x003c 00060 (day06.go:25)	MOVD	(R4)(R3), R5
-0x0040 00064 (day06.go:25)	ADD	$1, R5, R5
-0x0044 00068 (day06.go:25)	MOVD	R5, (R4)(R3)
+0x0030 00048 (day06.go:25)    MOVD    (R1)(R2<<3), R3
+0x0034 00052 (day06.go:25)    UBFIZ    $3, R3, $3, R3
+0x0038 00056 (day06.go:25)    MOVD    $"".ages-72(SP), R4
+0x003c 00060 (day06.go:25)    MOVD    (R4)(R3), R5
+0x0040 00064 (day06.go:25)    ADD    $1, R5, R5
+0x0044 00068 (day06.go:25)    MOVD    R5, (R4)(R3)
 ----
 
 a|
@@ -725,12 +725,12 @@ ages[fishes[i]%groups]++
 ----
 a|
 ----
-0x0048 00072 (day06.go:24)	ADD	$1, R2, R2
-0x004c 00076 (day06.go:24)	CMP	R2, R0
-0x0050 00080 (day06.go:24)	BGT	48
-0x0054 00084 (day06.go:24)	MOVD	"".days+24(FP), R0
-0x0058 00088 (day06.go:24)	MOVD	ZR, R1
-0x005c 00092 (day06.go:24)	JMP	116
+0x0048 00072 (day06.go:24)    ADD    $1, R2, R2
+0x004c 00076 (day06.go:24)    CMP    R2, R0
+0x0050 00080 (day06.go:24)    BGT    48
+0x0054 00084 (day06.go:24)    MOVD    "".days+24(FP), R0
+0x0058 00088 (day06.go:24)    MOVD    ZR, R1
+0x005c 00092 (day06.go:24)    JMP    116
 ----
 
 a|
@@ -739,9 +739,9 @@ for i := 0; i < len(fishes); i++ {
 ----
 a|
 ----
-0x0060 00096 (day06.go:33)	MOVD	"".ages-24(SP), R3
-0x0064 00100 (day06.go:33)	ADD	R2, R3, R3
-0x0068 00104 (day06.go:33)	MOVD	R3, "".ages-24(SP)
+0x0060 00096 (day06.go:33)    MOVD    "".ages-24(SP), R3
+0x0064 00100 (day06.go:33)    ADD    R2, R3, R3
+0x0068 00104 (day06.go:33)    MOVD    R3, "".ages-24(SP)
 ----
 
 a|
@@ -750,7 +750,7 @@ ages[6] += babies
 ----
 a|
 ----
-0x006c 00108 (day06.go:34)	MOVD	R2, "".ages-8(SP)
+0x006c 00108 (day06.go:34)    MOVD    R2, "".ages-8(SP)
 ----
 
 a|
@@ -759,9 +759,9 @@ ages[8] = babies
 ----
 a|
 ----
-0x0070 00112 (day06.go:28)	ADD	$1, R1, R1
-0x0074 00116 (day06.go:28)	CMP	R1, R0
-0x0078 00120 (day06.go:28)	BLS	136
+0x0070 00112 (day06.go:28)    ADD    $1, R1, R1
+0x0074 00116 (day06.go:28)    CMP    R1, R0
+0x0078 00120 (day06.go:28)    BLS    136
 ----
 
 a|
@@ -770,8 +770,8 @@ for day := uint(0); day < days; day++ {
 ----
 a|
 ----
-0x007c 00124 (day06.go:29)	MOVD	"".ages-72(SP), R2
-0x0080 00128 (day06.go:29)	MOVD	ZR, R3
+0x007c 00124 (day06.go:29)    MOVD    "".ages-72(SP), R2
+0x0080 00128 (day06.go:29)    MOVD    ZR, R3
 ----
 
 a|
@@ -780,9 +780,9 @@ babies := ages[0]
 ----
 a|
 ----
-0x0084 00132 (day06.go:30)	JMP	216
-0x0088 00136 (day06.go:30)	MOVD	ZR, R0
-0x008c 00140 (day06.go:30)	MOVD	ZR, R1
+0x0084 00132 (day06.go:30)    JMP    216
+0x0088 00136 (day06.go:30)    MOVD    ZR, R0
+0x008c 00140 (day06.go:30)    MOVD    ZR, R1
 ----
 
 a|
@@ -791,7 +791,7 @@ for age := 0; age < groups; age++ {
 ----
 a|
 ----
-0x0090 00144 (day06.go:28)	JMP	168
+0x0090 00144 (day06.go:28)    JMP    168
 ----
 
 a|
@@ -800,7 +800,7 @@ for day := uint(0); day < days; day++ {
 ----
 a|
 ----
-0x0094 00148 (day06.go:38)	ADD	$1, R0, R2
+0x0094 00148 (day06.go:38)    ADD    $1, R0, R2
 ----
 
 a|
@@ -809,9 +809,9 @@ for i := range ages {
 ----
 a|
 ----
-0x0098 00152 (day06.go:39)	MOVD	$"".ages-72(SP), R3
-0x009c 00156 (day06.go:39)	MOVD	(R3)(R0<<3), R3
-0x00a0 00160 (day06.go:39)	ADD	R3, R1, R1
+0x0098 00152 (day06.go:39)    MOVD    $"".ages-72(SP), R3
+0x009c 00156 (day06.go:39)    MOVD    (R3)(R0<<3), R3
+0x00a0 00160 (day06.go:39)    ADD    R3, R1, R1
 ----
 
 a|
@@ -820,9 +820,9 @@ sum += ages[i]
 ----
 a|
 ----
-0x00a4 00164 (day06.go:38)	MOVD	R2, R0
-0x00a8 00168 (day06.go:38)	CMP	$9, R0
-0x00ac 00172 (day06.go:38)	BLT	148
+0x00a4 00164 (day06.go:38)    MOVD    R2, R0
+0x00a8 00168 (day06.go:38)    CMP    $9, R0
+0x00ac 00172 (day06.go:38)    BLT    148
 ----
 
 a|
@@ -831,11 +831,11 @@ for i := range ages {
 ----
 a|
 ----
-0x00b0 00176 (day06.go:41)	MOVD	R1, "".~r2+32(FP)
-0x00b4 00180 (day06.go:41)	STP	(ZR, ZR), "".~r3+40(FP)
-0x00b8 00184 (day06.go:41)	ADD	$96, RSP
-0x00bc 00188 (day06.go:41)	SUB	$8, RSP, R29
-0x00c0 00192 (day06.go:41)	RET	(R30)
+0x00b0 00176 (day06.go:41)    MOVD    R1, "".~r2+32(FP)
+0x00b4 00180 (day06.go:41)    STP    (ZR, ZR), "".~r3+40(FP)
+0x00b8 00184 (day06.go:41)    ADD    $96, RSP
+0x00bc 00188 (day06.go:41)    SUB    $8, RSP, R29
+0x00c0 00192 (day06.go:41)    RET    (R30)
 ----
 
 a|
@@ -844,10 +844,10 @@ return sum, nil
 ----
 a|
 ----
-0x00c4 00196 (day06.go:31)	ADD	$1, R3, R4
-0x00c8 00200 (day06.go:31)	MOVD	$"".ages-72(SP), R5
-0x00cc 00204 (day06.go:31)	MOVD	(R5)(R4<<3), R6
-0x00d0 00208 (day06.go:31)	MOVD	R6, (R5)(R3<<3)
+0x00c4 00196 (day06.go:31)    ADD    $1, R3, R4
+0x00c8 00200 (day06.go:31)    MOVD    $"".ages-72(SP), R5
+0x00cc 00204 (day06.go:31)    MOVD    (R5)(R4<<3), R6
+0x00d0 00208 (day06.go:31)    MOVD    R6, (R5)(R3<<3)
 ----
 
 a|
@@ -856,10 +856,10 @@ ages[age] = ages[age+1]
 ----
 a|
 ----
-0x00d4 00212 (day06.go:30)	MOVD	R4, R3
-0x00d8 00216 (day06.go:30)	CMP	$8, R3
-0x00dc 00220 (day06.go:30)	BLT	196
-0x00e0 00224 (day06.go:30)	JMP	96
+0x00d4 00212 (day06.go:30)    MOVD    R4, R3
+0x00d8 00216 (day06.go:30)    CMP    $8, R3
+0x00dc 00220 (day06.go:30)    BLT    196
+0x00e0 00224 (day06.go:30)    JMP    96
 ----
 
 a|
@@ -884,7 +884,7 @@ Unoptimized baseline:
 goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
-cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics    
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
 BenchmarkDay08Part1-8                441           3028729 ns/op          525595 B/op      14200 allocs/op
 BenchmarkDay08Part1-8                374           3358154 ns/op          525596 B/op      14200 allocs/op
 BenchmarkDay08Part1-8                324           3171079 ns/op          525594 B/op      14200 allocs/op
@@ -976,7 +976,7 @@ If your financial controller tells you to cut down on deployments costs, no deba
 ----
 // Point represents a coordinate on the transparent paper
 type Point struct {
-	X, Y int
+    X, Y int
 }
 ----
 
@@ -985,7 +985,7 @@ This has vague similarity to `image.Point` from the stdlib.
 [source,go]
 ----
 type Point struct {
-	X, Y int
+    X, Y int
 }
 ----
 
@@ -997,8 +997,8 @@ Next is a Fold struct
 ----
 // Fold represents a fold instruction
 type Fold struct {
-	Axis  string // "x" or "y"
-	Value int
+    Axis  string // "x" or "y"
+    Value int
 }
 ----
 
@@ -1013,7 +1013,7 @@ The axis representation as a `string`, well,
 
 [source,go]
 ----
-		if fold.Axis == "y" {
+        if fold.Axis == "y" {
 ----
 
 Given that
@@ -1029,9 +1029,9 @@ The section is another struct,
 [source,go]
 ----
 type Day13Data struct {
-	Dots     map[image.Point]bool
-	Folds    []int
-	DotCount int
+    Dots     map[image.Point]bool
+    Folds    []int
+    DotCount int
 }
 ----
 
@@ -1107,12 +1107,12 @@ One nice feature: when passing either one fold or many folds as a slice, `folds[
 ----
 foldsToApply := folds
 if part1 {
-	// Part 1: only apply the first fold
-	foldsToApply = folds[:1]
+    // Part 1: only apply the first fold
+    foldsToApply = folds[:1]
 }
 
 for _, fold := range foldsToApply {
-	dots = applyFold(dots, fold)
+    dots = applyFold(dots, fold)
 }
 ----
 
@@ -1121,11 +1121,11 @@ I find this more concise:
 [source,go]
 ----
 for _, fold := range folds {
-	dots = applyFold(dots, fold)
-	// Part 1: only apply the first fold
-	if part1 {
-		break
-	}
+    dots = applyFold(dots, fold)
+    // Part 1: only apply the first fold
+    if part1 {
+        break
+    }
 }
 ----
 
@@ -1136,7 +1136,7 @@ Then checks for a `0` fold, which is very good, but has no error handling and si
 [source,go]
 ----
 if fold == 0 {
-	return dots
+    return dots
 }
 ----
 
@@ -1160,7 +1160,7 @@ The `bench13` function correctly identifies as a test helper function:
 [source,go]
 ----
 func bench13(b *testing.B, part1 bool) {
-	b.Helper()
+    b.Helper()
 ----
 
 Junie does not use range-over-int (since Go 1.22) although contributing rules clearly state to use the full feature set for the version in `go.mod`.
@@ -1313,26 +1313,26 @@ goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
-BenchmarkDay14Part1-16    	    1996	    546649 ns/op	  165118 B/op	     100 allocs/op
-BenchmarkDay14Part1-16    	    2018	    548640 ns/op	  165121 B/op	     100 allocs/op
-BenchmarkDay14Part1-16    	    1956	    550210 ns/op	  165118 B/op	     100 allocs/op
-BenchmarkDay14Part1-16    	    1963	    545281 ns/op	  165118 B/op	     100 allocs/op
-BenchmarkDay14Part1-16    	    2001	    543381 ns/op	  165118 B/op	     100 allocs/op
-BenchmarkDay14Part1-16    	    2037	    572696 ns/op	  165118 B/op	     100 allocs/op
-BenchmarkDay14Part1-16    	    2026	    552087 ns/op	  165118 B/op	     100 allocs/op
-BenchmarkDay14Part1-16    	    1938	    557649 ns/op	  165118 B/op	     100 allocs/op
-BenchmarkDay14Part1-16    	    2002	    547242 ns/op	  165118 B/op	     100 allocs/op
-BenchmarkDay14Part1-16    	    2010	    540044 ns/op	  165118 B/op	     100 allocs/op
-BenchmarkDay14Part2-16    	    2727	    380288 ns/op	  295361 B/op	    6453 allocs/op
-BenchmarkDay14Part2-16    	    2854	    387332 ns/op	  295361 B/op	    6453 allocs/op
-BenchmarkDay14Part2-16    	    2750	    375476 ns/op	  295361 B/op	    6453 allocs/op
-BenchmarkDay14Part2-16    	    2877	    375769 ns/op	  295361 B/op	    6453 allocs/op
-BenchmarkDay14Part2-16    	    2750	    376570 ns/op	  295361 B/op	    6453 allocs/op
-BenchmarkDay14Part2-16    	    2750	    374897 ns/op	  295361 B/op	    6453 allocs/op
-BenchmarkDay14Part2-16    	    2685	    377764 ns/op	  295361 B/op	    6453 allocs/op
-BenchmarkDay14Part2-16    	    2974	    380639 ns/op	  295361 B/op	    6453 allocs/op
-BenchmarkDay14Part2-16    	    2857	    382654 ns/op	  295361 B/op	    6453 allocs/op
-BenchmarkDay14Part2-16    	    2820	    375643 ns/op	  295361 B/op	    6453 allocs/op
+BenchmarkDay14Part1-16            1996        546649 ns/op      165118 B/op         100 allocs/op
+BenchmarkDay14Part1-16            2018        548640 ns/op      165121 B/op         100 allocs/op
+BenchmarkDay14Part1-16            1956        550210 ns/op      165118 B/op         100 allocs/op
+BenchmarkDay14Part1-16            1963        545281 ns/op      165118 B/op         100 allocs/op
+BenchmarkDay14Part1-16            2001        543381 ns/op      165118 B/op         100 allocs/op
+BenchmarkDay14Part1-16            2037        572696 ns/op      165118 B/op         100 allocs/op
+BenchmarkDay14Part1-16            2026        552087 ns/op      165118 B/op         100 allocs/op
+BenchmarkDay14Part1-16            1938        557649 ns/op      165118 B/op         100 allocs/op
+BenchmarkDay14Part1-16            2002        547242 ns/op      165118 B/op         100 allocs/op
+BenchmarkDay14Part1-16            2010        540044 ns/op      165118 B/op         100 allocs/op
+BenchmarkDay14Part2-16            2727        380288 ns/op      295361 B/op        6453 allocs/op
+BenchmarkDay14Part2-16            2854        387332 ns/op      295361 B/op        6453 allocs/op
+BenchmarkDay14Part2-16            2750        375476 ns/op      295361 B/op        6453 allocs/op
+BenchmarkDay14Part2-16            2877        375769 ns/op      295361 B/op        6453 allocs/op
+BenchmarkDay14Part2-16            2750        376570 ns/op      295361 B/op        6453 allocs/op
+BenchmarkDay14Part2-16            2750        374897 ns/op      295361 B/op        6453 allocs/op
+BenchmarkDay14Part2-16            2685        377764 ns/op      295361 B/op        6453 allocs/op
+BenchmarkDay14Part2-16            2974        380639 ns/op      295361 B/op        6453 allocs/op
+BenchmarkDay14Part2-16            2857        382654 ns/op      295361 B/op        6453 allocs/op
+BenchmarkDay14Part2-16            2820        375643 ns/op      295361 B/op        6453 allocs/op
 ----
 
 == Day 15: Chiton
@@ -1439,7 +1439,7 @@ There is currently no day15.go implementation in the repo; tests will not compil
 stub/implementation exists. If you want, I can add a minimal stub that returns a “not implemented” error so the suite compiles.
 ----
 
-Earlier agents always went all-in, creating part 2 implementations purely on guesswork, as the puzzle hasn't even been opened 
+Earlier agents always went all-in, creating part 2 implementations purely on guesswork, as the puzzle hasn't even been opened
 for part 2, that's why i wanted to limit the scope of the first implementation to only the examples in part 1.
 I was thinking that a working test case requires working code itself, but yes, this chain of thought is valid.
 I need to more clearly express my expectations.
@@ -1530,12 +1530,12 @@ Added the Part 1 puzzle-input test and set the expected value.
 
 Changes:
 
-Updated 
+Updated
 day15_test.go
 :
-Added 
+Added
 TestDay15Part1
- which reads 
+ which reads
 testdata/day15.txt
 .
 Set expected to 435, derived by running the solution.
@@ -1638,30 +1638,30 @@ Here's the benchmark baseline.
 goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
-cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics     
-BenchmarkDay15Part1-16    	    1093	   1030707 ns/op	  424760 B/op	   20016 allocs/op
-BenchmarkDay15Part1-16    	    1081	   1009188 ns/op	  424760 B/op	   20016 allocs/op
-BenchmarkDay15Part1-16    	    1092	   1012713 ns/op	  424764 B/op	   20016 allocs/op
-BenchmarkDay15Part1-16    	    1138	    997470 ns/op	  424760 B/op	   20016 allocs/op
-BenchmarkDay15Part1-16    	    1135	   1013479 ns/op	  424760 B/op	   20016 allocs/op
-BenchmarkDay15Part1-16    	    1125	   1005196 ns/op	  424760 B/op	   20016 allocs/op
-BenchmarkDay15Part1-16    	    1130	   1019221 ns/op	  424760 B/op	   20016 allocs/op
-BenchmarkDay15Part1-16    	    1107	   1017751 ns/op	  424760 B/op	   20016 allocs/op
-BenchmarkDay15Part1-16    	    1080	   1031162 ns/op	  424760 B/op	   20016 allocs/op
-BenchmarkDay15Part1-16    	    1072	   1030696 ns/op	  424760 B/op	   20016 allocs/op
-BenchmarkDay15Part2-16    	      31	  32767353 ns/op	10315883 B/op	  500022 allocs/op
-BenchmarkDay15Part2-16    	      31	  32299264 ns/op	10315886 B/op	  500022 allocs/op
-BenchmarkDay15Part2-16    	      37	  32396585 ns/op	10315892 B/op	  500022 allocs/op
-BenchmarkDay15Part2-16    	      37	  32598493 ns/op	10315880 B/op	  500022 allocs/op
-BenchmarkDay15Part2-16    	      32	  32098892 ns/op	10315880 B/op	  500022 allocs/op
-BenchmarkDay15Part2-16    	      31	  32452456 ns/op	10315883 B/op	  500022 allocs/op
-BenchmarkDay15Part2-16    	      33	  32642563 ns/op	10315888 B/op	  500022 allocs/op
-BenchmarkDay15Part2-16    	      37	  32291750 ns/op	10315885 B/op	  500022 allocs/op
-BenchmarkDay15Part2-16    	      36	  32399414 ns/op	10315893 B/op	  500022 allocs/op
-BenchmarkDay15Part2-16    	      32	  32186199 ns/op	10315889 B/op	  500022 allocs/op
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+BenchmarkDay15Part1-16            1093       1030707 ns/op      424760 B/op       20016 allocs/op
+BenchmarkDay15Part1-16            1081       1009188 ns/op      424760 B/op       20016 allocs/op
+BenchmarkDay15Part1-16            1092       1012713 ns/op      424764 B/op       20016 allocs/op
+BenchmarkDay15Part1-16            1138        997470 ns/op      424760 B/op       20016 allocs/op
+BenchmarkDay15Part1-16            1135       1013479 ns/op      424760 B/op       20016 allocs/op
+BenchmarkDay15Part1-16            1125       1005196 ns/op      424760 B/op       20016 allocs/op
+BenchmarkDay15Part1-16            1130       1019221 ns/op      424760 B/op       20016 allocs/op
+BenchmarkDay15Part1-16            1107       1017751 ns/op      424760 B/op       20016 allocs/op
+BenchmarkDay15Part1-16            1080       1031162 ns/op      424760 B/op       20016 allocs/op
+BenchmarkDay15Part1-16            1072       1030696 ns/op      424760 B/op       20016 allocs/op
+BenchmarkDay15Part2-16              31      32767353 ns/op    10315883 B/op      500022 allocs/op
+BenchmarkDay15Part2-16              31      32299264 ns/op    10315886 B/op      500022 allocs/op
+BenchmarkDay15Part2-16              37      32396585 ns/op    10315892 B/op      500022 allocs/op
+BenchmarkDay15Part2-16              37      32598493 ns/op    10315880 B/op      500022 allocs/op
+BenchmarkDay15Part2-16              32      32098892 ns/op    10315880 B/op      500022 allocs/op
+BenchmarkDay15Part2-16              31      32452456 ns/op    10315883 B/op      500022 allocs/op
+BenchmarkDay15Part2-16              33      32642563 ns/op    10315888 B/op      500022 allocs/op
+BenchmarkDay15Part2-16              37      32291750 ns/op    10315885 B/op      500022 allocs/op
+BenchmarkDay15Part2-16              36      32399414 ns/op    10315893 B/op      500022 allocs/op
+BenchmarkDay15Part2-16              32      32186199 ns/op    10315889 B/op      500022 allocs/op
 ----
 
-Given that part 2 is 5x5 times bigger, and that both runtime and allocations increase by the same factor, the implementation is O(n), 
+Given that part 2 is 5x5 times bigger, and that both runtime and allocations increase by the same factor, the implementation is O(n),
 which is extremely strong.
 
 GPT-5 is already suggesting
@@ -1685,28 +1685,28 @@ package adventofcode2021
 import "testing"
 
 func day15(t *testing.T, filename string, part1 bool, want uint) { <1>
-	lines, err := linesFromFilename(filename)
-	if err != nil {
-		t.Fatal(err)
-	}
-	got, err := Day15(lines, part1)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if want != got {
-		t.Fatalf("want %d but got %d", want, got)
-	}
+    lines, err := linesFromFilename(filename)
+    if err != nil {
+        t.Fatal(err)
+    }
+    got, err := Day15(lines, part1)
+    if err != nil {
+        t.Fatal(err)
+    }
+    if want != got {
+        t.Fatalf("want %d but got %d", want, got)
+    }
 }
 
 func TestDay15Part1Example(t *testing.T) {
-	// "In the above example, the lowest total risk is 40." <2>
-	day15(t, exampleFilename(15), true, 40)
+    // "In the above example, the lowest total risk is 40." <2>
+    day15(t, exampleFilename(15), true, 40)
 }
 
 func TestDay15Part1(t *testing.T) {
-	// Expected value should be derived from running the solution on the actual input once. <3>
-	// We'll compute it and then lock it in here.
-	day15(t, filename(15), true, 435)
+    // Expected value should be derived from running the solution on the actual input once. <3>
+    // We'll compute it and then lock it in here.
+    day15(t, filename(15), true, 435)
 }
 
 func BenchmarkDay15Part1(b *testing.B) {
@@ -1740,8 +1740,8 @@ Here's the solver.
 package adventofcode2021
 
 import (
-	"container/heap" <1>
-	"errors"
+    "container/heap" <1>
+    "errors"
 )
 
 // Day15 computes the lowest total risk of any path from the top left to the bottom right.
@@ -1750,117 +1750,117 @@ import (
 //
 // lines is the raw grid input. part1 selects Part 1 vs Part 2 logic. Only Part 1 is implemented here.
 func Day15(lines []string, part1 bool) (uint, error) { <2>
-	// Filter out empty lines <3>
-	var gridLines []string
-	for _, line := range lines {
-		if len(line) > 0 {
-			gridLines = append(gridLines, line)
-		}
-	}
-	baseRows := len(gridLines)
-	baseCols := len(gridLines[0])
+    // Filter out empty lines <3>
+    var gridLines []string
+    for _, line := range lines {
+        if len(line) > 0 {
+            gridLines = append(gridLines, line)
+        }
+    }
+    baseRows := len(gridLines)
+    baseCols := len(gridLines[0])
 
-	rows, cols := baseRows, baseCols
-	if !part1 {
-		rows *= 5
-		cols *= 5
-	}
-	N := rows * cols <4>
+    rows, cols := baseRows, baseCols
+    if !part1 {
+        rows *= 5
+        cols *= 5
+    }
+    N := rows * cols <4>
 
-	// Build weights. For Part 1, copy directly. For Part 2, expand 5x with wrapping risk increments.
-	weights := make([]byte, N)
-	if part1 {
-		for r := 0; r < rows; r++ {
-			row := gridLines[r]
-			for c := 0; c < cols; c++ {
-				weights[r*cols+c] = row[c] - '0' <5>
-			}
-		}
-	} else {
-		for r := 0; r < rows; r++ {
-			for c := 0; c < cols; c++ {
-				br := r % baseRows
-				bc := c % baseCols
-				inc := (r / baseRows) + (c / baseCols)
-				base := int(gridLines[br][bc] - '0')
-				// wrap risk: 1..9
-				v := ((base - 1 + inc) % 9) + 1
-				weights[r*cols+c] = byte(v)
-			}
-		}
-	}
+    // Build weights. For Part 1, copy directly. For Part 2, expand 5x with wrapping risk increments.
+    weights := make([]byte, N)
+    if part1 {
+        for r := 0; r < rows; r++ {
+            row := gridLines[r]
+            for c := 0; c < cols; c++ {
+                weights[r*cols+c] = row[c] - '0' <5>
+            }
+        }
+    } else {
+        for r := 0; r < rows; r++ {
+            for c := 0; c < cols; c++ {
+                br := r % baseRows
+                bc := c % baseCols
+                inc := (r / baseRows) + (c / baseCols)
+                base := int(gridLines[br][bc] - '0')
+                // wrap risk: 1..9
+                v := ((base - 1 + inc) % 9) + 1
+                weights[r*cols+c] = byte(v)
+            }
+        }
+    }
 
-	// Dijkstra on a 2D grid using a min-heap.
-	const inf = int(^uint(0) >> 1) // max int <6>
-	dist := make([]int, N)
-	for i := range dist {
-		dist[i] = inf  <7>
-	}
-	start := 0
-	target := N - 1
-	dist[start] = 0 <8>
+    // Dijkstra on a 2D grid using a min-heap.
+    const inf = int(^uint(0) >> 1) // max int <6>
+    dist := make([]int, N)
+    for i := range dist {
+        dist[i] = inf  <7>
+    }
+    start := 0
+    target := N - 1
+    dist[start] = 0 <8>
 
-	pq := &minHeap{}
-	heap.Push(pq, node{idx: start, dist: 0})
+    pq := &minHeap{}
+    heap.Push(pq, node{idx: start, dist: 0})
 
-	inBounds := func(r, c int) bool { return r >= 0 && r < rows && c >= 0 && c < cols } <11>
+    inBounds := func(r, c int) bool { return r >= 0 && r < rows && c >= 0 && c < cols } <11>
 
-	for pq.Len() > 0 {
-		n := heap.Pop(pq).(node)
-		if n.idx == target {
-			return uint(n.dist), nil
-		}
-		// If this entry is stale, skip
-		if n.dist != dist[n.idx] {
-			continue
-		}
-		r, c := n.idx/cols, n.idx%cols
-		// 4 neighbors <9>
-		// Up
-		if rr, cc := r-1, c; inBounds(rr, cc) {
-			ni := rr*cols + cc
-			nd := n.dist + int(weights[ni])
-			if nd < dist[ni] {
-				dist[ni] = nd
-				heap.Push(pq, node{idx: ni, dist: nd})
-			}
-		}
-		// Down
-		if rr, cc := r+1, c; inBounds(rr, cc) {
-			ni := rr*cols + cc
-			nd := n.dist + int(weights[ni])
-			if nd < dist[ni] {
-				dist[ni] = nd
-				heap.Push(pq, node{idx: ni, dist: nd})
-			}
-		}
-		// Left
-		if rr, cc := r, c-1; inBounds(rr, cc) {
-			ni := rr*cols + cc
-			nd := n.dist + int(weights[ni])
-			if nd < dist[ni] {
-				dist[ni] = nd
-				heap.Push(pq, node{idx: ni, dist: nd})
-			}
-		}
-		// Right
-		if rr, cc := r, c+1; inBounds(rr, cc) {
-			ni := rr*cols + cc
-			nd := n.dist + int(weights[ni])
-			if nd < dist[ni] {
-				dist[ni] = nd
-				heap.Push(pq, node{idx: ni, dist: nd})
-			}
-		}
-	}
+    for pq.Len() > 0 {
+        n := heap.Pop(pq).(node)
+        if n.idx == target {
+            return uint(n.dist), nil
+        }
+        // If this entry is stale, skip
+        if n.dist != dist[n.idx] {
+            continue
+        }
+        r, c := n.idx/cols, n.idx%cols
+        // 4 neighbors <9>
+        // Up
+        if rr, cc := r-1, c; inBounds(rr, cc) {
+            ni := rr*cols + cc
+            nd := n.dist + int(weights[ni])
+            if nd < dist[ni] {
+                dist[ni] = nd
+                heap.Push(pq, node{idx: ni, dist: nd})
+            }
+        }
+        // Down
+        if rr, cc := r+1, c; inBounds(rr, cc) {
+            ni := rr*cols + cc
+            nd := n.dist + int(weights[ni])
+            if nd < dist[ni] {
+                dist[ni] = nd
+                heap.Push(pq, node{idx: ni, dist: nd})
+            }
+        }
+        // Left
+        if rr, cc := r, c-1; inBounds(rr, cc) {
+            ni := rr*cols + cc
+            nd := n.dist + int(weights[ni])
+            if nd < dist[ni] {
+                dist[ni] = nd
+                heap.Push(pq, node{idx: ni, dist: nd})
+            }
+        }
+        // Right
+        if rr, cc := r, c+1; inBounds(rr, cc) {
+            ni := rr*cols + cc
+            nd := n.dist + int(weights[ni])
+            if nd < dist[ni] {
+                dist[ni] = nd
+                heap.Push(pq, node{idx: ni, dist: nd})
+            }
+        }
+    }
 
-	return 0, errors.New("no path found")
+    return 0, errors.New("no path found")
 }
 
 // node represents a position in the grid with its current best-known distance.
 type node struct {
-	idx  int
-	dist int
+    idx  int
+    dist int
 }
 
 type minHeap []node
@@ -1874,18 +1874,18 @@ func (h *minHeap) Pop() any          { old := *h; n := len(old); x := old[n-1]; 
 <1> + using the Go heap package, not many know Go has one
 <2> + correct uint usage as specified in contributing rules
 <3> - this is not required, don't know why this happens
-<4> + smart, use a 1D grid to avoid complicated 2D array of arrays, which is 
+<4> + smart, use a 1D grid to avoid complicated 2D array of arrays, which is
 not elegant in Go
 <5> + `y * width + x` to translate from 2D to 1D
 <6> - remove this line altogether...
 <7> - ... and better use math.MaxInt directly
 <8> + from the puzzle spec: initial node has no distance
-<9> - repeating identical code four times for the C4 neighbors 
+<9> - repeating identical code four times for the C4 neighbors
 
 ----
 $ cloc day*.go
        2 text files.
-       2 unique files.                              
+       2 unique files.
        0 files ignored.
 
 github.com/AlDanial/cloc v 2.02  T=0.01 s (329.5 files/s, 32455.2 lines/s)
@@ -1956,7 +1956,7 @@ Optimizing processing of neighbors
 We currently have a mechanism to avoid reprocessing neighbors when they're popped, using a boolean flag. To enhance this, I could implement a visited array of booleans, marking nodes as visited once they are popped. This would help us skip any future processing of those nodes.
 However, I realize the stale check already prevents unnecessary checks. Minor optimizations include computing baseCols, and I’m contemplating pre-sizing the minHeap to avoid reallocations. While larger preallocation might increase memory, it’s often not necessary. I'll implement these changes and run tests afterward.
 
-So, after using `int32` instead of `int`, and unrolling the neighbor again, 
+So, after using `int32` instead of `int`, and unrolling the neighbor again,
 
 ----
 goos: linux
@@ -1967,7 +1967,7 @@ cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
               │    sec/op    │    sec/op     vs base               │   sec/op     vs base               │
 Day15Part1-16   1015.6µ ± 1%   1083.8µ ± 1%  +6.72% (p=0.000 n=10)   989.7µ ± 2%  -2.55% (p=0.000 n=10)
 Day15Part2-16    32.40m ± 1%    33.89m ± 1%  +4.62% (p=0.000 n=10)   31.03m ± 1%  -4.22% (p=0.000 n=10)
-geomean          5.736m         6.061m       +5.66%   
+geomean          5.736m         6.061m       +5.66%
 0000               5.542m       -3.39%
 
               │   baseline   │             iteration#1             │             iteration#2             │
@@ -2085,9 +2085,318 @@ find solutions that are faster then 8 ms for part 2, taking into account that 80
 
  https://programsareproofs.com/articles/aoc-2021/[Programs are proofs]
 
- 
+
+If you are sceptical about the 95%, just follow along for a side-by-side comparison to Windsurf's SWE-1.
 
 == Day 16: Packet Decoder
+
+Using Windsurf 1.11.3 and their SWE-1.
+
+----
+Me:
+
+follow the rules in contributing.md to solve advent of code puzzle 2021 day 16
+----
+
+A couple of `Continue` ACKs later, we get the implementation for examples and part 1.
+
+----
+Assistant:
+
+Great! All the tests are passing. Here's a summary of what we've accomplished:
+
+Successfully implemented the Day 16 solution with proper packet parsing and version number summation.
+Created comprehensive test cases using the example inputs from the puzzle description.
+Added a test for the actual puzzle input, which gives us the answer for Part 1: 891.
+The implementation correctly handles:
+
+Parsing hexadecimal input into binary
+Decoding packet headers (version and type)
+Handling both literal and operator packets
+Recursively processing sub-packets
+Summing up version numbers
+The code is now complete for Part 1 of Day 16. Would you like me to proceed with implementing Part 2, or is there anything else you'd like to address with the current implementation?
+----
+
+Good news, the tests succeed.
+
+CAUTION: Part 1 does not check for the correct solution, it just logs the calculated result to the console.
+
+After manually adjusting the test case for part 1, the test succeeds.
+
+Let's review the code.
+
+=== Day 16 Part 1 test cases code review
+
+[source,go]
+----
+package adventofcode2022                                                                 <1>
+
+import (
+    "testing"
+)
+
+func TestDay16Part1Example1(t *testing.T) {                                              <2>
+    // "With the first example, the hex string 8A004A801A8002F478 represents an operator packet (version 4) which contains an operator packet (version 1) which contains an operator packet (version 5) which contains a literal value (version 6); this packet has a version sum of 16."
+    const want = 16
+    got := Day16("8A004A801A8002F478", true)
+    if got != want {
+        t.Fatalf("got %d, want %d", got, want)
+    }
+}
+
+func TestDay16Part1Example2(t *testing.T) {                                              <2>
+    // "The second example, 620080001611562C8802118E34, results in a version sum of 12." <3>
+    const want = 12
+    got := Day16("620080001611562C8802118E34", true)
+    if got != want {
+        t.Fatalf("got %d, want %d", got, want)
+    }
+}
+
+func TestDay16Part1Example3(t *testing.T) {                                              <2>
+    // "The third example, C0015000016115A2E0802F182340, results in a version sum of 23."
+    const want = 23
+    got := Day16("C0015000016115A2E0802F182340", true)
+    if got != want {
+        t.Fatalf("got %d, want %d", got, want)
+    }
+}
+
+func TestDay16Part1Example4(t *testing.T) {                                              <2>
+    // "The fourth example, A0016C880162017C3686B18A3D4780, results in a version sum of 31."
+    const want = 31
+    got := Day16("A0016C880162017C3686B18A3D4780", true)
+    if got != want {
+        t.Fatalf("got %d, want %d", got, want)
+    }
+}
+
+func TestDay16Part1(t *testing.T) {
+    // Read the input file
+    lines, err := linesFromFilename(filename(16))
+    if err != nil {
+        t.Fatalf("Failed to read input file: %v", err)                                   <3>
+    }
+    if len(lines) == 0 {
+        t.Fatal("Empty input file")                                                      <4>
+    }
+    hexStr := lines[0]                                                                   <5>
+
+    // Run the solution
+    got := Day16(hexStr, true)
+
+    // Log the answer (since we don't know it yet)
+    t.Logf("Day 16 Part 1 answer: %d", got)                                              <6>
+}
+
+func BenchmarkDay16(b *testing.B) {                                                      <7>
+    // This benchmark will be implemented later
+    b.Skip("Skipping benchmark until implementation is complete")
+}
+----
+<1> - wrong package name, must be `adventofcode2021`. This breaks building the complete project.
+<2> - Four identical implementations, no helper function, no table driven tests
+<3> - Not the original quote. Close, but a quote is a quote and MUST NOT be changed.
+<4> - superfluous, t.Fatal(err) should do it
+<5> - single use variable declaration which creates scope but is only used once, on the next line
+<6> - this implementation has no requirement
+<7> - SWE-1 does not understand the two phases when creating test functions for unkown solutions.
+It should use some kind of zero value that lets the code compile and run, and then punch in the calculated value.
+
+=== Day 16 Part 1 solver review
+
+[source,go]
+----
+package adventofcode2021
+
+import (
+    "strconv"
+)
+
+// Packet represents a BITS packet
+// The puzzle description indicates packets have a version, type ID, and content            <1>
+// that varies based on the type ID.
+type Packet struct {
+    Version uint
+    TypeID  uint
+    // For literal packets
+    Value uint
+    // For operator packets
+    SubPackets []Packet
+}
+
+// NewDay16 parses the input data for Day 16.
+// The input is a single line containing a hexadecimal string.
+func NewDay16(input string) (string, error) {
+    // For now, just return the input as is
+    // We'll do the actual parsing in the Day16 function
+    return input, nil                                                                        <2>
+}
+
+// Day16 solves the Day 16 puzzle.
+// part1 flag indicates whether to solve part 1 (true) or part 2 (false).
+func Day16(hexStr string, part1 bool) uint {                                                 <3>, <4>
+    // Convert hex string to binary                                                          <5>
+    binStr := hexToBin(hexStr)
+
+    // Parse the packet                                                                      <5>
+    packet, _ := parsePacket(binStr)
+
+    if part1 {
+        return sumVersions(packet)
+    }
+    // Part 2 will be implemented later
+    return 0
+}
+
+// hexToBin converts a hexadecimal string to a binary string
+func hexToBin(hexStr string) string {                                                        <6>
+    hexToBinMap := map[rune]string{
+        '0': "0000",
+        '1': "0001",
+        '2': "0010",
+        '3': "0011",
+        '4': "0100",
+        '5': "0101",
+        '6': "0110",
+        '7': "0111",
+        '8': "1000",
+        '9': "1001",
+        'A': "1010",
+        'B': "1011",
+        'C': "1100",
+        'D': "1101",
+        'E': "1110",
+        'F': "1111",
+    }
+
+    binStr := ""
+    for _, h := range hexStr {
+        binStr += hexToBinMap[h]                                                             <7>
+    }
+    return binStr
+}
+
+// parsePacket parses a binary string into a Packet
+// Returns the packet and the number of bits consumed
+func parsePacket(binStr string) (Packet, int) {                                              <8>
+    if len(binStr) < 6 { // Minimum packet size is 6 bits (version + type)
+        return Packet{}, 0
+    }
+
+    // Parse version (first 3 bits)
+    version := binToUint(binStr[0:3])
+    typeID := binToUint(binStr[3:6])
+
+    var p Packet
+    p.Version = version
+    p.TypeID = typeID
+
+    // Literal value packet
+    if typeID == 4 {
+        value, bitsRead := parseLiteralValue(binStr[6:])
+        p.Value = value
+        return p, 6 + bitsRead
+    }
+
+    // Operator packet
+    lengthTypeID := binStr[6] - '0'
+    var subPackets []Packet
+    var bitsRead int
+
+    if lengthTypeID == 0 {
+        // Next 15 bits are total length in bits of sub-packets
+        length := binToUint(binStr[7:22])
+        subPacketsStr := binStr[22 : 22+int(length)]
+        subPackets, _ = parseSubPacketsByLength(subPacketsStr)                               <9>
+        bitsRead = 22 + int(length)
+    } else {
+        // Next 11 bits are number of sub-packets
+        subPacketCount := binToUint(binStr[7:18])
+        subPackets, bitsRead = parseSubPacketsByCount(binStr[18:], int(subPacketCount))
+        bitsRead += 18
+    }
+
+    p.SubPackets = subPackets
+    return p, bitsRead
+}
+
+// parseLiteralValue parses a literal value from a binary string
+// Returns the value and the number of bits consumed
+func parseLiteralValue(binStr string) (uint, int) {
+    var valueStr string
+    var i int
+    for i = 0; i < len(binStr); i += 5 {
+        if i+5 > len(binStr) {
+            break
+        }
+        group := binStr[i : i+5]
+        valueStr += group[1:]
+        if group[0] == '0' {
+            i += 5
+            break
+        }
+    }
+    return binToUint(valueStr), i
+}
+
+// parseSubPacketsByLength parses sub-packets from a binary string with a given total bit length
+func parseSubPacketsByLength(binStr string) ([]Packet, int) {
+    var packets []Packet
+    totalBitsRead := 0
+    for totalBitsRead < len(binStr) {
+        packet, bitsRead := parsePacket(binStr[totalBitsRead:])                              <9>
+        if bitsRead == 0 {
+            break
+        }
+        packets = append(packets, packet)
+        totalBitsRead += bitsRead
+    }
+    return packets, totalBitsRead
+}
+
+// parseSubPacketsByCount parses a specific number of sub-packets from a binary string
+func parseSubPacketsByCount(binStr string, count int) ([]Packet, int) {
+    var packets []Packet
+    totalBitsRead := 0
+    for i := 0; i < count && totalBitsRead < len(binStr); i++ {
+        packet, bitsRead := parsePacket(binStr[totalBitsRead:])                              <9>
+        if bitsRead == 0 {
+            break
+        }
+        packets = append(packets, packet)
+        totalBitsRead += bitsRead
+    }
+    return packets, totalBitsRead
+}
+
+// binToUint converts a binary string to uint
+func binToUint(binStr string) uint {
+    val, _ := strconv.ParseUint(binStr, 2, 64)
+    return uint(val)
+}
+
+// sumVersions recursively sums the version numbers of all packets
+func sumVersions(p Packet) uint {
+    sum := p.Version
+    for _, subPkt := range p.SubPackets {
+        sum += sumVersions(subPkt)
+    }
+    return sum
+}
+----
+<1> - Comments should explain the code not the puzzle
+<2> - bad one: instead of parsing and returning the struct, SWE-1 implements a Parser that does nothing
+<3> + correct type `uint`
+<4> - bad one: silently ignore errors, although Day16() packs the parser that should have been in NewDay16().
+<5> - useless comment, just repeating the words from the code does not help in any way and clutters the flow
+<6> - using 'binary strings' as binary representation is weird
+<7> - string concatenation is slow and memory intensive
+<8> - this is the parser we want in NewDay16(), silently ignores errors
+<9> - bad one: the rules clearly state that recursion is forbidden
+
+All in all, this implementation is huge, 9 functions.
 
 == Day 17: Trick Shot
 
@@ -2104,33 +2413,33 @@ mistakes:
 
 [source,go]
 ----
-	burn := func(dist int) int {
-		if part1 {
-			return dist
-		}
-		// OEIS A000217 triangular number
-		return dist * (dist + 1) / 2 <1>
-	}
+    burn := func(dist int) int {
+        if part1 {
+            return dist
+        }
+        // OEIS A000217 triangular number
+        return dist * (dist + 1) / 2 <1>
+    }
 
-	fuel := func(pos int) int {
-		sum := 0
-		for i := range positions {
-			dist := positions[i] - pos
-			if dist < 0 {
-				dist = -dist <2>
-			}
-			sum += burn(dist)
-		}
-		return sum
-	}
+    fuel := func(pos int) int {
+        sum := 0
+        for i := range positions {
+            dist := positions[i] - pos
+            if dist < 0 {
+                dist = -dist <2>
+            }
+            sum += burn(dist)
+        }
+        return sum
+    }
 
-	fmin := math.MaxInt32 <3>
-	for pos := min; pos <= max; pos++ { <4>
-		f := fuel(pos)
-		if f < fmin {
-			fmin = f
-		}
-	}
+    fmin := math.MaxInt32 <3>
+    for pos := min; pos <= max; pos++ { <4>
+        f := fuel(pos)
+        if f < fmin {
+            fmin = f
+        }
+    }
 ----
 <1> OEIS contains thousands of man-years of the smartest brains on this planet
 ever
@@ -2143,7 +2452,7 @@ goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay07Part2-8   	     260	   4508358 ns/op	       0 B/op	       0 allocs/op
+BenchmarkDay07Part2-8            260       4508358 ns/op           0 B/op           0 allocs/op
 ----
 
 4.5 ms, no allocations.
