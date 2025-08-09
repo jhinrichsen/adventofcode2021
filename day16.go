@@ -38,31 +38,22 @@ func Day16(hexStr string, part1 bool) uint {
 }
 
 // hexToBin converts a hexadecimal string to a binary string
-func hexToBin(hexStr string) string {
-	hexToBinMap := map[rune]string{
-		'0': "0000",
-		'1': "0001",
-		'2': "0010",
-		'3': "0011",
-		'4': "0100",
-		'5': "0101",
-		'6': "0110",
-		'7': "0111",
-		'8': "1000",
-		'9': "1001",
-		'A': "1010",
-		'B': "1011",
-		'C': "1100",
-		'D': "1101",
-		'E': "1110",
-		'F': "1111",
-	}
+var hexToBinMap = [256]string{
+	'0': "0000", '1': "0001", '2': "0010", '3': "0011",
+	'4': "0100", '5': "0101", '6': "0110", '7': "0111",
+	'8': "1000", '9': "1001", 'A': "1010", 'B': "1011",
+	'C': "1100", 'D': "1101", 'E': "1110", 'F': "1111",
+	'a': "1010", 'b': "1011", 'c': "1100", 'd': "1101",
+	'e': "1110", 'f': "1111",
+}
 
-	binStr := ""
-	for _, h := range hexStr {
-		binStr += hexToBinMap[h]
+func hexToBin(hexStr string) string {
+	size := len(hexStr) * 4
+	binStr := make([]byte, 0, size)
+	for i := 0; i < len(hexStr); i++ {
+		binStr = append(binStr, hexToBinMap[hexStr[i]]...)
 	}
-	return binStr
+	return string(binStr)
 }
 
 // parsePacket parses a binary string into a Packet
@@ -73,9 +64,9 @@ func parsePacket(binStr string) (Packet, int) {
 		return Packet{}, 0
 	}
 
-	// Parse version (first 3 bits)
-	version := binToUint(binStr[0:3])
-	typeID := binToUint(binStr[3:6])
+	// Parse version (first 3 bits) and type (next 3 bits) using bit operations
+	version := uint(binStr[0]-'0')<<2 | uint(binStr[1]-'0')<<1 | uint(binStr[2]-'0')
+	typeID := uint(binStr[3]-'0')<<2 | uint(binStr[4]-'0')<<1 | uint(binStr[5]-'0')
 
 	var p Packet
 	p.Version = version
@@ -113,20 +104,31 @@ func parsePacket(binStr string) (Packet, int) {
 // parseLiteralValue parses a literal value from a binary string
 // Returns the value and the number of bits consumed
 func parseLiteralValue(binStr string) (uint, int) {
-	var valueStr string
-	var i int
-	for i = 0; i < len(binStr); i += 5 {
+	var value uint
+	var bitsRead int
+
+	for i := 0; i < len(binStr); i += 5 {
 		if i+5 > len(binStr) {
 			break
 		}
+
+		// Get the current 5-bit group
 		group := binStr[i : i+5]
-		valueStr += group[1:]
+
+		// Parse the 4 value bits and add them to the result
+		for j := 1; j < 5; j++ {
+			value = (value << 1) | uint(group[j]-'0')
+		}
+
+		bitsRead += 5
+
+		// Last group has 0 as the first bit
 		if group[0] == '0' {
-			i += 5
 			break
 		}
 	}
-	return binToUint(valueStr), i
+
+	return value, bitsRead
 }
 
 // parseSubPacketsByLength parses sub-packets from a binary string with a given total bit length
@@ -165,12 +167,26 @@ func binToUint(binStr string) uint {
 	return uint(val)
 }
 
-// sumVersions recursively sums the version numbers of all packets
-func sumVersions(p Packet) uint {
-	sum := p.Version
-	for _, subPkt := range p.SubPackets {
-		sum += sumVersions(subPkt)
+// sumVersions sums the version numbers of all packets using iterative DFS
+func sumVersions(root Packet) uint {
+	sum := uint(0)
+	stack := []Packet{root}
+
+	for len(stack) > 0 {
+		// Pop the last element
+		n := len(stack) - 1
+		p := stack[n]
+		stack = stack[:n]
+
+		// Add this packet's version
+		sum += p.Version
+
+		// Push all sub-packets onto the stack
+		for i := len(p.SubPackets) - 1; i >= 0; i-- {
+			stack = append(stack, p.SubPackets[i])
+		}
 	}
+
 	return sum
 }
 
@@ -179,8 +195,8 @@ func evaluatePacket(p Packet) uint {
 	switch p.TypeID {
 	case 0: // sum
 		sum := uint(0)
-		for _, subPkt := range p.SubPackets {
-			sum += evaluatePacket(subPkt)
+		for i := range p.SubPackets {
+			sum += evaluatePacket(p.SubPackets[i])
 		}
 		return sum
 
@@ -189,8 +205,8 @@ func evaluatePacket(p Packet) uint {
 			return 0
 		}
 		product := uint(1)
-		for _, subPkt := range p.SubPackets {
-			product *= evaluatePacket(subPkt)
+		for i := range p.SubPackets {
+			product *= evaluatePacket(p.SubPackets[i])
 		}
 		return product
 
