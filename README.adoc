@@ -2398,6 +2398,55 @@ func sumVersions(p Packet) uint {
 
 All in all, this implementation is huge, 9 functions.
 
+=== Benchmarking part 1
+
+SWE-1 created a benchmark that does nothing. This is probably the worst decision to take,
+either leave it out, or implement it. Creating code that does nothing is useless.
+All implementation details are clear, the benchmark could have been written, so instead of
+
+[source,go]
+----
+func BenchmarkDay16(b *testing.B) {
+	// This benchmark will be implemented later
+	b.Skip("Skipping benchmark until implementation is complete")
+}
+----
+
+SWE-1 could easily have come up with an implementation like this:
+
+[source,go]
+----
+func BenchmarkDay16(b *testing.B) {
+	lines, err := linesFromFilename(filename(16))
+	if err != nil {
+		b.Fatal(err)
+	}
+	for range b.N {
+		Day16(lines[0], true)
+	}
+}
+----
+
+==== Baseline
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics     
+BenchmarkDay16-16    	    2138	    497054 ns/op	 4075410 B/op	    1923 allocs/op
+BenchmarkDay16-16    	    2077	    515426 ns/op	 4075411 B/op	    1923 allocs/op
+BenchmarkDay16-16    	    2014	    505410 ns/op	 4075408 B/op	    1923 allocs/op
+BenchmarkDay16-16    	    2132	    495957 ns/op	 4075408 B/op	    1923 allocs/op
+BenchmarkDay16-16    	    2098	    504699 ns/op	 4075410 B/op	    1923 allocs/op
+BenchmarkDay16-16    	    2235	    496928 ns/op	 4075408 B/op	    1923 allocs/op
+BenchmarkDay16-16    	    2017	    499649 ns/op	 4075409 B/op	    1923 allocs/op
+BenchmarkDay16-16    	    2193	    644431 ns/op	 4075409 B/op	    1923 allocs/op
+BenchmarkDay16-16    	    1746	    708832 ns/op	 4075410 B/op	    1923 allocs/op
+BenchmarkDay16-16    	    1362	    782393 ns/op	 4075411 B/op	    1923 allocs/op
+----
+
+
 == Day 17: Trick Shot
 
 == Day 18: Snailfish

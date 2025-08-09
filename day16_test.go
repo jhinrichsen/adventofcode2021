@@ -54,6 +54,11 @@ func TestDay16Part1(t *testing.T) {
 }
 
 func BenchmarkDay16(b *testing.B) {
-	// This benchmark will be implemented later
-	b.Skip("Skipping benchmark until implementation is complete")
+	lines, err := linesFromFilename(filename(16))
+	if err != nil {
+		b.Fatal(err)
+	}
+	for range b.N {
+		Day16(lines[0], true)
+	}
 }
