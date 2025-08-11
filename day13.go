@@ -1,20 +1,18 @@
 package adventofcode2021
 
-import (
-	"image"
-	"image/color"
-	"image/png"
-	"math/bits"
-	"os"
-)
+import "strings"
 
-// BitImage represents a 2D bit image stored as a flat array of uint64 words
+// Point represents a 2D point with X and Y coordinates
+type Point struct {
+	X, Y int
+}
+
+// BitImage represents a 2D grid of bits
 type BitImage struct {
 	data        []uint64
 	width       int
 	height      int
 	wordsPerRow int
-	rect        image.Rectangle
 }
 
 // NewBitImage creates a new BitImage with the given dimensions
@@ -26,7 +24,6 @@ func NewBitImage(width, height int) *BitImage {
 		width:       width,
 		height:      height,
 		wordsPerRow: wordsPerRow,
-		rect:        image.Rect(0, 0, width, height),
 	}
 }
 
@@ -56,60 +53,96 @@ func (img *BitImage) Clear() {
 	}
 }
 
-// ColorModel returns the BitImage's color model
-func (img *BitImage) ColorModel() color.Model {
-	return color.GrayModel
-}
-
-// Bounds returns the BitImage's bounds
-func (img *BitImage) Bounds() image.Rectangle {
-	return img.rect
-}
-
-// At returns the color at the given coordinates
-func (img *BitImage) At(x, y int) color.Color {
-	if img.Get(x, y) {
-		return color.Gray{Y: 0} // Black pixel
-	}
-	return color.Gray{Y: 255} // White pixel
-}
-
 // Count returns the number of set bits in the image
-func (img *BitImage) Count() uint {
-	var count uint
+func (img *BitImage) Count() int {
+	count := 0
 	for _, word := range img.data {
-		count += uint(bits.OnesCount64(word))
+		for word != 0 {
+			count += int(word & 1)
+			word >>= 1
+		}
 	}
 	return count
 }
 
-// ToPNG saves the BitImage as a PNG file
-// Set bits are rendered as black pixels (0), unset bits as white pixels (255)
-// This provides optimal contrast for OCR scanning
-func (img *BitImage) ToPNG(filename string) error {
-	// Create a grayscale image
-	grayImg := image.NewGray(image.Rect(0, 0, img.width, img.height))
+// ToASCII returns the image as a slice of strings, one per row
+// '#' for set bits and '.' for unset bits
+func (img *BitImage) ToASCII() []string {
+	if img.height == 0 || img.width == 0 {
+		return nil
+	}
 
-	// Fill the image: set bits = black (0), unset bits = white (255)
+	// Find content bounds
+	minX, maxX := img.width-1, 0
+	minY, maxY := img.height-1, 0
 	for y := 0; y < img.height; y++ {
 		for x := 0; x < img.width; x++ {
 			if img.Get(x, y) {
-				grayImg.SetGray(x, y, color.Gray{Y: 0}) // Black for set bits
-			} else {
-				grayImg.SetGray(x, y, color.Gray{Y: 255}) // White for unset bits
+				if x < minX { minX = x }
+				if x > maxX { maxX = x }
+				if y < minY { minY = y }
+				if y > maxY { maxY = y }
 			}
 		}
 	}
 
-	// Create the output file
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
+	// If no points, return empty
+	if minX > maxX || minY > maxY {
+		return nil
 	}
-	defer file.Close()
 
-	// Encode as PNG
-	return png.Encode(file, grayImg)
+	// Calculate content dimensions
+	contentWidth := maxX - minX + 1
+	contentHeight := maxY - minY + 1
+
+	// Create a grid with the content dimensions
+	grid := make([][]rune, contentHeight)
+	for y := 0; y < contentHeight; y++ {
+		grid[y] = make([]rune, contentWidth)
+		for x := 0; x < contentWidth; x++ {
+			if img.Get(minX + x, minY + y) {
+				grid[y][x] = '#'
+			} else {
+				grid[y][x] = '.'
+			}
+		}
+	}
+
+	// Convert grid to []string
+	result := make([]string, contentHeight)
+	for y := 0; y < contentHeight; y++ {
+		result[y] = string(grid[y])
+	}
+
+	// Ensure minimum dimensions for OCR (6x4)
+	minOCRWidth := 6
+	minOCRHeight := 4
+
+	// Pad width if needed
+	if contentWidth < minOCRWidth {
+		padding := (minOCRWidth - contentWidth) / 2
+		for i := range result {
+			result[i] = strings.Repeat(".", padding) + result[i] + strings.Repeat(".", minOCRWidth-contentWidth-padding)
+		}
+	}
+
+	// Pad height if needed
+	if contentHeight < minOCRHeight {
+		paddingTop := (minOCRHeight - contentHeight) / 2
+		paddingBottom := minOCRHeight - contentHeight - paddingTop
+
+		// Pad top
+		for i := 0; i < paddingTop; i++ {
+			result = append([]string{strings.Repeat(".", len(result[0]))}, result...)
+		}
+
+		// Pad bottom
+		for i := 0; i < paddingBottom; i++ {
+			result = append(result, strings.Repeat(".", len(result[0])))
+		}
+	}
+
+	return result
 }
 
 // reverseBits64 reverses the bits in a 64-bit word
@@ -239,8 +272,8 @@ func (img *BitImage) FoldHorizontal(foldLine int) {
 }
 
 // NewDay13 parses the input lines into dots and fold instructions
-func NewDay13(lines []string) ([]image.Point, []int) {
-	dots := make([]image.Point, 0, 1024)
+func NewDay13(lines []string) ([]Point, []int) {
+	dots := make([]Point, 0, 1024)
 	folds := make([]int, 0, 32)
 	parsingDots := true
 
@@ -268,7 +301,7 @@ func NewDay13(lines []string) ([]image.Point, []int) {
 			}
 			if mode == 1 {
 				y = val
-				dots = append(dots, image.Point{X: x, Y: y})
+				dots = append(dots, Point{X: x, Y: y})
 			}
 			continue
 		}
@@ -297,26 +330,34 @@ func NewDay13(lines []string) ([]image.Point, []int) {
 }
 
 // Day13 solves the transparent origami puzzle
-func Day13(points []image.Point, folds []int, part1 bool) (uint, image.Image) {
-	if part1 {
-		// For part 1, we only need to apply the first fold and count dots
-		// Use a simple map-based approach for speed
-		dotSet := make(map[image.Point]bool)
+// Parameters:
+//   - points: slice of points representing the dots
+//   - folds: slice of fold instructions (positive for x, negative for y)
+//   - limit: maximum number of folds to apply (0 means apply all)
+//
+// Returns:
+//   - count of visible dots
+//   - the final grid as a slice of strings, one string per line
+func Day13(points []Point, folds []int, limit uint) (uint, []string) {
+	// Use a map-based approach for counting dots when we don't need the full grid
+	if limit > 0 && limit <= uint(len(folds)) {
+		// If we have a limit and it's less than the number of folds, use the map approach
+		dotSet := make(map[Point]bool)
 		for _, pt := range points {
 			dotSet[pt] = true
 		}
 
-		// Apply only the first fold
-		if len(folds) > 0 {
-			fold := folds[0]
-			newDotSet := make(map[image.Point]bool)
+		// Apply up to 'limit' folds
+		for i := 0; i < int(limit) && i < len(folds); i++ {
+			fold := folds[i]
+			newDotSet := make(map[Point]bool)
 			if fold > 0 {
 				// Vertical fold (fold along x=fold)
 				for pt := range dotSet {
 					if pt.X > fold {
 						// Fold left - mirror the point
 						newX := 2*fold - pt.X
-						newDotSet[image.Point{X: newX, Y: pt.Y}] = true
+						newDotSet[Point{X: newX, Y: pt.Y}] = true
 					} else {
 						// Keep as is
 						newDotSet[pt] = true
@@ -329,24 +370,28 @@ func Day13(points []image.Point, folds []int, part1 bool) (uint, image.Image) {
 					if pt.Y > fold {
 						// Fold up - mirror the point
 						newY := 2*fold - pt.Y
-						newDotSet[image.Point{X: pt.X, Y: newY}] = true
+						newDotSet[Point{X: pt.X, Y: newY}] = true
 					} else {
 						// Keep as is
 						newDotSet[pt] = true
 					}
 				}
 			}
-			return uint(len(newDotSet)), nil
+			dotSet = newDotSet
 		}
 		return uint(len(dotSet)), nil
 	}
 
-	// For part 2, use the BitImage implementation to generate an image
+	// If no limit or limit exceeds number of folds, use the BitImage implementation
 	// Find grid size
 	w, h := 0, 0
 	for _, pt := range points {
-		w = max(w, pt.X)
-		h = max(h, pt.Y)
+		if pt.X > w {
+			w = pt.X
+		}
+		if pt.Y > h {
+			h = pt.Y
+		}
 	}
 	w++
 	h++
@@ -354,13 +399,16 @@ func Day13(points []image.Point, folds []int, part1 bool) (uint, image.Image) {
 	// Create BitImage
 	img := NewBitImage(w, h)
 
-	// fill points
+	// Fill points
 	for _, pt := range points {
 		img.Set(pt.X, pt.Y)
 	}
 
-	// Apply all folds
-	for _, fold := range folds {
+	// Apply folds up to the limit (or all if limit is 0)
+	for i, fold := range folds {
+		if limit > 0 && uint(i) >= limit {
+			break
+		}
 		if fold > 0 {
 			// Vertical fold (fold along x=fold)
 			img.FoldVertical(fold)
@@ -370,8 +418,6 @@ func Day13(points []image.Point, folds []int, part1 bool) (uint, image.Image) {
 		}
 	}
 
-	// Generate the image file for OCR scanning
-	_ = img.ToPNG("day13_part2.png")
-
-	return img.Count(), img
+	// Get the ASCII representation as a slice of strings
+	return uint(img.Count()), img.ToASCII()
 }
