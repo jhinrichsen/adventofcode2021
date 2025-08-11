@@ -32,10 +32,10 @@ for a solution avoid looking at those.
 | 10 | 1 | 1
 | 11 | 1 | 1
 | 12 | 1 | 1
-| 13 |  |
+| 13 | 1 |
 | 14 | 1 | 1
 | 15 | 1 | 1
-| 16 |  |
+| 16 | 1 | 1
 | 17 |  |
 | 18 |  |
 | 19 |  |
@@ -2433,7 +2433,7 @@ func BenchmarkDay16(b *testing.B) {
 goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
-cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics     
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
 BenchmarkDay16-16    	    2138	    497054 ns/op	 4075410 B/op	    1923 allocs/op
 BenchmarkDay16-16    	    2077	    515426 ns/op	 4075411 B/op	    1923 allocs/op
 BenchmarkDay16-16    	    2014	    505410 ns/op	 4075408 B/op	    1923 allocs/op
@@ -2448,6 +2448,8 @@ BenchmarkDay16-16    	    1362	    782393 ns/op	 4075411 B/op	    1923 allocs/op
 
 
 == Day 17: Trick Shot
+
+Giving Gemini 2.5 Pro a try, rated at 0.75x credita in Windsurf 1.11.5.
 
 == Day 18: Snailfish
 
