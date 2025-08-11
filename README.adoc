@@ -1311,13 +1311,13 @@ I give up frustrated after a couple of hours, and let GPT-5 clean up the mess.
 
 After 10 to 15 minutes later, we get a working day13, including OCR scanning the output of part 2 using `gitlab.com/jhinrichsen/aococr`.
 
-=== Benchmark baseline 
+=== Benchmark baseline
 
 ----
 goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
-cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics    
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
 BenchmarkDay13Part1-8   	    5239	    357944 ns/op	  124690 B/op	      34 allocs/op
 BenchmarkDay13Part1-8   	    3302	    365828 ns/op	  124688 B/op	      34 allocs/op
 BenchmarkDay13Part1-8   	    2553	    392399 ns/op	  124688 B/op	      34 allocs/op
@@ -1338,6 +1338,34 @@ BenchmarkDay13Part2-8   	    1143	   1286782 ns/op	  400682 B/op	     199 allocs
 BenchmarkDay13Part2-8   	    1038	   1341260 ns/op	  400681 B/op	     199 allocs/op
 BenchmarkDay13Part2-8   	     850	   1239358 ns/op	  400681 B/op	     199 allocs/op
 BenchmarkDay13Part2-8   	     825	   1276838 ns/op	  400681 B/op	     199 allocs/op
+----
+
+=== Optimization #1: fold bits in a bitset, not grids
+
+Due to the sparse nature of the puzzle we get
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+             │      b0      │                  b1                  │
+             │    sec/op    │    sec/op     vs base                │
+Day13Part1-8   366.43µ ± 5%   78.25µ ±  8%  -78.65% (p=0.000 n=10)
+Day13Part2-8   1262.5µ ± 2%   115.3µ ± 14%  -90.86% (p=0.000 n=10)
+geomean         680.2µ        94.99µ        -86.03%
+
+             │      b0       │                  b1                  │
+             │     B/op      │     B/op      vs base                │
+Day13Part1-8   121.77Ki ± 0%   88.25Ki ± 0%  -27.52% (p=0.000 n=10)
+Day13Part2-8   391.29Ki ± 0%   16.70Ki ± 0%  -95.73% (p=0.000 n=10)
+geomean         218.3Ki        38.39Ki       -82.41%
+
+             │     b0      │                 b1                 │
+             │  allocs/op  │ allocs/op   vs base                │
+Day13Part1-8   34.000 ± 0%   3.000 ± 0%  -91.18% (p=0.000 n=10)
+Day13Part2-8   199.00 ± 0%   11.00 ± 0%  -94.47% (p=0.000 n=10)
+geomean         82.26        5.745       -93.02%
 ----
 
 == Day 14: Extended Polymerization
@@ -2482,6 +2510,31 @@ BenchmarkDay16-16    	    1746	    708832 ns/op	 4075410 B/op	    1923 allocs/op
 BenchmarkDay16-16    	    1362	    782393 ns/op	 4075411 B/op	    1923 allocs/op
 ----
 
+==== Folding points in a bitset, not grids
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+             │      b0      │                  b1                  │
+             │    sec/op    │    sec/op     vs base                │
+Day13Part1-8   366.43µ ± 5%   78.25µ ±  8%  -78.65% (p=0.000 n=10)
+Day13Part2-8   1262.5µ ± 2%   115.3µ ± 14%  -90.86% (p=0.000 n=10)
+geomean         680.2µ        94.99µ        -86.03%
+
+             │      b0       │                  b1                  │
+             │     B/op      │     B/op      vs base                │
+Day13Part1-8   121.77Ki ± 0%   88.25Ki ± 0%  -27.52% (p=0.000 n=10)
+Day13Part2-8   391.29Ki ± 0%   16.70Ki ± 0%  -95.73% (p=0.000 n=10)
+geomean         218.3Ki        38.39Ki       -82.41%
+
+             │     b0      │                 b1                 │
+             │  allocs/op  │ allocs/op   vs base                │
+Day13Part1-8   34.000 ± 0%   3.000 ± 0%  -91.18% (p=0.000 n=10)
+Day13Part2-8   199.00 ± 0%   11.00 ± 0%  -94.47% (p=0.000 n=10)
+geomean         82.26        5.745       -93.02%
+----
 
 == Day 17: Trick Shot
 

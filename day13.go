@@ -45,21 +45,21 @@ func NewDay13(lines []string) ([]Point, []int) {
 		if len(b) < 13 {
 			continue
 		}
-		axisC := b[11]
-		valIdx := 13 // character after 'x=' or 'y='
-		val := 0
-		for j := valIdx; j < len(b); j++ {
-			c := b[j]
-			if c < '0' || c > '9' {
-				break
-			}
-			val = val*10 + int(c-'0')
-		}
-		if axisC == 'y' {
-			val = -val
-		}
-		folds = append(folds, val)
-	}
+		        axisC := b[11]
+        valIdx := 13 // character after 'x=' or 'y='
+        val := 0
+        for j := range len(b) - valIdx {
+            c := b[valIdx+j]
+            if c < '0' || c > '9' {
+                break
+            }
+            val = val*10 + int(c-'0')
+        }
+        if axisC == 'y' {
+            val = -val
+        }
+        folds = append(folds, val)
+    }
 	return dots, folds
 }
 
@@ -73,92 +73,138 @@ func NewDay13(lines []string) ([]Point, []int) {
 //   - count of visible dots
 //   - the final grid as a slice of strings, one string per line
 func Day13(points []Point, folds []int, limit uint) (uint, []string) {
-    // Single algorithm: map-based folding for both parts
-    dotSet := make(map[Point]bool)
-    for _, pt := range points {
-        dotSet[pt] = true
-    }
-
     // Determine how many folds to apply
     applyCount := len(folds)
     if limit > 0 {
         applyCount = min(len(folds), int(limit))
     }
 
-    // Apply folds
-    for i := range applyCount {
-        fold := folds[i]
-        newDotSet := make(map[Point]bool)
-        if fold > 0 {
-            // Vertical fold along x=fold
-            for pt := range dotSet {
-                switch {
-                case pt.X > fold:
-                    newX := 2*fold - pt.X
-                    newDotSet[Point{X: newX, Y: pt.Y}] = true
-                case pt.X < fold:
-                    newDotSet[pt] = true
-                // points on the fold are discarded
-                }
-            }
+    // Compute initial maxima to size Part 1 bitmap precisely
+    maxX0, maxY0 := 0, 0
+    for _, pt := range points {
+        if pt.X > maxX0 {
+            maxX0 = pt.X
+        }
+        if pt.Y > maxY0 {
+            maxY0 = pt.Y
+        }
+    }
+
+    // Determine target dimensions
+    w, h := 0, 0
+    if applyCount == 0 {
+        // No folds: width/height are just maxima + 1 (edge case; not used by tests)
+        w, h = maxX0+1, maxY0+1
+    } else if limit > 0 {
+        // Part 1: size after the first fold only
+        f := folds[0]
+        if f > 0 {
+            // x-fold, width becomes f, height unchanged
+            w = f
+            h = maxY0 + 1
         } else {
-            // Horizontal fold along y=-fold
-            fold = -fold
-            for pt := range dotSet {
-                switch {
-                case pt.Y > fold:
-                    newY := 2*fold - pt.Y
-                    newDotSet[Point{X: pt.X, Y: newY}] = true
-                case pt.Y < fold:
-                    newDotSet[pt] = true
-                // points on the fold are discarded
+            // y-fold, height becomes -f, width unchanged
+            w = maxX0 + 1
+            h = -f
+        }
+    } else {
+        // Part 2: final paper size from smallest fold lines
+        minXF, minYF := -1, -1
+        for _, f := range folds {
+            if f > 0 {
+                if minXF == -1 || f < minXF {
+                    minXF = f
+                }
+            } else {
+                y := -f
+                if minYF == -1 || y < minYF {
+                    minYF = y
                 }
             }
         }
-        dotSet = newDotSet
+        if minXF >= 0 {
+            w = minXF
+        } else {
+            w = maxX0 + 1
+        }
+        if minYF >= 0 {
+            h = minYF
+        } else {
+            h = maxY0 + 1
+        }
     }
 
-    // Part 1 path (limit > 0): return count only
-    if limit > 0 {
-        return uint(len(dotSet)), nil
+    // Bitset helpers
+    area := w * h
+    bits := make([]uint64, (area+63)>>6)
+    setBit := func(i int) bool {
+        idx := i >> 6
+        mask := uint64(1) << (uint(i) & 63)
+        old := bits[idx]
+        bits[idx] = old | mask
+        return (old & mask) == 0
     }
 
-    // Part 2 path (limit == 0): render full image using paper size implied by folds
-    // Determine paper bounds from folds: width is the smallest x-fold value,
-    // height is the smallest y-fold value. If none for an axis, use dot maxima.
-    minXF, minYF := -1, -1
-    for _, f := range folds {
-        if f > 0 { // x fold at x=f
-            if minXF == -1 || f < minXF {
-                minXF = f
+    // Fold a single point through N folds; return final coords and ok=false if it lands on a fold line
+    foldPoint := func(x, y int) (nx, ny int, ok bool) {
+        nx, ny = x, y
+        for i := range applyCount {
+            f := folds[i]
+            if f > 0 {
+                // x-fold at x=f
+                if nx > f {
+                    nx = 2*f - nx
+                } else if nx == f {
+                    return 0, 0, false
+                }
+            } else {
+                yf := -f
+                if ny > yf {
+                    ny = 2*yf - ny
+                } else if ny == yf {
+                    return 0, 0, false
+                }
             }
-        } else { // y fold at y=-f
-            y := -f
-            if minYF == -1 || y < minYF {
-                minYF = y
+        }
+        return nx, ny, true
+    }
+
+    // Populate bitset and count unique dots
+    var count uint
+    if applyCount == 0 {
+        // No folds: just set existing points (not used by AoC but keep correctness)
+        for _, p := range points {
+            if p.X >= 0 && p.X < w && p.Y >= 0 && p.Y < h {
+                if setBit(p.Y*w + p.X) {
+                    count++
+                }
+            }
+        }
+    } else {
+        for _, p := range points {
+            x, y, ok := foldPoint(p.X, p.Y)
+            if !ok || x < 0 || x >= w || y < 0 || y >= h {
+                continue
+            }
+            if setBit(y*w + x) {
+                count++
             }
         }
     }
 
-    maxX, maxY := 0, 0
-    for pt := range dotSet {
-        maxX = max(maxX, pt.X)
-        maxY = max(maxY, pt.Y)
-    }
-    w := maxX + 1
-    h := maxY + 1
-    if minXF >= 0 {
-        w = minXF
-    }
-    if minYF >= 0 {
-        h = minYF
+    // Part 1 path: return count only
+    if limit > 0 {
+        return count, nil
     }
 
+    // Part 2: render full image using '.' and '#'
     result := make([]string, h)
-    row := make([]rune, w)
-    for y := 0; y < h; y++ {
-        for x := 0; x < w; x++ {
-            if dotSet[Point{X: x, Y: y}] {
+    row := make([]byte, w)
+    for y := range h {
+        base := y * w
+        for x := range w {
+            i := base + x
+            if (bits[i>>6]>>(uint(i)&63))&1 == 1 {
                 row[x] = '#'
             } else {
                 row[x] = '.'
@@ -166,5 +212,5 @@ func Day13(points []Point, folds []int, limit uint) (uint, []string) {
         }
         result[y] = string(row)
     }
-    return uint(len(dotSet)), result
+    return count, result
 }
