@@ -7,6 +7,7 @@ bench:
 
 .PHONY: lint
 lint:
+	gofmt -e -l -w .
 	golint
 	CGO_ENABLED=0 go vet
 	CGO_ENABLED=0 staticcheck

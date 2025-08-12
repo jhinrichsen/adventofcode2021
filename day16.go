@@ -29,10 +29,10 @@ func NewDay16(input string) (string, error) {
 func Day16(hexStr string, part1 bool) uint {
 	// Convert hex string to binary
 	binStr := hexToBin(hexStr)
-	
+
 	// Parse the packet
 	packet, _ := parsePacket(binStr)
-	
+
 	if part1 {
 		return sumVersions(packet)
 	}
@@ -78,7 +78,7 @@ func parsePacket(binStr string) (Packet, int) {
 	// Parse version (first 3 bits)
 	version := binToUint(binStr[0:3])
 	typeID := binToUint(binStr[3:6])
-	
+
 	var p Packet
 	p.Version = version
 	p.TypeID = typeID

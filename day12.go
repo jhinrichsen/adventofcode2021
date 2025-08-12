@@ -41,8 +41,6 @@ func Day12(connections map[string][]string, part1 bool) uint {
 	}
 }
 
-
-
 // countPaths iteratively counts all valid paths from start to end
 func countPaths(connections map[string][]string, start, end string, canVisitTwice bool) uint {
 	// Stack for DFS traversal, each element contains:
