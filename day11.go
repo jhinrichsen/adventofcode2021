@@ -20,7 +20,6 @@ func NewDay11(lines []string) [][]int {
 	return grid
 }
 
-
 func Day11(data [][]int, part1 bool) uint {
 	rows, cols := len(data), len(data[0])
 	totalFlashes := uint(0)
@@ -38,7 +37,7 @@ func Day11(data [][]int, part1 bool) uint {
 	}
 
 	// Use integer queue for better performance (store flat indices)
-	queue := make([]int, gridSize*10) // Allow for multiple additions of same cell
+	queue := make([]int, gridSize*10)        // Allow for multiple additions of same cell
 	flashedCells := make([]int, 0, gridSize) // Track cells that flashed for efficient reset
 
 	// Function to simulate one step

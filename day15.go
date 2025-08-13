@@ -151,12 +151,3 @@ func Day15(lines []string, part1 bool) (uint, error) {
 
 	return 0, errors.New("no path found")
 }
-
-/* manually removed, abs() is unused
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-*/

@@ -1,246 +1,13 @@
 package adventofcode2021
 
-import (
-	"image"
-	"image/color"
-	"image/png"
-	"math/bits"
-	"os"
-)
+import "image"
 
-// BitImage represents a 2D bit image stored as a flat array of uint64 words
-type BitImage struct {
-	data        []uint64
-	width       int
-	height      int
-	wordsPerRow int
-	rect        image.Rectangle
-}
-
-// NewBitImage creates a new BitImage with the given dimensions
-func NewBitImage(width, height int) *BitImage {
-	wordsPerRow := (width + 63) / 64
-	totalWords := wordsPerRow * height
-	return &BitImage{
-		data:        make([]uint64, totalWords),
-		width:       width,
-		height:      height,
-		wordsPerRow: wordsPerRow,
-		rect:        image.Rect(0, 0, width, height),
-	}
-}
-
-// Set sets the bit at the given coordinates
-func (img *BitImage) Set(x, y int) {
-	if x >= 0 && x < img.width && y >= 0 && y < img.height {
-		wordIdx := x / 64
-		bitIdx := x % 64
-		img.data[y*img.wordsPerRow+wordIdx] |= 1 << bitIdx
-	}
-}
-
-// Get returns true if the bit at the given coordinates is set
-func (img *BitImage) Get(x, y int) bool {
-	if x >= 0 && x < img.width && y >= 0 && y < img.height {
-		wordIdx := x / 64
-		bitIdx := x % 64
-		return (img.data[y*img.wordsPerRow+wordIdx] & (1 << bitIdx)) != 0
-	}
-	return false
-}
-
-// Clear clears all bits in the image
-func (img *BitImage) Clear() {
-	for i := range img.data {
-		img.data[i] = 0
-	}
-}
-
-// ColorModel returns the BitImage's color model
-func (img *BitImage) ColorModel() color.Model {
-	return color.GrayModel
-}
-
-// Bounds returns the BitImage's bounds
-func (img *BitImage) Bounds() image.Rectangle {
-	return img.rect
-}
-
-// At returns the color at the given coordinates
-func (img *BitImage) At(x, y int) color.Color {
-	if img.Get(x, y) {
-		return color.Gray{Y: 0} // Black pixel
-	}
-	return color.Gray{Y: 255} // White pixel
-}
-
-// Count returns the number of set bits in the image
-func (img *BitImage) Count() uint {
-	var count uint
-	for _, word := range img.data {
-		count += uint(bits.OnesCount64(word))
-	}
-	return count
-}
-
-// ToPNG saves the BitImage as a PNG file
-// Set bits are rendered as black pixels (0), unset bits as white pixels (255)
-// This provides optimal contrast for OCR scanning
-func (img *BitImage) ToPNG(filename string) error {
-	// Create a grayscale image
-	grayImg := image.NewGray(image.Rect(0, 0, img.width, img.height))
-
-	// Fill the image: set bits = black (0), unset bits = white (255)
-	for y := 0; y < img.height; y++ {
-		for x := 0; x < img.width; x++ {
-			if img.Get(x, y) {
-				grayImg.SetGray(x, y, color.Gray{Y: 0}) // Black for set bits
-			} else {
-				grayImg.SetGray(x, y, color.Gray{Y: 255}) // White for unset bits
-			}
-		}
-	}
-
-	// Create the output file
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	// Encode as PNG
-	return png.Encode(file, grayImg)
-}
-
-// reverseBits64 reverses the bits in a 64-bit word
-func reverseBits64(x uint64) uint64 {
-	x = (x>>1)&0x5555555555555555 | (x&0x5555555555555555)<<1
-	x = (x>>2)&0x3333333333333333 | (x&0x3333333333333333)<<2
-	x = (x>>4)&0x0F0F0F0F0F0F0F0F | (x&0x0F0F0F0F0F0F0F0F)<<4
-	x = (x>>8)&0x00FF00FF00FF00FF | (x&0x00FF00FF00FF00FF)<<8
-	x = (x>>16)&0x0000FFFF0000FFFF | (x&0x0000FFFF0000FFFF)<<16
-	x = (x >> 32) | (x << 32)
-	return x
-}
-
-// FoldVertical folds the image along a vertical line in-place
-func (img *BitImage) FoldVertical(foldLine int) {
-	newWidth := foldLine
-	newWordsPerRow := (newWidth + 63) / 64
-	oldWordsPerRow := img.wordsPerRow
-
-	for y := 0; y < img.height; y++ {
-		rowOffset := y * img.wordsPerRow
-
-		// Handle right side folding with word-level bit manipulation
-		rightStartX := foldLine + 1
-		if rightStartX < img.width {
-			rightStartWord := rightStartX / 64
-
-			// Process complete words from the right side
-			for w := rightStartWord; w < oldWordsPerRow; w++ {
-				if img.data[rowOffset+w] == 0 {
-					continue // Skip empty words
-				}
-
-				word := img.data[rowOffset+w]
-				wordStartX := w * 64
-				wordEndX := wordStartX + 63
-
-				// Check if this entire word can be processed with word-level operations
-				if wordStartX >= rightStartX && wordEndX < img.width {
-					// This word is entirely in the fold region
-					// Calculate the mirror position for this word
-					mirrorWordEndX := 2*foldLine - wordStartX
-					mirrorWordStartX := 2*foldLine - wordEndX
-
-					// Check if the mirrored word fits entirely within the new width
-					if mirrorWordStartX >= 0 && mirrorWordEndX < newWidth {
-						mirrorWordIdx := mirrorWordStartX / 64
-						mirrorBitOffset := mirrorWordStartX % 64
-
-						if mirrorBitOffset == 0 {
-							// Perfect alignment - reverse bits and OR directly
-							img.data[rowOffset+mirrorWordIdx] |= reverseBits64(word)
-						} else {
-							// Handle bit offset with word-level operations
-							reversedWord := reverseBits64(word)
-
-							// Split the reversed word across two target words
-							img.data[rowOffset+mirrorWordIdx] |= reversedWord << mirrorBitOffset
-							if mirrorWordIdx+1 < newWordsPerRow {
-								img.data[rowOffset+mirrorWordIdx+1] |= reversedWord >> (64 - mirrorBitOffset)
-							}
-						}
-						continue // Skip bit-by-bit processing for this word
-					}
-				}
-
-				// Fall back to bit-by-bit processing (for words that span boundaries or don't fit entirely)
-				for bit := 0; bit < 64 && word != 0; bit++ {
-					if (word & (1 << bit)) != 0 {
-						x := wordStartX + bit
-						if x >= rightStartX {
-							mirrorX := 2*foldLine - x
-							if mirrorX >= 0 && mirrorX < newWidth {
-								wordIdx := mirrorX / 64
-								bitIdx := mirrorX % 64
-								img.data[rowOffset+wordIdx] |= 1 << bitIdx
-							}
-						}
-						word &= ^(1 << bit)
-					}
-				}
-			}
-		}
-
-		// Clear words beyond the fold line (but don't truncate slice to avoid allocations)
-		for w := newWordsPerRow; w < img.wordsPerRow; w++ {
-			img.data[rowOffset+w] = 0
-		}
-		if newWordsPerRow > 0 {
-			lastWordBits := newWidth % 64
-			if lastWordBits > 0 {
-				mask := (uint64(1) << lastWordBits) - 1
-				img.data[rowOffset+newWordsPerRow-1] &= mask
-			}
-		}
-	}
-
-	img.width = newWidth
-	img.wordsPerRow = newWordsPerRow
-}
-
-// FoldHorizontal folds the image along a horizontal line in-place
-func (img *BitImage) FoldHorizontal(foldLine int) {
-	newHeight := foldLine
-
-	for r := 0; r < newHeight; r++ {
-		mirrorRow := 2*foldLine - r
-		if mirrorRow < img.height {
-			// Use word-level operations for efficiency
-			rowOffset := r * img.wordsPerRow
-			mirrorRowOffset := mirrorRow * img.wordsPerRow
-			for w := 0; w < img.wordsPerRow; w++ {
-				img.data[rowOffset+w] |= img.data[mirrorRowOffset+w]
-			}
-		}
-		// Note: if mirrorRow >= img.height, we just keep the existing row as-is
-	}
-
-	// Clear rows beyond the fold line (but don't truncate slice to avoid allocations)
-	for r := newHeight; r < img.height; r++ {
-		rowOffset := r * img.wordsPerRow
-		for w := 0; w < img.wordsPerRow; w++ {
-			img.data[rowOffset+w] = 0
-		}
-	}
-	img.height = newHeight
-}
+// Point is an alias to image.Point for text-based image coordinates
+type Point = image.Point
 
 // NewDay13 parses the input lines into dots and fold instructions
-func NewDay13(lines []string) ([]image.Point, []int) {
-	dots := make([]image.Point, 0, 1024)
+func NewDay13(lines []string) ([]Point, []int) {
+	dots := make([]Point, 0, 1024)
 	folds := make([]int, 0, 32)
 	parsingDots := true
 
@@ -268,7 +35,7 @@ func NewDay13(lines []string) ([]image.Point, []int) {
 			}
 			if mode == 1 {
 				y = val
-				dots = append(dots, image.Point{X: x, Y: y})
+				dots = append(dots, Point{X: x, Y: y})
 			}
 			continue
 		}
@@ -297,81 +64,153 @@ func NewDay13(lines []string) ([]image.Point, []int) {
 }
 
 // Day13 solves the transparent origami puzzle
-func Day13(points []image.Point, folds []int, part1 bool) (uint, image.Image) {
-	if part1 {
-		// For part 1, we only need to apply the first fold and count dots
-		// Use a simple map-based approach for speed
-		dotSet := make(map[image.Point]bool)
-		for _, pt := range points {
-			dotSet[pt] = true
-		}
+// Parameters:
+//   - points: slice of points representing the dots
+//   - folds: slice of fold instructions (positive for x, negative for y)
+//   - limit: maximum number of folds to apply (0 means apply all)
+//
+// Returns:
+//   - count of visible dots
+//   - the final grid as a slice of strings, one string per line
+func Day13(points []Point, folds []int, limit uint) (uint, []string) {
+	// Determine how many folds to apply
+	applyCount := len(folds)
+	if limit > 0 {
+		applyCount = min(len(folds), int(limit))
+	}
 
-		// Apply only the first fold
-		if len(folds) > 0 {
-			fold := folds[0]
-			newDotSet := make(map[image.Point]bool)
-			if fold > 0 {
-				// Vertical fold (fold along x=fold)
-				for pt := range dotSet {
-					if pt.X > fold {
-						// Fold left - mirror the point
-						newX := 2*fold - pt.X
-						newDotSet[image.Point{X: newX, Y: pt.Y}] = true
-					} else {
-						// Keep as is
-						newDotSet[pt] = true
-					}
+	// Compute initial maxima to size Part 1 bitmap precisely
+	maxX0, maxY0 := 0, 0
+	for _, pt := range points {
+		if pt.X > maxX0 {
+			maxX0 = pt.X
+		}
+		if pt.Y > maxY0 {
+			maxY0 = pt.Y
+		}
+	}
+
+	// Determine target dimensions
+	w, h := 0, 0
+	if applyCount == 0 {
+		// No folds: width/height are just maxima + 1 (edge case; not used by tests)
+		w, h = maxX0+1, maxY0+1
+	} else if limit > 0 {
+		// Part 1: size after the first fold only
+		f := folds[0]
+		if f > 0 {
+			// x-fold, width becomes f, height unchanged
+			w = f
+			h = maxY0 + 1
+		} else {
+			// y-fold, height becomes -f, width unchanged
+			w = maxX0 + 1
+			h = -f
+		}
+	} else {
+		// Part 2: final paper size from smallest fold lines
+		minXF, minYF := -1, -1
+		for _, f := range folds {
+			if f > 0 {
+				if minXF == -1 || f < minXF {
+					minXF = f
 				}
 			} else {
-				// Horizontal fold (fold along y=-fold)
-				fold = -fold
-				for pt := range dotSet {
-					if pt.Y > fold {
-						// Fold up - mirror the point
-						newY := 2*fold - pt.Y
-						newDotSet[image.Point{X: pt.X, Y: newY}] = true
-					} else {
-						// Keep as is
-						newDotSet[pt] = true
-					}
+				y := -f
+				if minYF == -1 || y < minYF {
+					minYF = y
 				}
 			}
-			return uint(len(newDotSet)), nil
 		}
-		return uint(len(dotSet)), nil
-	}
-
-	// For part 2, use the BitImage implementation to generate an image
-	// Find grid size
-	w, h := 0, 0
-	for _, pt := range points {
-		w = max(w, pt.X)
-		h = max(h, pt.Y)
-	}
-	w++
-	h++
-
-	// Create BitImage
-	img := NewBitImage(w, h)
-
-	// fill points
-	for _, pt := range points {
-		img.Set(pt.X, pt.Y)
-	}
-
-	// Apply all folds
-	for _, fold := range folds {
-		if fold > 0 {
-			// Vertical fold (fold along x=fold)
-			img.FoldVertical(fold)
+		if minXF >= 0 {
+			w = minXF
 		} else {
-			// Horizontal fold (fold along y=-fold)
-			img.FoldHorizontal(-fold)
+			w = maxX0 + 1
+		}
+		if minYF >= 0 {
+			h = minYF
+		} else {
+			h = maxY0 + 1
 		}
 	}
 
-	// Generate the image file for OCR scanning
-	_ = img.ToPNG("day13_part2.png")
+	// Bitset helpers
+	area := w * h
+	bits := make([]uint64, (area+63)>>6)
+	setBit := func(i int) bool {
+		idx := i >> 6
+		mask := uint64(1) << (uint(i) & 63)
+		old := bits[idx]
+		bits[idx] = old | mask
+		return (old & mask) == 0
+	}
 
-	return img.Count(), img
+	// Fold a single point through N folds; return final coords and ok=false if it lands on a fold line
+	foldPoint := func(x, y int) (nx, ny int, ok bool) {
+		nx, ny = x, y
+		for i := range applyCount {
+			f := folds[i]
+			if f > 0 {
+				// x-fold at x=f
+				if nx > f {
+					nx = 2*f - nx
+				} else if nx == f {
+					return 0, 0, false
+				}
+			} else {
+				yf := -f
+				if ny > yf {
+					ny = 2*yf - ny
+				} else if ny == yf {
+					return 0, 0, false
+				}
+			}
+		}
+		return nx, ny, true
+	}
+
+	// Populate bitset and count unique dots
+	var count uint
+	if applyCount == 0 {
+		// No folds: just set existing points (not used by AoC but keep correctness)
+		for _, p := range points {
+			if p.X >= 0 && p.X < w && p.Y >= 0 && p.Y < h {
+				if setBit(p.Y*w + p.X) {
+					count++
+				}
+			}
+		}
+	} else {
+		for _, p := range points {
+			x, y, ok := foldPoint(p.X, p.Y)
+			if !ok || x < 0 || x >= w || y < 0 || y >= h {
+				continue
+			}
+			if setBit(y*w + x) {
+				count++
+			}
+		}
+	}
+
+	// Part 1 path: return count only
+	if limit > 0 {
+		return count, nil
+	}
+
+	// Part 2: render full image using '.' and '#'
+	result := make([]string, h)
+	row := make([]byte, w)
+	for y := range h {
+		base := y * w
+		for x := range w {
+			i := base + x
+			if (bits[i>>6]>>(uint(i)&63))&1 == 1 {
+				row[x] = '#'
+			} else {
+				row[x] = '.'
+			}
+		}
+		result[y] = string(row)
+	}
+	return count, result
 }

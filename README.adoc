@@ -1300,9 +1300,73 @@ The bytes/op drops from 2320.3 KiB to 204.2 KiB, which is a factor of 7.36, very
 
 As the last alternative, we do not operate on dedicated bits, but use the full CPU length of 64 bit.
 Runtime drops by a factor of 3.5, slight drop in bytes/op of 10%, and a massive drop in number of allocations from 943 to 3, factor 314.
-These factors are cumulative, 3.5 times 314 is 1.100.
-Duplicate this factor, because if GC kicks in we not only need to setup memory, we also need to tear down memory, so we end up with a factor of 2.200.
-If the budget for running the baseline lasts for one day, the optimized version will run for 6 years.
+
+=== Part 2
+
+Implementing part 2 is where things break apart.
+Junie uses a second implementation for part 2, and this seems to breach the context size.
+It is like wearing a too-short T-shirt — pull it down in the front gently, it rides up in the back; tug it down in the back, and it hikes up in the front.
+Grab it both hands and pull, it rips into pieces.
+I give up frustrated after a couple of hours, and let GPT-5 clean up the mess.
+
+After 10 to 15 minutes later, we get a working day13, including OCR scanning the output of part 2 using `gitlab.com/jhinrichsen/aococr`.
+
+=== Benchmark baseline
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+BenchmarkDay13Part1-8   	    5239	    357944 ns/op	  124690 B/op	      34 allocs/op
+BenchmarkDay13Part1-8   	    3302	    365828 ns/op	  124688 B/op	      34 allocs/op
+BenchmarkDay13Part1-8   	    2553	    392399 ns/op	  124688 B/op	      34 allocs/op
+BenchmarkDay13Part1-8   	    3290	    350450 ns/op	  124688 B/op	      34 allocs/op
+BenchmarkDay13Part1-8   	    2846	    367131 ns/op	  124688 B/op	      34 allocs/op
+BenchmarkDay13Part1-8   	    2842	    367040 ns/op	  124688 B/op	      34 allocs/op
+BenchmarkDay13Part1-8   	    3158	    383972 ns/op	  124688 B/op	      34 allocs/op
+BenchmarkDay13Part1-8   	    2790	    365110 ns/op	  124688 B/op	      34 allocs/op
+BenchmarkDay13Part1-8   	    3531	    347914 ns/op	  124688 B/op	      34 allocs/op
+BenchmarkDay13Part1-8   	    2677	    382443 ns/op	  124688 B/op	      34 allocs/op
+BenchmarkDay13Part2-8   	     818	   1270412 ns/op	  400681 B/op	     199 allocs/op
+BenchmarkDay13Part2-8   	    1104	   1254493 ns/op	  400680 B/op	     199 allocs/op
+BenchmarkDay13Part2-8   	    1161	   1277781 ns/op	  400681 B/op	     199 allocs/op
+BenchmarkDay13Part2-8   	     871	   1229851 ns/op	  400681 B/op	     199 allocs/op
+BenchmarkDay13Part2-8   	     910	   1233428 ns/op	  400681 B/op	     199 allocs/op
+BenchmarkDay13Part2-8   	     853	   1253554 ns/op	  400681 B/op	     199 allocs/op
+BenchmarkDay13Part2-8   	    1143	   1286782 ns/op	  400682 B/op	     199 allocs/op
+BenchmarkDay13Part2-8   	    1038	   1341260 ns/op	  400681 B/op	     199 allocs/op
+BenchmarkDay13Part2-8   	     850	   1239358 ns/op	  400681 B/op	     199 allocs/op
+BenchmarkDay13Part2-8   	     825	   1276838 ns/op	  400681 B/op	     199 allocs/op
+----
+
+=== Optimization #1: fold bits in a bitset, not grids
+
+Due to the sparse nature of the puzzle we get
+
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
+             │      b0      │                  b1                  │
+             │    sec/op    │    sec/op     vs base                │
+Day13Part1-8   366.43µ ± 5%   78.25µ ±  8%  -78.65% (p=0.000 n=10)
+Day13Part2-8   1262.5µ ± 2%   115.3µ ± 14%  -90.86% (p=0.000 n=10)
+geomean         680.2µ        94.99µ        -86.03%
+
+             │      b0       │                  b1                  │
+             │     B/op      │     B/op      vs base                │
+Day13Part1-8   121.77Ki ± 0%   88.25Ki ± 0%  -27.52% (p=0.000 n=10)
+Day13Part2-8   391.29Ki ± 0%   16.70Ki ± 0%  -95.73% (p=0.000 n=10)
+geomean         218.3Ki        38.39Ki       -82.41%
+
+             │     b0      │                 b1                 │
+             │  allocs/op  │ allocs/op   vs base                │
+Day13Part1-8   34.000 ± 0%   3.000 ± 0%  -91.18% (p=0.000 n=10)
+Day13Part2-8   199.00 ± 0%   11.00 ± 0%  -94.47% (p=0.000 n=10)
+geomean         82.26        5.745       -93.02%
+----
 
 == Day 14: Extended Polymerization
 
@@ -2691,6 +2755,8 @@ Runtime goes down to 8/ 10 µs, no more allocs at all for part 1, part 2 goes do
 Code still uses recursion though.
 
 == Day 17: Trick Shot
+
+Giving Gemini 2.5 Pro a try, rated at 0.75x credita in Windsurf 1.11.5.
 
 == Day 18: Snailfish
 

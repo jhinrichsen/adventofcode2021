@@ -77,6 +77,7 @@ func TestDay14Part2Example(t *testing.T) {
 }
 
 func TestDay14Part2(t *testing.T) {
+	const want = 2437698971143
 	lines, err := linesFromFilename(filename(14))
 	if err != nil {
 		t.Fatal(err)
@@ -84,7 +85,6 @@ func TestDay14Part2(t *testing.T) {
 
 	template, rules := NewDay14(lines)
 	got := Day14(template, rules, false)
-	want := got // Use the actual result as the expected value
 
 	if got != want {
 		t.Errorf("Day14Part2() = %v, want %v", got, want)
