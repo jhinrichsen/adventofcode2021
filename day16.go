@@ -79,18 +79,6 @@ func parseLiteral(data BITS, offset int) (uint, int) {
 	return value, offset
 }
 
-// stackFrame represents the state of a packet being processed
-type stackFrame struct {
-	offset     int    // current bit offset in the BITS data
-	count      int    // remaining sub-packets to process (when isCount is true)
-	isCount    bool   // true if using count, false if using endOffset
-	endOffset  int    // used when isCount is false
-	versionSum uint   // for part 1
-	values     []uint // for part 2
-	typeID     uint   // operator type ID
-	hasValue   bool   // true if we've processed this frame's value
-}
-
 // sumVersions iteratively sums all version numbers in the BITS transmission
 func sumVersions(bits BITS, startOffset int) (uint, int) {
 	var total uint
