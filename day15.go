@@ -65,7 +65,7 @@ func Day15(lines []string, part1 bool) (uint, error) {
 	target := N - 1
 	dist[start] = 0
 
-	const C = 9 // max edge weight
+	const C = 9            // max edge weight
 	B := C * (rows + cols) // safe upper bound on shortest-path cost
 	buckets := make([][]int, B)
 	buckets[0] = append(buckets[0], start)
@@ -152,9 +152,11 @@ func Day15(lines []string, part1 bool) (uint, error) {
 	return 0, errors.New("no path found")
 }
 
+/* manually removed, abs() is unused
 func abs(x int) int {
 	if x < 0 {
 		return -x
 	}
 	return x
 }
+*/
