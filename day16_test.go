@@ -44,7 +44,11 @@ func TestDay16Part1Examples(t *testing.T) {
 			continue
 		}
 		t.Run(ex.name, func(t *testing.T) {
-			got := Day16(ex.hex, true)
+			bits, err := NewDay16(ex.hex)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := Day16(bits, true)
 			if got != ex.want {
 				t.Fatalf("got %d, want %d", got, ex.want)
 			}
@@ -59,7 +63,11 @@ func TestDay16Part1(t *testing.T) {
 		t.Fatal(err)
 	}
 	hexStr := lines[0]
-	got := Day16(hexStr, true)
+	bits, err := NewDay16(hexStr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := Day16(bits, true)
 	if got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
@@ -71,7 +79,11 @@ func TestDay16Part2Examples(t *testing.T) {
 			continue
 		}
 		t.Run(ex.name, func(t *testing.T) {
-			got := Day16(ex.hex, false)
+			bits, err := NewDay16(ex.hex)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := Day16(bits, false)
 			if got != ex.want {
 				t.Fatalf("got %d, want %d", got, ex.want)
 			}
@@ -85,7 +97,11 @@ func TestDay16Part2(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	got := Day16(lines[0], false)
+	bits, err := NewDay16(lines[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := Day16(bits, false)
 	if got != want {
 		t.Fatalf("got %d, want %d", got, want)
 	}
@@ -96,8 +112,13 @@ func BenchmarkDay16Part1(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	b.ResetTimer()
 	for range b.N {
-		_ = Day16(lines[0], true)
+		bits, err := NewDay16(lines[0])
+		if err != nil {
+			b.Fatal(err)
+		}
+		_ = Day16(bits, true)
 	}
 }
 
@@ -106,7 +127,12 @@ func BenchmarkDay16Part2(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	b.ResetTimer()
 	for range b.N {
-		_ = Day16(lines[0], false)
+		bits, err := NewDay16(lines[0])
+		if err != nil {
+			b.Fatal(err)
+		}
+		_ = Day16(bits, false)
 	}
 }
