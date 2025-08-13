@@ -2630,12 +2630,65 @@ Then we lose it again, it creates a complete new benchmark suite to run original
 Nice try if this would work, but in the meantime it forgot how to run benchmarks, and wants to re-run _all_ days 5 times.
 This definitely takes too long, and i step in and abort.
 SWE-1 moved critical parts of Day16 to the (illegal) benchmark_compare_test file, so all tests for part 2 are broken.
-After `fixing`, 
+After `fixing`, there's a huge drop in both runtime and memory allocation of -90%.
 
 ----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │      b0       │                 b1                  │
+              │    sec/op     │   sec/op     vs base                │
+Day16Part1-16   510.98µ ± 40%   20.93µ ± 1%  -95.90% (p=0.000 n=10)
+Day16Part2-16   731.44µ ±  4%   20.22µ ± 1%  -97.24% (p=0.000 n=10)
+geomean          611.4µ         20.57µ       -96.64%
+
+              │       b0       │                  b1                  │
+              │      B/op      │     B/op      vs base                │
+Day16Part1-16   3979.89Ki ± 0%   45.27Ki ± 0%  -98.86% (p=0.000 n=10)
+Day16Part2-16   3979.89Ki ± 0%   37.98Ki ± 0%  -99.05% (p=0.000 n=10)
+geomean           3.887Mi        41.47Ki       -98.96%
+
+              │     b0      │                 b1                 │
+              │  allocs/op  │ allocs/op   vs base                │
+Day16Part1-16   1923.0 ± 0%   221.0 ± 0%  -88.51% (p=0.000 n=10)
+Day16Part2-16   1923.0 ± 0%   215.0 ± 0%  -88.82% (p=0.000 n=10)
+geomean         1.923k        218.0       -88.66%
 ----
 
+From now on i take the lead and tell SWE-1 exactly what to do.
+After a couple of iterations we end up with this improvement compared to the previous optimization (not the baseline):
 
+----
+goos: linux
+goarch: amd64
+pkg: gitlab.com/jhinrichsen/adventofcode2021
+cpu: AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
+              │       b0       │                  b1                  │                 b2                  │
+              │     sec/op     │    sec/op     vs base                │   sec/op     vs base                │
+Day16Part1-16   510.981µ ± 40%   20.929µ ± 1%  -95.90% (p=0.000 n=10)   7.490µ ± 4%  -98.53% (p=0.000 n=10)
+Day16Part2-16    731.44µ ±  4%    20.22µ ± 1%  -97.24% (p=0.000 n=10)   10.43µ ± 0%  -98.57% (p=0.000 n=10)
+geomean           611.4µ          20.57µ       -96.64%                  8.840µ       -98.55%
+
+              │       b0        │                  b1                   │                    b2                     │
+              │      B/op       │     B/op       vs base                │     B/op      vs base                     │
+Day16Part1-16    3979.89Ki ± 0%    45.27Ki ± 0%  -98.86% (p=0.000 n=10)    0.00Ki ± 0%  -100.00% (p=0.000 n=10)
+Day16Part2-16   3979.893Ki ± 0%   37.984Ki ± 0%  -99.05% (p=0.000 n=10)   4.102Ki ± 0%   -99.90% (p=0.000 n=10)
+geomean            3.887Mi         41.47Ki       -98.96%                                ?                       ¹ ²
+¹ summaries must be >0 to compute geomean
+² ratios must be >0 to compute geomean
+
+              │     b0      │                 b1                 │                   b2                    │
+              │  allocs/op  │ allocs/op   vs base                │ allocs/op   vs base                     │
+Day16Part1-16   1923.0 ± 0%   221.0 ± 0%  -88.51% (p=0.000 n=10)     0.0 ± 0%  -100.00% (p=0.000 n=10)
+Day16Part2-16   1923.0 ± 0%   215.0 ± 0%  -88.82% (p=0.000 n=10)   213.0 ± 0%   -88.92% (p=0.000 n=10)
+geomean         1.923k        218.0       -88.66%                              ?                       ¹ ²
+¹ summaries must be >0 to compute geomean
+² ratios must be >0 to compute geomean
+----
+
+Runtime goes down to 8/ 10 µs, no more allocs at all for part 1, part 2 goes down from 4 MiB to 4 4KiB.
+Code still uses recursion though.
 
 == Day 17: Trick Shot
 
