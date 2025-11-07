@@ -5,16 +5,31 @@ import (
 )
 
 func TestDay17Part1Example(t *testing.T) {
-	const want = 45
-	lines, err := linesFromFilename(exampleFilename(17))
-	if err != nil {
-		t.Fatal(err)
-	}
-	data := NewDay17(lines)
-	got := Day17(data, true)
-	if want != got {
-		t.Fatalf("want %d but got %d", want, got)
-	}
+    const want = 45
+    lines, err := linesFromFilename(exampleFilename(17))
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    data := NewDay17(lines)
+    got := Day17(data, true)
+    if want != got {
+        t.Fatalf("want %d but got %d", want, got)
+    }
+}
+
+func TestDay17Part2Example(t *testing.T) {
+    // "In this example, there are 112 distinct initial velocity values that cause the probe to be within the target area after any step."
+    const want = 112
+    lines, err := linesFromFilename(exampleFilename(17))
+    if err != nil {
+        t.Fatal(err)
+    }
+    data := NewDay17(lines)
+    got := Day17(data, false)
+    if want != got {
+        t.Fatalf("want %d but got %d", want, got)
+    }
 }
 
 func TestDay17Part1(t *testing.T) {

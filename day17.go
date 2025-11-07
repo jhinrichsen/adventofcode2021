@@ -40,23 +40,31 @@ func inTarget(px, py int, d Day17Input) bool {
 
 // Day17 computes the solution. For part1=true, solve Part 1; for part1=false, Part 2 would be computed if unlocked.
 func Day17(data Day17Input, part1 bool) uint {
-	maxY := int(0)
-	// Part 1 only: search reasonable velocity space
+	maxHeight := 0
+	hitCount := 0
+
+	// Reasonable bounds: vx0 in [0..x2], vy0 in [y1..-y1]
+	// The upper bound -y1 works for typical inputs where y1 is negative.
+	upperVy := -data.y1
+	if upperVy < 0 {
+		upperVy = 0
+	}
+
 	for vx0 := 0; vx0 <= data.x2; vx0++ {
-		for vy0 := data.y1; vy0 <= 200; vy0++ {
+		for vy0 := data.y1; vy0 <= upperVy; vy0++ {
 			vx, vy := vx0, vy0
 			x, y := 0, 0
-			for step := 0; step < 500; step++ {
+			localMax := 0
+			hit := false
+			// Simulate steps; stop when probe passes beyond target window
+			for step := 0; step < 1000; step++ {
 				x += vx
 				y += vy
+				if y > localMax {
+					localMax = y
+				}
 				if inTarget(x, y, data) {
-					if vy0 > 0 {
-						h := vy0
-						sum := h * (h + 1) / 2
-						if int(sum) > maxY {
-							maxY = int(sum)
-						}
-					}
+					hit = true
 					break
 				}
 				if x > data.x2 || y < data.y1 {
@@ -69,9 +77,19 @@ func Day17(data Day17Input, part1 bool) uint {
 				}
 				vy--
 			}
+			if hit {
+				if localMax > maxHeight {
+					maxHeight = localMax
+				}
+				hitCount++
+			}
 		}
 	}
-	return uint(maxY)
+
+	if part1 {
+		return uint(maxHeight)
+	}
+	return uint(hitCount)
 }
 
 // Helpers for tests
