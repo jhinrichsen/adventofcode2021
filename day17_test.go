@@ -44,3 +44,16 @@ func TestDay17Part1(t *testing.T) {
 		t.Fatalf("want %d but got %d", want, got)
 	}
 }
+
+func TestDay17Part2(t *testing.T) {
+	const want = 4120
+	lines, err := linesFromFilename(filename(17))
+	if err != nil {
+		t.Fatal(err)
+	}
+	data := NewDay17(lines)
+	got := Day17(data, false)
+	if want != got {
+		t.Fatalf("want %d but got %d", want, got)
+	}
+}
