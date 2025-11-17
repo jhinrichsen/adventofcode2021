@@ -88,6 +88,76 @@ func Day21(lines []string, part1 bool) uint {
 		}
 	}
 
-	// Part 2 would use quantum dice
-	return 0
+	// Part 2: Quantum dice
+	// When rolling 3-sided die 3 times, count frequencies of each sum
+	rollFreq := map[int]uint{
+		3: 1, // (1,1,1)
+		4: 3, // (1,1,2), (1,2,1), (2,1,1)
+		5: 6, // (1,1,3), (1,3,1), (3,1,1), (1,2,2), (2,1,2), (2,2,1)
+		6: 7, // (1,2,3), (1,3,2), (2,1,3), (2,3,1), (3,1,2), (3,2,1), (2,2,2)
+		7: 6, // (1,3,3), (3,1,3), (3,3,1), (2,2,3), (2,3,2), (3,2,2)
+		8: 3, // (2,3,3), (3,2,3), (3,3,2)
+		9: 1, // (3,3,3)
+	}
+
+	type GameState struct {
+		p1Pos, p1Score int
+		p2Pos, p2Score int
+		turn           int
+	}
+
+	memo := make(map[GameState][2]uint)
+
+	var play func(p1Pos, p1Score, p2Pos, p2Score, turn int) [2]uint
+	play = func(p1Pos, p1Score, p2Pos, p2Score, turn int) [2]uint {
+		// Check if game is over
+		if p1Score >= 21 {
+			return [2]uint{1, 0}
+		}
+		if p2Score >= 21 {
+			return [2]uint{0, 1}
+		}
+
+		state := GameState{p1Pos, p1Score, p2Pos, p2Score, turn}
+		if result, ok := memo[state]; ok {
+			return result
+		}
+
+		var totalWins [2]uint
+
+		if turn == 0 {
+			// Player 1's turn
+			for roll, freq := range rollFreq {
+				newPos := p1Pos + roll
+				for newPos > 10 {
+					newPos -= 10
+				}
+				newScore := p1Score + newPos
+				wins := play(newPos, newScore, p2Pos, p2Score, 1)
+				totalWins[0] += wins[0] * freq
+				totalWins[1] += wins[1] * freq
+			}
+		} else {
+			// Player 2's turn
+			for roll, freq := range rollFreq {
+				newPos := p2Pos + roll
+				for newPos > 10 {
+					newPos -= 10
+				}
+				newScore := p2Score + newPos
+				wins := play(p1Pos, p1Score, newPos, newScore, 0)
+				totalWins[0] += wins[0] * freq
+				totalWins[1] += wins[1] * freq
+			}
+		}
+
+		memo[state] = totalWins
+		return totalWins
+	}
+
+	wins := play(p1Pos, 0, p2Pos, 0, 0)
+	if wins[0] > wins[1] {
+		return wins[0]
+	}
+	return wins[1]
 }
