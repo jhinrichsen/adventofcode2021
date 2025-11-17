@@ -2797,58 +2797,31 @@ Giving Gemini 2.5 Pro a try, rated at 0.75x credita in Windsurf 1.11.5.
 
 == Day 19: Beacon Scanner
 
-Easiest puzzle so far, took me 23 min for both parts.
-Everybody and their mother was fast on this one, so we broke the private
-leaderboard :-).
-
-Mysteriously, i had no off-by-one in this puzzle, and avoided my typical
-mistakes:
-
-[source,go]
-----
-    burn := func(dist int) int {
-        if part1 {
-            return dist
-        }
-        // OEIS A000217 triangular number
-        return dist * (dist + 1) / 2 <1>
-    }
-
-    fuel := func(pos int) int {
-        sum := 0
-        for i := range positions {
-            dist := positions[i] - pos
-            if dist < 0 {
-                dist = -dist <2>
-            }
-            sum += burn(dist)
-        }
-        return sum
-    }
-
-    fmin := math.MaxInt32 <3>
-    for pos := min; pos <= max; pos++ { <4>
-        f := fuel(pos)
-        if f < fmin {
-            fmin = f
-        }
-    }
-----
-<1> OEIS contains thousands of man-years of the smartest brains on this planet
-ever
-<2> A distance can never be negative
-<3> Do not initialize min values to 0
-<4> Control end of interval (pos < max versus pos <= max)
+Optimized 3D scanner matching by replacing function closures with direct rotation calculations, reusing allocations, and caching absolute beacon coordinates.
 
 ----
 goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
-cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay07Part2-8            260       4508358 ns/op           0 B/op           0 allocs/op
-----
+cpu: Intel(R) Xeon(R) CPU @ 2.60GHz
+              │ day19-b0.txt │           day19-b1.txt            │
+              │    sec/op    │   sec/op    vs base               │
+Day19Part1-16    4.580 ± 35%   2.322 ± 1%  -49.30% (p=0.000 n=8)
+Day19Part2-16    4.604 ±  1%   2.330 ± 1%  -49.40% (p=0.000 n=8)
+geomean          4.592         2.326       -49.35%
 
-4.5 ms, no allocations.
+              │   day19-b0.txt   │             day19-b1.txt             │
+              │       B/op       │     B/op      vs base                │
+Day19Part1-16   5047292.8Ki ± 0%   206.9Ki ± 0%  -100.00% (p=0.000 n=8)
+Day19Part2-16   5047293.7Ki ± 0%   207.8Ki ± 0%  -100.00% (p=0.000 n=8)
+geomean             4.813Gi        207.3Ki       -100.00%
+
+              │  day19-b0.txt  │            day19-b1.txt            │
+              │   allocs/op    │  allocs/op   vs base               │
+Day19Part1-16   1057.864k ± 0%   1.232k ± 0%  -99.88% (p=0.000 n=8)
+Day19Part2-16   1057.865k ± 0%   1.233k ± 0%  -99.88% (p=0.000 n=8)
+geomean            1.058M        1.232k       -99.88%
+----
 
 == Day 20: Trench Maps
 
