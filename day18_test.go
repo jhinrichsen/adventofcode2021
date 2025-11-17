@@ -118,3 +118,29 @@ func TestDay18Part1(t *testing.T) {
 		t.Fatalf("want %d but got %d", want, got)
 	}
 }
+
+func TestDay18Part2Example(t *testing.T) {
+	const want = 3993
+	lines, err := linesFromFilename(example1Filename(18))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got := Day18(lines, false)
+	if want != got {
+		t.Fatalf("want %d but got %d", want, got)
+	}
+}
+
+func TestDay18Part2(t *testing.T) {
+	const want = 4855
+	lines, err := linesFromFilename(filename(18))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got := Day18(lines, false)
+	if want != got {
+		t.Fatalf("want %d but got %d", want, got)
+	}
+}

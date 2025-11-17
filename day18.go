@@ -263,8 +263,21 @@ func Day18(lines []string, part1 bool) uint {
 		return magnitude(result)
 	}
 
-	// Part 2 would go here
-	return 0
+	// Part 2: Find largest magnitude from adding any two different numbers
+	maxMag := uint(0)
+	for i := range numbers {
+		for j := range numbers {
+			if i == j {
+				continue
+			}
+			result := add(numbers[i], numbers[j])
+			mag := magnitude(result)
+			if mag > maxMag {
+				maxMag = mag
+			}
+		}
+	}
+	return maxMag
 }
 
 // String representation for debugging
