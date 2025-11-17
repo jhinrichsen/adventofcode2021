@@ -2848,6 +2848,14 @@ Day20Part2-16   6.000 ± 0%   5.000 ± 0%  -16.67% (p=0.000 n=8)
 
 == Day 22: Reactor Reboot
 
+Optimized Part 1 by replacing map-based cube tracking with a fixed-size 3D array for the constrained -50..50 range.
+
+----
+Before: 454ms, 84MB allocations
+After:  4.4ms, 1.2MB allocations
+Improvement: -99% time, -98.6% memory
+----
+
 == Day 23: Amphipod
 
 == Day 24: Arithmetic Logic Unit
@@ -2860,6 +2868,22 @@ Expect 20x to 50x better performance.
 = Benchmarks
 
 Complete benchmark results for all 49 standard puzzles (Days 1-24 Parts 1&2, Day 25 Part 1).
+
+== Performance Summary
+
+Total runtime progression with Go 1.25.4 and GOGC=off:
+
+* Original (unoptimized): 13.611 seconds
+* After Day 5, 12, 20 optimizations: ~11 seconds
+* After Day 19 fingerprinting: 1.446 seconds (-89.3%)
+* After Day 22 array optimization: **1.033 seconds (-92.4%)**
+
+Major optimizations:
+* Day 5: Flat arrays instead of maps (-95% time)
+* Day 12: Backtracking instead of copying (-86% time)
+* Day 19: Distance fingerprinting + caching (-99.2% time, 4.6s → 36ms)
+* Day 20: Loop unrolling (-46% time)
+* Day 22: Fixed 3D array for Part 1 (-99% time, 454ms → 4.4ms)
 
 == Environment
 
