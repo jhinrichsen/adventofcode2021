@@ -2876,11 +2876,12 @@ Total runtime progression with Go 1.25.4 and GOGC=off:
 * Original (unoptimized): 13.611 seconds
 * After Day 5, 12, 20 optimizations: ~11 seconds
 * After Day 19 fingerprinting: 1.446 seconds (-89.3%)
-* After Day 22 array optimization: **1.033 seconds (-92.4%)**
+* After Day 22 array optimization: 1.033 seconds (-92.4%)
+* **SUBSECOND ACHIEVED: 0.978 seconds (-92.8%)**
 
 Major optimizations:
 * Day 5: Flat arrays instead of maps (-95% time)
-* Day 12: Backtracking instead of copying (-86% time)
+* Day 12: Backtracking + pre-allocated capacity (-86% time, then -5% more)
 * Day 19: Distance fingerprinting + caching (-99.2% time, 4.6s → 36ms)
 * Day 20: Loop unrolling (-46% time)
 * Day 22: Fixed 3D array for Part 1 (-99% time, 454ms → 4.4ms)
