@@ -69,7 +69,15 @@ govulncheck.sarif:
 $(BENCH_FILE): $(wildcard *.go)
 	@echo "Running benchmarks and saving to $@..."
 	@mkdir -p benches
-	$(GO) test -run=^$$ -bench=Day..Part.$$ -benchmem | tee $@
+	@# Check available memory (need at least 8 GiB for GOGC=off)
+	@available=$$(free -b | awk '/^Mem:/ {print $$7}'); \
+	required=$$((8 * 1024 * 1024 * 1024)); \
+	if [ $$available -lt $$required ]; then \
+		echo "ERROR: Insufficient memory. Available: $$(echo "scale=1; $$available/1024/1024/1024" | bc) GiB, Required: 8 GiB"; \
+		echo "GOGC=off requires more memory. Consider freeing memory or running with default GC."; \
+		exit 1; \
+	fi
+	GOGC=off $(GO) test -run=^$$ -bench=Day..Part.$$ -benchmem | tee $@
 
 README.html: README.adoc
 	asciidoc $^
