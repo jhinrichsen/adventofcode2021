@@ -222,6 +222,23 @@ func Day19(lines []string, part1 bool) uint {
 		return uint(len(allBeacons))
 	}
 
-	// Part 2 would calculate max Manhattan distance between scanners
-	return 0
+	// Part 2: Calculate max Manhattan distance between scanners
+	maxDist := 0
+	positions := make([]Point3D, 0, len(scannerPos))
+	for _, pos := range scannerPos {
+		positions = append(positions, pos)
+	}
+
+	for i := range positions {
+		for j := i + 1; j < len(positions); j++ {
+			p1 := positions[i]
+			p2 := positions[j]
+			dist := abs(p1.x-p2.x) + abs(p1.y-p2.y) + abs(p1.z-p2.z)
+			if dist > maxDist {
+				maxDist = dist
+			}
+		}
+	}
+
+	return uint(maxDist)
 }
