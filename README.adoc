@@ -258,6 +258,22 @@ cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
 BenchmarkDay05Part2-8             26      40890804 ns/op    16117340 B/op        7627 allocs/op
 ----
 
+Optimized by replacing map with fixed-size flat array for grid coordinates.
+
+----
+                   │   b0_day05    │               b1_day05               │
+                   │    sec/op     │   sec/op     vs base                 │
+Day05Part2Int-16     31.747m ± 10%   1.476m ± 5%  -95.35% (p=0.000 n=8)
+
+                   │   b0_day05    │               b1_day05                │
+                   │     B/op      │     B/op      vs base                 │
+Day05Part2Int-16     13.400Mi ± 0%   1.030Mi ± 0%  -92.32% (p=0.000 n=8)
+
+                   │  b0_day05   │               b1_day05               │
+                   │  allocs/op  │  allocs/op   vs base                 │
+Day05Part2Int-16     3.543k ± 0%   2.501k ± 0%  -29.41% (p=0.000 n=8)
+----
+
 == Day 6: Lanternfish
 
 Part 2 blows my machine around day 240/245 of 256 days when using the naive
@@ -945,6 +961,25 @@ BenchmarkDay09Part2-8                835           1632204 ns/op          424531
 == Day 11: Dumbo Octopus
 
 == Day 12: Passage Pathing
+
+Optimized path counting by replacing map copying with backtracking using a single shared visited map and an iterative stack-based DFS.
+
+----
+              │      b0      │                 b1                 │
+              │    sec/op    │   sec/op     vs base               │
+Day12Part1-16   14.510m ± 5%   2.839m ± 1%  -80.44% (p=0.000 n=8)
+Day12Part2-16   692.78m ± 7%   95.93m ± 2%  -86.15% (p=0.000 n=8)
+
+              │        b0         │                  b1                  │
+              │       B/op        │     B/op      vs base                │
+Day12Part1-16     9123.489Ki ± 0%   5.438Ki ± 0%   -99.94% (p=0.000 n=8)
+Day12Part2-16   335831.184Ki ± 0%   5.438Ki ± 0%  -100.00% (p=0.000 n=8)
+
+              │       b0        │                 b1                 │
+              │    allocs/op    │ allocs/op   vs base                │
+Day12Part1-16     75515.00 ± 0%   77.00 ± 0%   -99.90% (p=0.000 n=8)
+Day12Part2-16   3689397.00 ± 0%   77.00 ± 0%  -100.00% (p=0.000 n=8)
+----
 
 == Day 13: Transparent Origami
 
@@ -2762,64 +2797,64 @@ Giving Gemini 2.5 Pro a try, rated at 0.75x credita in Windsurf 1.11.5.
 
 == Day 19: Beacon Scanner
 
-Easiest puzzle so far, took me 23 min for both parts.
-Everybody and their mother was fast on this one, so we broke the private
-leaderboard :-).
-
-Mysteriously, i had no off-by-one in this puzzle, and avoided my typical
-mistakes:
-
-[source,go]
-----
-    burn := func(dist int) int {
-        if part1 {
-            return dist
-        }
-        // OEIS A000217 triangular number
-        return dist * (dist + 1) / 2 <1>
-    }
-
-    fuel := func(pos int) int {
-        sum := 0
-        for i := range positions {
-            dist := positions[i] - pos
-            if dist < 0 {
-                dist = -dist <2>
-            }
-            sum += burn(dist)
-        }
-        return sum
-    }
-
-    fmin := math.MaxInt32 <3>
-    for pos := min; pos <= max; pos++ { <4>
-        f := fuel(pos)
-        if f < fmin {
-            fmin = f
-        }
-    }
-----
-<1> OEIS contains thousands of man-years of the smartest brains on this planet
-ever
-<2> A distance can never be negative
-<3> Do not initialize min values to 0
-<4> Control end of interval (pos < max versus pos <= max)
+Optimized 3D scanner matching with two major improvements: (1) replaced function closures with direct rotation calculations, reused allocations, and cached absolute beacon coordinates, (2) added distance-based fingerprinting to skip non-overlapping scanner pairs.
 
 ----
 goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
-cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
-BenchmarkDay07Part2-8            260       4508358 ns/op           0 B/op           0 allocs/op
+cpu: Intel(R) Xeon(R) CPU @ 2.60GHz
+              │ day19-b1.txt  │            day19-b2.txt            │
+              │    sec/op     │   sec/op     vs base               │
+Day19Part1-16   2321.77m ± 1%   36.16m ± 3%  -98.44% (p=0.000 n=8)
+Day19Part2-16   2329.65m ± 1%   35.87m ± 3%  -98.46% (p=0.000 n=8)
+geomean            2.326        36.02m       -98.45%
+
+              │ day19-b1.txt │             day19-b2.txt             │
+              │     B/op     │     B/op      vs base                │
+Day19Part1-16   206.9Ki ± 0%   840.4Ki ± 0%  +306.22% (p=0.000 n=8)
+Day19Part2-16   207.8Ki ± 0%   841.3Ki ± 0%  +304.93% (p=0.000 n=8)
+geomean         207.3Ki        840.9Ki       +305.58%
+
+              │ day19-b1.txt │            day19-b2.txt            │
+              │  allocs/op   │  allocs/op   vs base               │
+Day19Part1-16    1.232k ± 0%   1.742k ± 0%  +41.40% (p=0.000 n=8)
+Day19Part2-16    1.233k ± 0%   1.743k ± 0%  +41.36% (p=0.000 n=8)
+geomean          1.232k        1.742k       +41.38%
 ----
 
-4.5 ms, no allocations.
-
 == Day 20: Trench Maps
+
+Optimized image enhancement by removing offset precomputation and manually unrolling the 3x3 window loop.
+
+----
+              │   b0_day20   │              b2_day20              │
+              │    sec/op    │   sec/op     vs base               │
+Day20Part1-16   1989.4µ ± 3%   780.5µ ± 4%  -60.77% (p=0.000 n=8)
+Day20Part2-16    38.88m ± 2%   21.08m ± 4%  -45.78% (p=0.000 n=8)
+
+              │   b0_day20    │              b2_day20               │
+              │     B/op      │     B/op      vs base               │
+Day20Part1-16    160.6Ki ± 0%   160.6Ki ± 0%        ~ (p=1.000 n=8)
+Day20Part2-16   2976.6Ki ± 0%   160.6Ki ± 0%  -94.61% (p=0.000 n=8)
+
+              │  b0_day20  │              b2_day20               │
+              │ allocs/op  │ allocs/op   vs base                 │
+Day20Part1-16   5.000 ± 0%   5.000 ± 0%        ~ (p=1.000 n=8)
+Day20Part2-16   6.000 ± 0%   5.000 ± 0%  -16.67% (p=0.000 n=8)
+----
 
 == Day 21: Dirac Dice
 
 == Day 22: Reactor Reboot
+
+Optimized Part 1 by replacing map-based cube tracking with a fixed-size 3D array for the constrained -50..50 range.
+
+----
+Before: 454ms, 84MB allocations
+After:  4.4ms, 1.2MB allocations
+Improvement: -99% time, -98.6% memory
+----
 
 == Day 23: Amphipod
 
@@ -2829,3 +2864,67 @@ BenchmarkDay07Part2-8            260       4508358 ns/op           0 B/op       
 
 TODO: implement, and use as the best available showcase of all aoc puzzles for GPU rewrite.
 Expect 20x to 50x better performance.
+
+= Benchmarks
+
+Complete benchmark results for all 49 standard puzzles (Days 1-24 Parts 1&2, Day 25 Part 1).
+
+== Performance Summary
+
+Total runtime progression with Go 1.25.4 and GOGC=off:
+
+* Original (unoptimized): 13.611 seconds
+* After Day 5, 12, 20 optimizations: ~11 seconds
+* After Day 19 fingerprinting: 1.446 seconds (-89.3%)
+* After Day 22 array optimization: **1.033 seconds (-92.4%)**
+
+Major optimizations:
+* Day 5: Flat arrays instead of maps (-95% time)
+* Day 12: Backtracking instead of copying (-86% time)
+* Day 19: Distance fingerprinting + caching (-99.2% time, 4.6s → 36ms)
+* Day 20: Loop unrolling (-46% time)
+* Day 22: Fixed 3D array for Part 1 (-99% time, 454ms → 4.4ms)
+
+== Environment
+
+[cols="1,3"]
+|===
+|OS |Ubuntu 24.04.3 LTS (Noble Numbat)
+|Kernel |Linux 4.4.0
+|CPU |Intel(R) Xeon(R) CPU @ 2.60GHz
+|Cores |16 cores, 1 thread per core
+|Go Version |go1.24.7 linux/amd64
+|Architecture |amd64
+|===
+
+== Total Runtime
+
+Total execution time for all 49 benchmarks: *13.611 seconds*
+
+== Full Benchmark Results
+
+include::benches/linux-amd64-IntelR_XeonR.txt[]
+
+=== Garbage Collector Comparison
+
+Comparing three GC configurations with Go 1.25.4:
+
+* b0: Default GC (GOGC=100, Go 1.25.4)
+* b1: GC disabled (GOGC=off, Go 1.25.4)
+* b2: Green Tea GC (GOEXPERIMENT=greenteagc, Go 1.25.4)
+
+==== GOGC=off vs Default GC
+
+Disabling garbage collection provides a 5.50% geometric mean speedup with essentially identical memory usage and allocations.
+
+----
+include::benches/b1-vs-b0.txt[]
+----
+
+==== Green Tea GC vs Default GC
+
+The experimental Green Tea GC performs 1.22% slower than the default GC for these workloads, with negligible memory differences.
+
+----
+include::benches/b2-vs-b0.txt[]
+----

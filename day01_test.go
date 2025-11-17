@@ -51,13 +51,24 @@ func TestDay01Part2(t *testing.T) {
 	}
 }
 
+func BenchmarkDay01Part1(b *testing.B) {
+	ns, err := numbersFromFilename(filename(1))
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for range b.N {
+		_ = Day01Part1(ns)
+	}
+}
+
 func BenchmarkDay01Part2(b *testing.B) {
 	ns, err := numbersFromFilename(filename(1))
 	if err != nil {
 		b.Fatal(err)
 	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		_ = Day01Part2(ns)
 	}
 }

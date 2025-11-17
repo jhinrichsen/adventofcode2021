@@ -95,69 +95,72 @@ func Day20(tm *TrenchMap, part1 bool) int {
 	infiniteValue := byte(0)
 	toggleInfinite := (algo[0] == '#' && algo[511] == '.')
 
-	// Only precompute offsets for part 2 (50 steps)
-	var offsets [][9]int
-	if !part1 {
-		offsets = make([][9]int, bufSize)
-		for y := range size {
-			for x := range size {
-				i := y*size + x
-				offsetIdx := 0
-				for dy := -1; dy <= 1; dy++ {
-					for dx := -1; dx <= 1; dx++ {
-						ny, nx := y+dy, x+dx
-						offset := ny*size + nx
-						if ny < 0 || ny >= size || nx < 0 || nx >= size {
-							offset = -1
-						}
-						offsets[i][offsetIdx] = offset
-						offsetIdx++
-					}
-				}
-			}
-		}
-	}
-
 	for step := 0; step < steps; step++ {
 		// Clear next buffer
-		for i := range next {
-			next[i] = 0
-		}
+		clear(next)
 
-		if part1 {
-			// Optimized path for part 1 (2 steps)
-			for y := range size {
-				for x := range size {
-					index := 0
-					for dy := -1; dy <= 1; dy++ {
-						for dx := -1; dx <= 1; dx++ {
-							ny, nx := y+dy, x+dx
-							bit := infiniteValue
-							if ny >= 0 && ny < size && nx >= 0 && nx < size {
-								bit = current[ny*size+nx]
-							}
-							index = (index << 1) | int(bit)
-						}
-					}
-					if algo[index] == '#' {
-						next[y*size+x] = 1
-					}
-				}
-			}
-		} else {
-			// Optimized path for part 2 (50 steps)
-			for i := 0; i < bufSize; i++ {
+		// Process all pixels - optimize by manually unrolling the 3x3 window
+		for y := range size {
+			yBase := y * size
+			for x := range size {
 				index := 0
-				for j := 0; j < 9; j++ {
-					offset := offsets[i][j]
-					bit := infiniteValue
-					if offset != -1 {
-						bit = current[offset]
+
+				// Manually unroll 3x3 window for better performance
+				// Row -1
+				if y > 0 {
+					prevRow := (y-1) * size
+					if x > 0 {
+						index = int(current[prevRow+x-1])
+					} else {
+						index = int(infiniteValue)
 					}
-					index = (index << 1) | int(bit)
+					index = (index << 1) | int(current[prevRow+x])
+					if x < size-1 {
+						index = (index << 1) | int(current[prevRow+x+1])
+					} else {
+						index = (index << 1) | int(infiniteValue)
+					}
+				} else {
+					index = int(infiniteValue)
+					index = (index << 1) | int(infiniteValue)
+					index = (index << 1) | int(infiniteValue)
 				}
+
+				// Row 0 (current)
+				if x > 0 {
+					index = (index << 1) | int(current[yBase+x-1])
+				} else {
+					index = (index << 1) | int(infiniteValue)
+				}
+				index = (index << 1) | int(current[yBase+x])
+				if x < size-1 {
+					index = (index << 1) | int(current[yBase+x+1])
+				} else {
+					index = (index << 1) | int(infiniteValue)
+				}
+
+				// Row +1
+				if y < size-1 {
+					nextRow := (y+1) * size
+					if x > 0 {
+						index = (index << 1) | int(current[nextRow+x-1])
+					} else {
+						index = (index << 1) | int(infiniteValue)
+					}
+					index = (index << 1) | int(current[nextRow+x])
+					if x < size-1 {
+						index = (index << 1) | int(current[nextRow+x+1])
+					} else {
+						index = (index << 1) | int(infiniteValue)
+					}
+				} else {
+					index = (index << 1) | int(infiniteValue)
+					index = (index << 1) | int(infiniteValue)
+					index = (index << 1) | int(infiniteValue)
+				}
+
 				if algo[index] == '#' {
-					next[i] = 1
+					next[yBase+x] = 1
 				}
 			}
 		}

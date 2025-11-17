@@ -47,6 +47,22 @@ func TestDay06Part2(t *testing.T) {
 	day06(t, filename(6), 256, 1639854996917)
 }
 
+func BenchmarkDay06Part1(b *testing.B) {
+	lines, err := linesFromFilename(filename(6))
+	if err != nil {
+		b.Fatal(err)
+	}
+	fishes, err := ParseCommaSeparatedNumbers(lines[0])
+	if err != nil {
+		b.Fatal(err)
+	}
+	ufishes := asUint(fishes)
+	b.ResetTimer()
+	for range b.N {
+		_, _ = Day06(ufishes, 80)
+	}
+}
+
 func BenchmarkDay06Part2(b *testing.B) {
 	lines, err := linesFromFilename(filename(6))
 	if err != nil {
@@ -58,7 +74,7 @@ func BenchmarkDay06Part2(b *testing.B) {
 	}
 	ufishes := asUint(fishes)
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		_, _ = Day06(ufishes, 256)
 	}
 }

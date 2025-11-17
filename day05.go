@@ -1,26 +1,17 @@
 package adventofcode2021
 
 import (
-	"image"
 	"math"
 	"strings"
 )
 
 func Day05Int(lines []string, part1 bool) (int, error) {
-	parse := func(line string) (image.Point, error) {
-		var c image.Point
-		var err error
+	parse := func(line string) (int, int, error) {
 		numbers, err := ParseCommaSeparatedNumbers(line)
 		if err != nil {
-			return c, err
+			return 0, 0, err
 		}
-		c.X = numbers[0]
-		c.Y = numbers[1]
-		return c, err
-	}
-
-	diagonal := func(c1, c2 image.Point) bool {
-		return c1.X != c2.X && c1.Y != c2.Y
+		return numbers[0], numbers[1], nil
 	}
 
 	abs := func(i int) int {
@@ -30,46 +21,48 @@ func Day05Int(lines []string, part1 bool) (int, error) {
 		return i
 	}
 
-	m := make(map[image.Point]int)
+	// Use a flat array instead of map - coordinates are bounded by ~1000
+	const maxCoord = 1000
+	grid := make([]byte, maxCoord*maxCoord)
+
 	for _, line := range lines {
 		parts := strings.Fields(line)
-		src, err := parse(parts[0])
+		srcX, srcY, err := parse(parts[0])
 		if err != nil {
 			return 0, err
 		}
-		dst, err := parse(parts[2])
+		dstX, dstY, err := parse(parts[2])
 		if err != nil {
 			return 0, err
 		}
 
 		// for part 1, only consider horizontal or vertical lines
-		if part1 && diagonal(src, dst) {
+		if part1 && srcX != dstX && srcY != dstY {
 			continue
 		}
 
-		dx := dst.X - src.X
+		dx := dstX - srcX
 		if dx != 0 {
 			dx = dx / abs(dx)
 		}
-		dy := dst.Y - src.Y
+		dy := dstY - srcY
 		if dy != 0 {
 			dy = dy / abs(dy)
 		}
-		inc := image.Point{dx, dy}
 
-		c := src
+		x, y := srcX, srcY
 		for {
-			m[c]++
-			if c == dst {
+			grid[y*maxCoord+x]++
+			if x == dstX && y == dstY {
 				break
 			}
-			c.X += inc.X
-			c.Y += inc.Y
+			x += dx
+			y += dy
 		}
 	}
 
 	var count int
-	for _, v := range m {
+	for _, v := range grid {
 		if v > 1 {
 			count++
 		}

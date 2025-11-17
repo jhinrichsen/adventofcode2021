@@ -10,8 +10,10 @@ type Point3D struct {
 }
 
 type Scanner struct {
-	id      int
-	beacons []Point3D
+	id          int
+	beacons     []Point3D
+	// distances contains all pairwise squared distances between beacons (rotation-invariant)
+	distances   map[int]int
 }
 
 // parseDay19 parses scanner input
@@ -59,42 +61,88 @@ func parseDay19(lines []string) []Scanner {
 		scanners = append(scanners, *current)
 	}
 
+	// Compute distance fingerprints for each scanner
+	for i := range scanners {
+		scanners[i].distances = computeDistances(scanners[i].beacons)
+	}
+
 	return scanners
 }
 
-// All 24 rotation functions
-func allRotations() []func(Point3D) Point3D {
-	return []func(Point3D) Point3D{
-		// Facing +x (4 rotations)
-		func(p Point3D) Point3D { return Point3D{p.x, p.y, p.z} },
-		func(p Point3D) Point3D { return Point3D{p.x, -p.z, p.y} },
-		func(p Point3D) Point3D { return Point3D{p.x, -p.y, -p.z} },
-		func(p Point3D) Point3D { return Point3D{p.x, p.z, -p.y} },
-		// Facing -x (4 rotations)
-		func(p Point3D) Point3D { return Point3D{-p.x, -p.y, p.z} },
-		func(p Point3D) Point3D { return Point3D{-p.x, -p.z, -p.y} },
-		func(p Point3D) Point3D { return Point3D{-p.x, p.y, -p.z} },
-		func(p Point3D) Point3D { return Point3D{-p.x, p.z, p.y} },
-		// Facing +y (4 rotations)
-		func(p Point3D) Point3D { return Point3D{-p.y, p.x, p.z} },
-		func(p Point3D) Point3D { return Point3D{p.z, p.x, p.y} },
-		func(p Point3D) Point3D { return Point3D{p.y, p.x, -p.z} },
-		func(p Point3D) Point3D { return Point3D{-p.z, p.x, -p.y} },
-		// Facing -y (4 rotations)
-		func(p Point3D) Point3D { return Point3D{p.y, -p.x, p.z} },
-		func(p Point3D) Point3D { return Point3D{p.z, -p.x, -p.y} },
-		func(p Point3D) Point3D { return Point3D{-p.y, -p.x, -p.z} },
-		func(p Point3D) Point3D { return Point3D{-p.z, -p.x, p.y} },
-		// Facing +z (4 rotations)
-		func(p Point3D) Point3D { return Point3D{-p.z, p.y, p.x} },
-		func(p Point3D) Point3D { return Point3D{-p.y, -p.z, p.x} },
-		func(p Point3D) Point3D { return Point3D{p.z, -p.y, p.x} },
-		func(p Point3D) Point3D { return Point3D{p.y, p.z, p.x} },
-		// Facing -z (4 rotations)
-		func(p Point3D) Point3D { return Point3D{p.z, p.y, -p.x} },
-		func(p Point3D) Point3D { return Point3D{-p.y, p.z, -p.x} },
-		func(p Point3D) Point3D { return Point3D{-p.z, -p.y, -p.x} },
-		func(p Point3D) Point3D { return Point3D{p.y, -p.z, -p.x} },
+// computeDistances computes all pairwise squared distances between beacons
+func computeDistances(beacons []Point3D) map[int]int {
+	distances := make(map[int]int)
+	for i := range beacons {
+		for j := i + 1; j < len(beacons); j++ {
+			dx := beacons[i].x - beacons[j].x
+			dy := beacons[i].y - beacons[j].y
+			dz := beacons[i].z - beacons[j].z
+			distSq := dx*dx + dy*dy + dz*dz
+			distances[distSq]++
+		}
+	}
+	return distances
+}
+
+// rotate applies one of 24 rotations to a point
+func rotate(p Point3D, rotIdx int) Point3D {
+	switch rotIdx {
+	// Facing +x (4 rotations)
+	case 0:
+		return Point3D{p.x, p.y, p.z}
+	case 1:
+		return Point3D{p.x, -p.z, p.y}
+	case 2:
+		return Point3D{p.x, -p.y, -p.z}
+	case 3:
+		return Point3D{p.x, p.z, -p.y}
+	// Facing -x (4 rotations)
+	case 4:
+		return Point3D{-p.x, -p.y, p.z}
+	case 5:
+		return Point3D{-p.x, -p.z, -p.y}
+	case 6:
+		return Point3D{-p.x, p.y, -p.z}
+	case 7:
+		return Point3D{-p.x, p.z, p.y}
+	// Facing +y (4 rotations)
+	case 8:
+		return Point3D{-p.y, p.x, p.z}
+	case 9:
+		return Point3D{p.z, p.x, p.y}
+	case 10:
+		return Point3D{p.y, p.x, -p.z}
+	case 11:
+		return Point3D{-p.z, p.x, -p.y}
+	// Facing -y (4 rotations)
+	case 12:
+		return Point3D{p.y, -p.x, p.z}
+	case 13:
+		return Point3D{p.z, -p.x, -p.y}
+	case 14:
+		return Point3D{-p.y, -p.x, -p.z}
+	case 15:
+		return Point3D{-p.z, -p.x, p.y}
+	// Facing +z (4 rotations)
+	case 16:
+		return Point3D{-p.z, p.y, p.x}
+	case 17:
+		return Point3D{-p.y, -p.z, p.x}
+	case 18:
+		return Point3D{p.z, -p.y, p.x}
+	case 19:
+		return Point3D{p.y, p.z, p.x}
+	// Facing -z (4 rotations)
+	case 20:
+		return Point3D{p.z, p.y, -p.x}
+	case 21:
+		return Point3D{-p.y, p.z, -p.x}
+	case 22:
+		return Point3D{-p.z, -p.y, -p.x}
+	case 23:
+		return Point3D{p.y, -p.z, -p.x}
+	default:
+		return p
 	}
 }
 
@@ -108,25 +156,44 @@ func add3D(p1, p2 Point3D) Point3D {
 	return Point3D{p1.x + p2.x, p1.y + p2.y, p1.z + p2.z}
 }
 
-// tryMatch attempts to match two scanners, returns (rotation_index, offset, success)
-func tryMatch(s1, s2 Scanner) (int, Point3D, bool) {
-	rotations := allRotations()
+// mightOverlap checks if two scanners might have overlapping beacons based on distance fingerprints
+func mightOverlap(s1, s2 Scanner) bool {
+	// For 12 overlapping beacons, we need at least C(12,2) = 66 common distances
+	const minCommonDistances = 66
 
+	commonCount := 0
+	for dist := range s1.distances {
+		if s2.distances[dist] > 0 {
+			// Count the minimum of the two counts for this distance
+			count := s1.distances[dist]
+			if s2.distances[dist] < count {
+				count = s2.distances[dist]
+			}
+			commonCount += count
+			if commonCount >= minCommonDistances {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// tryMatch attempts to match two scanners, returns (rotation_index, offset, success)
+func tryMatch(s1, s2 Scanner, rotated []Point3D, offsetCounts map[Point3D]int) (int, Point3D, bool) {
 	// Try each rotation
-	for rotIdx, rot := range rotations {
+	for rotIdx := range 24 {
 		// Rotate all beacons in s2
-		rotated := make([]Point3D, len(s2.beacons))
 		for i, b := range s2.beacons {
-			rotated[i] = rot(b)
+			rotated[i] = rotate(b, rotIdx)
 		}
 
 		// Try all pairs of beacons as potential matches
 		// If they match, the offset should be the same for at least 12 beacons
-		offsetCounts := make(map[Point3D]int)
+		clear(offsetCounts)
 
 		for _, b1 := range s1.beacons {
-			for _, b2 := range rotated {
-				offset := subtract3D(b1, b2)
+			for i := range len(s2.beacons) {
+				offset := subtract3D(b1, rotated[i])
 				offsetCounts[offset]++
 				if offsetCounts[offset] >= 12 {
 					return rotIdx, offset, true
@@ -155,8 +222,22 @@ func Day19(lines []string, part1 bool) uint {
 	scannerRot := make(map[int]int)
 	scannerRot[0] = 0
 
+	// Cache absolute beacon coordinates for positioned scanners
+	absCache := make(map[int][]Point3D)
+	absCache[0] = make([]Point3D, len(scanners[0].beacons))
+	copy(absCache[0], scanners[0].beacons)
+
+	// Pre-allocate working buffers for tryMatch
+	maxBeacons := 0
+	for i := range scanners {
+		if len(scanners[i].beacons) > maxBeacons {
+			maxBeacons = len(scanners[i].beacons)
+		}
+	}
+	rotated := make([]Point3D, maxBeacons)
+	offsetCounts := make(map[Point3D]int, maxBeacons*maxBeacons)
+
 	// Keep trying to match unpositioned scanners with positioned ones
-	rotations := allRotations()
 	for len(positioned) < len(scanners) {
 		matched := false
 
@@ -171,21 +252,28 @@ func Day19(lines []string, part1 bool) uint {
 					continue
 				}
 
-				// Transform scanner j's beacons to absolute coordinates
-				absBeacons := make([]Point3D, len(scanners[j].beacons))
-				jRot := rotations[scannerRot[j]]
-				jPos := scannerPos[j]
-				for k, b := range scanners[j].beacons {
-					absBeacons[k] = add3D(jRot(b), jPos)
+				// Quick check: do these scanners might overlap based on distance fingerprints?
+				if !mightOverlap(scanners[j], scanners[i]) {
+					continue
 				}
-				tempScanner := Scanner{beacons: absBeacons}
+
+				// Use cached absolute coordinates
+				tempScanner := Scanner{beacons: absCache[j]}
 
 				// Try to match scanner i with these absolute coordinates
-				rotIdx, offset, success := tryMatch(tempScanner, scanners[i])
+				rotIdx, offset, success := tryMatch(tempScanner, scanners[i], rotated, offsetCounts)
 				if success {
 					positioned[i] = true
 					scannerPos[i] = offset
 					scannerRot[i] = rotIdx
+
+					// Cache absolute coordinates for scanner i
+					absBeacons := make([]Point3D, len(scanners[i].beacons))
+					for k, b := range scanners[i].beacons {
+						absBeacons[k] = add3D(rotate(b, rotIdx), offset)
+					}
+					absCache[i] = absBeacons
+
 					matched = true
 					break
 				}
@@ -209,12 +297,8 @@ func Day19(lines []string, part1 bool) uint {
 			continue
 		}
 
-		rot := rotations[scannerRot[i]]
-		pos := scannerPos[i]
-
-		for _, b := range scanners[i].beacons {
-			abs := add3D(rot(b), pos)
-			allBeacons[abs] = true
+		for _, b := range absCache[i] {
+			allBeacons[b] = true
 		}
 	}
 
