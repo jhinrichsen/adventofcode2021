@@ -2907,3 +2907,27 @@ Total execution time for all 49 benchmarks: *13.611 seconds*
 == Full Benchmark Results
 
 include::benches/linux-amd64-IntelR_XeonR.txt[]
+
+=== Garbage Collector Comparison
+
+Comparing three GC configurations against the default baseline (b0):
+
+* b0: Default GC (GOGC=100, Go 1.24.7)
+* b1: GC disabled (GOGC=off, Go 1.24.7)
+* b2: Green Tea GC (GOEXPERIMENT=greenteagc, Go 1.25.4)
+
+==== GOGC=off vs Default GC
+
+Disabling garbage collection provides a 7.88% geometric mean speedup with essentially identical memory usage and allocations.
+
+----
+include::benches/b1-vs-b0.txt[]
+----
+
+==== Green Tea GC vs Default GC
+
+The experimental Green Tea GC in Go 1.25.4 provides a 1.94% geometric mean speedup with 0.62% less memory and 1.93% fewer allocations.
+
+----
+include::benches/b2-vs-b0.txt[]
+----
