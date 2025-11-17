@@ -105,9 +105,11 @@ func Day22(lines []string, part1 bool) uint {
 	cuboids := parseDay22(lines)
 
 	if part1 {
-		// For Part 1, only consider cubes in -50..50 range
-		// Use a map to track which cubes are on
-		onCubes := make(map[Point3D]bool)
+		// For Part 1, use a fixed-size 3D array for -50..50 range
+		// 101 values per dimension: [-50, -49, ..., 0, ..., 49, 50]
+		const offset = 50
+		const size = 101
+		var grid [size][size][size]bool
 
 		for _, c := range cuboids {
 			// Clamp to -50..50 range
@@ -127,17 +129,25 @@ func Day22(lines []string, part1 bool) uint {
 			for x := x1; x <= x2; x++ {
 				for y := y1; y <= y2; y++ {
 					for z := z1; z <= z2; z++ {
-						if c.on {
-							onCubes[Point3D{x, y, z}] = true
-						} else {
-							delete(onCubes, Point3D{x, y, z})
-						}
+						grid[x+offset][y+offset][z+offset] = c.on
 					}
 				}
 			}
 		}
 
-		return uint(len(onCubes))
+		// Count "on" cubes
+		count := uint(0)
+		for x := range size {
+			for y := range size {
+				for z := range size {
+					if grid[x][y][z] {
+						count++
+					}
+				}
+			}
+		}
+
+		return count
 	}
 
 	// Part 2: Use inclusion-exclusion with weighted cuboids
