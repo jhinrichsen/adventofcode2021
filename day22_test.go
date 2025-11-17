@@ -42,3 +42,29 @@ func TestDay22Part1(t *testing.T) {
 		t.Fatalf("want %d but got %d", want, got)
 	}
 }
+
+func TestDay22Part2Example(t *testing.T) {
+	const want = 2758514936282235
+	lines, err := linesFromFilename(example3Filename(22))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got := Day22(lines, false)
+	if want != got {
+		t.Fatalf("want %d but got %d", want, got)
+	}
+}
+
+func TestDay22Part2(t *testing.T) {
+	const want = 1207167990362099
+	lines, err := linesFromFilename(filename(22))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got := Day22(lines, false)
+	if want != got {
+		t.Fatalf("want %d but got %d", want, got)
+	}
+}

@@ -12,6 +12,13 @@ type Cuboid struct {
 	on     bool
 }
 
+type WeightedCuboid struct {
+	x1, x2 int
+	y1, y2 int
+	z1, z2 int
+	weight int
+}
+
 func parseDay22(lines []string) []Cuboid {
 	var cuboids []Cuboid
 
@@ -68,6 +75,31 @@ func parseDay22(lines []string) []Cuboid {
 	return cuboids
 }
 
+// intersects checks if two cuboids overlap
+func intersects(a, b WeightedCuboid) bool {
+	return a.x1 <= b.x2 && a.x2 >= b.x1 &&
+		a.y1 <= b.y2 && a.y2 >= b.y1 &&
+		a.z1 <= b.z2 && a.z2 >= b.z1
+}
+
+// intersection returns the intersection of two cuboids with the given weight
+func intersection(a, b WeightedCuboid, weight int) WeightedCuboid {
+	return WeightedCuboid{
+		x1:     max(a.x1, b.x1),
+		x2:     min(a.x2, b.x2),
+		y1:     max(a.y1, b.y1),
+		y2:     min(a.y2, b.y2),
+		z1:     max(a.z1, b.z1),
+		z2:     min(a.z2, b.z2),
+		weight: weight,
+	}
+}
+
+// volume calculates the volume of a cuboid
+func volume(c WeightedCuboid) int64 {
+	return int64(c.x2-c.x1+1) * int64(c.y2-c.y1+1) * int64(c.z2-c.z1+1)
+}
+
 // Day22 solves day 22 puzzle
 func Day22(lines []string, part1 bool) uint {
 	cuboids := parseDay22(lines)
@@ -108,6 +140,36 @@ func Day22(lines []string, part1 bool) uint {
 		return uint(len(onCubes))
 	}
 
-	// Part 2 would need a more sophisticated algorithm
-	return 0
+	// Part 2: Use inclusion-exclusion with weighted cuboids
+	var weightedCuboids []WeightedCuboid
+
+	for _, c := range cuboids {
+		newCuboid := WeightedCuboid{c.x1, c.x2, c.y1, c.y2, c.z1, c.z2, 1}
+
+		// For all existing cuboids that overlap with the new one,
+		// add their intersection with opposite weight to fix double-counting
+		var toAdd []WeightedCuboid
+		for _, existing := range weightedCuboids {
+			if intersects(existing, newCuboid) {
+				overlap := intersection(existing, newCuboid, -existing.weight)
+				toAdd = append(toAdd, overlap)
+			}
+		}
+
+		// Add all the overlap cuboids
+		weightedCuboids = append(weightedCuboids, toAdd...)
+
+		// If this is an "on" instruction, also add the original cuboid
+		if c.on {
+			weightedCuboids = append(weightedCuboids, newCuboid)
+		}
+	}
+
+	// Calculate total volume
+	var total int64
+	for _, wc := range weightedCuboids {
+		total += volume(wc) * int64(wc.weight)
+	}
+
+	return uint(total)
 }
