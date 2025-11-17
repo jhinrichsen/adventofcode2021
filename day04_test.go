@@ -44,6 +44,22 @@ func TestDay04Part2(t *testing.T) {
 	day04(t, filename(4), false, 30070)
 }
 
+func BenchmarkDay04Part1(b *testing.B) {
+	lines, err := linesFromFilename(filename(4))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	for range b.N {
+		draws, boards, err := NewDay04(lines)
+		if err != nil {
+			b.Fatal(err)
+		}
+		_ = Day04Part1(draws, boards)
+	}
+}
+
 func BenchmarkDay04Part2(b *testing.B) {
 	lines, err := linesFromFilename(filename(4))
 	if err != nil {
@@ -51,7 +67,7 @@ func BenchmarkDay04Part2(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		draws, boards, err := NewDay04(lines)
 		if err != nil {
 			b.Fatal(err)

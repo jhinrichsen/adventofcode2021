@@ -37,21 +37,29 @@ func TestDay05Part2(t *testing.T) {
 	day05(t, Day05Cmplx, filename(5), false, 22213)
 }
 
-func benchDay05(b *testing.B, f func([]string, bool) (int, error)) {
+func benchDay05(b *testing.B, f func([]string, bool) (int, error), part1 bool) {
 	lines, err := linesFromFilename(filename(5))
 	if err != nil {
 		b.Fatal(err)
 	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_, _ = f(lines, false)
+	for range b.N {
+		_, _ = f(lines, part1)
 	}
 }
 
+func BenchmarkDay05Part1(b *testing.B) {
+	benchDay05(b, Day05Int, true)
+}
+
+func BenchmarkDay05Part2(b *testing.B) {
+	benchDay05(b, Day05Int, false)
+}
+
 func BenchmarkDay05Part2Int(b *testing.B) {
-	benchDay05(b, Day05Int)
+	benchDay05(b, Day05Int, false)
 }
 
 func BenchmarkDay05Part2Cmplx(b *testing.B) {
-	benchDay05(b, Day05Cmplx)
+	benchDay05(b, Day05Cmplx, false)
 }

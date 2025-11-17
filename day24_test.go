@@ -29,3 +29,25 @@ func TestDay24Part2(t *testing.T) {
 		t.Fatalf("want %d but got %d", want, got)
 	}
 }
+
+func BenchmarkDay24Part1(b *testing.B) {
+	lines, err := linesFromFilename(filename(24))
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for range b.N {
+		_ = Day24(lines, true)
+	}
+}
+
+func BenchmarkDay24Part2(b *testing.B) {
+	lines, err := linesFromFilename(filename(24))
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for range b.N {
+		_ = Day24(lines, false)
+	}
+}

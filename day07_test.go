@@ -34,6 +34,23 @@ func TestDay07Part2(t *testing.T) {
 	day07(t, filename(7), false, 88612508)
 }
 
+func BenchmarkDay07Part1(b *testing.B) {
+	lines, err := linesFromFilename(filename(7))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	is, err := ParseCommaSeparatedNumbers(lines[0])
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	for range b.N {
+		_ = Day07(is, true)
+	}
+}
+
 func BenchmarkDay07Part2(b *testing.B) {
 	lines, err := linesFromFilename(filename(7))
 	if err != nil {
@@ -46,7 +63,7 @@ func BenchmarkDay07Part2(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		_ = Day07(is, false)
 	}
 }
