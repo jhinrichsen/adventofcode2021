@@ -258,6 +258,22 @@ cpu: AMD Ryzen 5 3400G with Radeon Vega Graphics
 BenchmarkDay05Part2-8             26      40890804 ns/op    16117340 B/op        7627 allocs/op
 ----
 
+Optimized by replacing map with fixed-size flat array for grid coordinates.
+
+----
+                   │   b0_day05    │               b1_day05               │
+                   │    sec/op     │   sec/op     vs base                 │
+Day05Part2Int-16     31.747m ± 10%   1.476m ± 5%  -95.35% (p=0.000 n=8)
+
+                   │   b0_day05    │               b1_day05                │
+                   │     B/op      │     B/op      vs base                 │
+Day05Part2Int-16     13.400Mi ± 0%   1.030Mi ± 0%  -92.32% (p=0.000 n=8)
+
+                   │  b0_day05   │               b1_day05               │
+                   │  allocs/op  │  allocs/op   vs base                 │
+Day05Part2Int-16     3.543k ± 0%   2.501k ± 0%  -29.41% (p=0.000 n=8)
+----
+
 == Day 6: Lanternfish
 
 Part 2 blows my machine around day 240/245 of 256 days when using the naive
@@ -945,6 +961,25 @@ BenchmarkDay09Part2-8                835           1632204 ns/op          424531
 == Day 11: Dumbo Octopus
 
 == Day 12: Passage Pathing
+
+Optimized path counting by replacing map copying with backtracking using a single shared visited map and an iterative stack-based DFS.
+
+----
+              │      b0      │                 b1                 │
+              │    sec/op    │   sec/op     vs base               │
+Day12Part1-16   14.510m ± 5%   2.839m ± 1%  -80.44% (p=0.000 n=8)
+Day12Part2-16   692.78m ± 7%   95.93m ± 2%  -86.15% (p=0.000 n=8)
+
+              │        b0         │                  b1                  │
+              │       B/op        │     B/op      vs base                │
+Day12Part1-16     9123.489Ki ± 0%   5.438Ki ± 0%   -99.94% (p=0.000 n=8)
+Day12Part2-16   335831.184Ki ± 0%   5.438Ki ± 0%  -100.00% (p=0.000 n=8)
+
+              │       b0        │                 b1                 │
+              │    allocs/op    │ allocs/op   vs base                │
+Day12Part1-16     75515.00 ± 0%   77.00 ± 0%   -99.90% (p=0.000 n=8)
+Day12Part2-16   3689397.00 ± 0%   77.00 ± 0%  -100.00% (p=0.000 n=8)
+----
 
 == Day 13: Transparent Origami
 
@@ -2816,6 +2851,25 @@ BenchmarkDay07Part2-8            260       4508358 ns/op           0 B/op       
 4.5 ms, no allocations.
 
 == Day 20: Trench Maps
+
+Optimized image enhancement by removing offset precomputation and manually unrolling the 3x3 window loop.
+
+----
+              │   b0_day20   │              b2_day20              │
+              │    sec/op    │   sec/op     vs base               │
+Day20Part1-16   1989.4µ ± 3%   780.5µ ± 4%  -60.77% (p=0.000 n=8)
+Day20Part2-16    38.88m ± 2%   21.08m ± 4%  -45.78% (p=0.000 n=8)
+
+              │   b0_day20    │              b2_day20               │
+              │     B/op      │     B/op      vs base               │
+Day20Part1-16    160.6Ki ± 0%   160.6Ki ± 0%        ~ (p=1.000 n=8)
+Day20Part2-16   2976.6Ki ± 0%   160.6Ki ± 0%  -94.61% (p=0.000 n=8)
+
+              │  b0_day20  │              b2_day20               │
+              │ allocs/op  │ allocs/op   vs base                 │
+Day20Part1-16   5.000 ± 0%   5.000 ± 0%        ~ (p=1.000 n=8)
+Day20Part2-16   6.000 ± 0%   5.000 ± 0%  -16.67% (p=0.000 n=8)
+----
 
 == Day 21: Dirac Dice
 
