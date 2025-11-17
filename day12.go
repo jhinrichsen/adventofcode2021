@@ -59,8 +59,9 @@ func countPaths(connections map[string][]string, start, end string, canVisitTwic
 		entering        bool // true when entering, false when backtracking
 	}
 
-	visited := make(map[string]int)
-	stack := []stackItem{{cave: start, usedDoubleVisit: false, neighborIdx: 0, entering: true}}
+	visited := make(map[string]int, 16)
+	stack := make([]stackItem, 1, 128)
+	stack[0] = stackItem{cave: start, usedDoubleVisit: false, neighborIdx: 0, entering: true}
 	var count uint
 
 	for len(stack) > 0 {
