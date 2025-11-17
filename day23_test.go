@@ -29,3 +29,29 @@ func TestDay23Part1(t *testing.T) {
 		t.Fatalf("want %d but got %d", want, got)
 	}
 }
+
+func TestDay23Part2Example(t *testing.T) {
+	const want = 44169
+	lines, err := linesFromFilename(example1Filename(23))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got := Day23(lines, false)
+	if want != got {
+		t.Fatalf("want %d but got %d", want, got)
+	}
+}
+
+func TestDay23Part2(t *testing.T) {
+	const want = 50245
+	lines, err := linesFromFilename(filename(23))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got := Day23(lines, false)
+	if want != got {
+		t.Fatalf("want %d but got %d", want, got)
+	}
+}

@@ -5,20 +5,30 @@ import (
 )
 
 type AmphipodState struct {
-	hallway [11]byte        // hallway positions (0=empty, 'A'/'B'/'C'/'D')
-	rooms   [4][2]byte      // 4 rooms, each with depth 2
-	cost    uint            // total cost to reach this state
+	hallway   [11]byte    // hallway positions (0=empty, 'A'/'B'/'C'/'D')
+	rooms     [4][4]byte  // 4 rooms, each with depth up to 4
+	cost      uint        // total cost to reach this state
+	roomDepth int         // depth of rooms (2 for part1, 4 for part2)
 }
 
 func (s AmphipodState) String() string {
-	return string(s.hallway[:]) + string(s.rooms[0][:]) + string(s.rooms[1][:]) + string(s.rooms[2][:]) + string(s.rooms[3][:])
+	result := string(s.hallway[:])
+	for i := range s.rooms {
+		result += string(s.rooms[i][:s.roomDepth])
+	}
+	return result
 }
 
 func (s AmphipodState) isGoal() bool {
-	return s.rooms[0][0] == 'A' && s.rooms[0][1] == 'A' &&
-		s.rooms[1][0] == 'B' && s.rooms[1][1] == 'B' &&
-		s.rooms[2][0] == 'C' && s.rooms[2][1] == 'C' &&
-		s.rooms[3][0] == 'D' && s.rooms[3][1] == 'D'
+	for roomIdx := range s.rooms {
+		expected := byte('A' + roomIdx)
+		for depth := 0; depth < s.roomDepth; depth++ {
+			if s.rooms[roomIdx][depth] != expected {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func energyCost(amphipod byte) uint {
@@ -60,36 +70,81 @@ func (pq *StateQueue) Pop() interface{} {
 	return item
 }
 
-func parseDay23(lines []string) AmphipodState {
+func parseDay23(lines []string, part1 bool) AmphipodState {
 	var state AmphipodState
+
+	// Set room depth
+	if part1 {
+		state.roomDepth = 2
+	} else {
+		state.roomDepth = 4
+	}
 
 	// Initialize empty
 	for i := range state.hallway {
 		state.hallway[i] = '.'
 	}
 	for i := range state.rooms {
-		state.rooms[i][0] = '.'
-		state.rooms[i][1] = '.'
+		for j := range state.rooms[i] {
+			state.rooms[i][j] = '.'
+		}
 	}
 
-	// Parse the diagram
-	if len(lines) >= 5 {
-		// Line 3: ###B#C#B#D###
-		line3 := lines[2]
-		if len(line3) >= 10 {
-			state.rooms[0][0] = line3[3]
-			state.rooms[1][0] = line3[5]
-			state.rooms[2][0] = line3[7]
-			state.rooms[3][0] = line3[9]
-		}
+	if part1 {
+		// Parse the diagram for Part 1 (depth 2)
+		if len(lines) >= 5 {
+			// Line 3: ###B#C#B#D###
+			line3 := lines[2]
+			if len(line3) >= 10 {
+				state.rooms[0][0] = line3[3]
+				state.rooms[1][0] = line3[5]
+				state.rooms[2][0] = line3[7]
+				state.rooms[3][0] = line3[9]
+			}
 
-		// Line 4:   #A#D#C#A#
-		line4 := lines[3]
-		if len(line4) >= 10 {
-			state.rooms[0][1] = line4[3]
-			state.rooms[1][1] = line4[5]
-			state.rooms[2][1] = line4[7]
-			state.rooms[3][1] = line4[9]
+			// Line 4:   #A#D#C#A#
+			line4 := lines[3]
+			if len(line4) >= 10 {
+				state.rooms[0][1] = line4[3]
+				state.rooms[1][1] = line4[5]
+				state.rooms[2][1] = line4[7]
+				state.rooms[3][1] = line4[9]
+			}
+		}
+	} else {
+		// Parse the diagram for Part 2 (depth 4)
+		// Insert the fixed rows between original rows
+		if len(lines) >= 5 {
+			// Line 3: ###B#C#B#D### (original first row)
+			line3 := lines[2]
+			if len(line3) >= 10 {
+				state.rooms[0][0] = line3[3]
+				state.rooms[1][0] = line3[5]
+				state.rooms[2][0] = line3[7]
+				state.rooms[3][0] = line3[9]
+			}
+
+			// Fixed rows to insert:
+			// Row 2: #D#C#B#A#
+			state.rooms[0][1] = 'D'
+			state.rooms[1][1] = 'C'
+			state.rooms[2][1] = 'B'
+			state.rooms[3][1] = 'A'
+
+			// Row 3: #D#B#A#C#
+			state.rooms[0][2] = 'D'
+			state.rooms[1][2] = 'B'
+			state.rooms[2][2] = 'A'
+			state.rooms[3][2] = 'C'
+
+			// Line 4:   #A#D#C#A# (original second row)
+			line4 := lines[3]
+			if len(line4) >= 10 {
+				state.rooms[0][3] = line4[3]
+				state.rooms[1][3] = line4[5]
+				state.rooms[2][3] = line4[7]
+				state.rooms[3][3] = line4[9]
+			}
 		}
 	}
 
@@ -127,23 +182,30 @@ func getNextStates(state AmphipodState) []AmphipodState {
 		// Find top amphipod in room
 		var amphipod byte
 		var depth int
-		if state.rooms[roomIdx][0] != '.' {
-			amphipod = state.rooms[roomIdx][0]
-			depth = 0
-		} else if state.rooms[roomIdx][1] != '.' {
-			amphipod = state.rooms[roomIdx][1]
-			depth = 1
-		} else {
+		found := false
+		for d := 0; d < state.roomDepth; d++ {
+			if state.rooms[roomIdx][d] != '.' {
+				amphipod = state.rooms[roomIdx][d]
+				depth = d
+				found = true
+				break
+			}
+		}
+		if !found {
 			continue // room is empty
 		}
 
 		// Check if this amphipod should stay (it's in the right room and all below are correct)
 		targetRoom := roomIndex(amphipod)
 		if targetRoom == roomIdx {
-			if depth == 1 {
-				continue // bottom position, stays
+			allBelowCorrect := true
+			for d := depth; d < state.roomDepth; d++ {
+				if state.rooms[roomIdx][d] != amphipod && state.rooms[roomIdx][d] != '.' {
+					allBelowCorrect = false
+					break
+				}
 			}
-			if state.rooms[roomIdx][1] == amphipod || state.rooms[roomIdx][1] == '.' {
+			if allBelowCorrect {
 				continue // can stay
 			}
 		}
@@ -191,7 +253,8 @@ func getNextStates(state AmphipodState) []AmphipodState {
 
 		// Check if room is ready (only contains same type or empty)
 		roomReady := true
-		for _, occupant := range state.rooms[targetRoom] {
+		for d := 0; d < state.roomDepth; d++ {
+			occupant := state.rooms[targetRoom][d]
 			if occupant != '.' && occupant != amphipod {
 				roomReady = false
 				break
@@ -219,12 +282,14 @@ func getNextStates(state AmphipodState) []AmphipodState {
 		}
 
 		// Find deepest empty position in target room
-		var depth int
-		if state.rooms[targetRoom][1] == '.' {
-			depth = 1
-		} else if state.rooms[targetRoom][0] == '.' {
-			depth = 0
-		} else {
+		depth := -1
+		for d := state.roomDepth - 1; d >= 0; d-- {
+			if state.rooms[targetRoom][d] == '.' {
+				depth = d
+				break
+			}
+		}
+		if depth == -1 {
 			continue // room is full
 		}
 
@@ -242,7 +307,7 @@ func getNextStates(state AmphipodState) []AmphipodState {
 
 // Day23 solves day 23 puzzle
 func Day23(lines []string, part1 bool) uint {
-	initialState := parseDay23(lines)
+	initialState := parseDay23(lines, part1)
 
 	// Dijkstra's algorithm
 	pq := &StateQueue{initialState}
