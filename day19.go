@@ -10,8 +10,10 @@ type Point3D struct {
 }
 
 type Scanner struct {
-	id      int
-	beacons []Point3D
+	id          int
+	beacons     []Point3D
+	// distances contains all pairwise squared distances between beacons (rotation-invariant)
+	distances   map[int]int
 }
 
 // parseDay19 parses scanner input
@@ -59,7 +61,27 @@ func parseDay19(lines []string) []Scanner {
 		scanners = append(scanners, *current)
 	}
 
+	// Compute distance fingerprints for each scanner
+	for i := range scanners {
+		scanners[i].distances = computeDistances(scanners[i].beacons)
+	}
+
 	return scanners
+}
+
+// computeDistances computes all pairwise squared distances between beacons
+func computeDistances(beacons []Point3D) map[int]int {
+	distances := make(map[int]int)
+	for i := range beacons {
+		for j := i + 1; j < len(beacons); j++ {
+			dx := beacons[i].x - beacons[j].x
+			dy := beacons[i].y - beacons[j].y
+			dz := beacons[i].z - beacons[j].z
+			distSq := dx*dx + dy*dy + dz*dz
+			distances[distSq]++
+		}
+	}
+	return distances
 }
 
 // rotate applies one of 24 rotations to a point
@@ -134,6 +156,28 @@ func add3D(p1, p2 Point3D) Point3D {
 	return Point3D{p1.x + p2.x, p1.y + p2.y, p1.z + p2.z}
 }
 
+// mightOverlap checks if two scanners might have overlapping beacons based on distance fingerprints
+func mightOverlap(s1, s2 Scanner) bool {
+	// For 12 overlapping beacons, we need at least C(12,2) = 66 common distances
+	const minCommonDistances = 66
+
+	commonCount := 0
+	for dist := range s1.distances {
+		if s2.distances[dist] > 0 {
+			// Count the minimum of the two counts for this distance
+			count := s1.distances[dist]
+			if s2.distances[dist] < count {
+				count = s2.distances[dist]
+			}
+			commonCount += count
+			if commonCount >= minCommonDistances {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // tryMatch attempts to match two scanners, returns (rotation_index, offset, success)
 func tryMatch(s1, s2 Scanner, rotated []Point3D, offsetCounts map[Point3D]int) (int, Point3D, bool) {
 	// Try each rotation
@@ -205,6 +249,11 @@ func Day19(lines []string, part1 bool) uint {
 			// Try to match scanner i with any positioned scanner
 			for j := range scanners {
 				if !positioned[j] {
+					continue
+				}
+
+				// Quick check: do these scanners might overlap based on distance fingerprints?
+				if !mightOverlap(scanners[j], scanners[i]) {
 					continue
 				}
 

@@ -2797,30 +2797,30 @@ Giving Gemini 2.5 Pro a try, rated at 0.75x credita in Windsurf 1.11.5.
 
 == Day 19: Beacon Scanner
 
-Optimized 3D scanner matching by replacing function closures with direct rotation calculations, reusing allocations, and caching absolute beacon coordinates.
+Optimized 3D scanner matching with two major improvements: (1) replaced function closures with direct rotation calculations, reused allocations, and cached absolute beacon coordinates, (2) added distance-based fingerprinting to skip non-overlapping scanner pairs.
 
 ----
 goos: linux
 goarch: amd64
 pkg: gitlab.com/jhinrichsen/adventofcode2021
 cpu: Intel(R) Xeon(R) CPU @ 2.60GHz
-              │ day19-b0.txt │           day19-b1.txt            │
-              │    sec/op    │   sec/op    vs base               │
-Day19Part1-16    4.580 ± 35%   2.322 ± 1%  -49.30% (p=0.000 n=8)
-Day19Part2-16    4.604 ±  1%   2.330 ± 1%  -49.40% (p=0.000 n=8)
-geomean          4.592         2.326       -49.35%
+              │ day19-b1.txt  │            day19-b2.txt            │
+              │    sec/op     │   sec/op     vs base               │
+Day19Part1-16   2321.77m ± 1%   36.16m ± 3%  -98.44% (p=0.000 n=8)
+Day19Part2-16   2329.65m ± 1%   35.87m ± 3%  -98.46% (p=0.000 n=8)
+geomean            2.326        36.02m       -98.45%
 
-              │   day19-b0.txt   │             day19-b1.txt             │
-              │       B/op       │     B/op      vs base                │
-Day19Part1-16   5047292.8Ki ± 0%   206.9Ki ± 0%  -100.00% (p=0.000 n=8)
-Day19Part2-16   5047293.7Ki ± 0%   207.8Ki ± 0%  -100.00% (p=0.000 n=8)
-geomean             4.813Gi        207.3Ki       -100.00%
+              │ day19-b1.txt │             day19-b2.txt             │
+              │     B/op     │     B/op      vs base                │
+Day19Part1-16   206.9Ki ± 0%   840.4Ki ± 0%  +306.22% (p=0.000 n=8)
+Day19Part2-16   207.8Ki ± 0%   841.3Ki ± 0%  +304.93% (p=0.000 n=8)
+geomean         207.3Ki        840.9Ki       +305.58%
 
-              │  day19-b0.txt  │            day19-b1.txt            │
-              │   allocs/op    │  allocs/op   vs base               │
-Day19Part1-16   1057.864k ± 0%   1.232k ± 0%  -99.88% (p=0.000 n=8)
-Day19Part2-16   1057.865k ± 0%   1.233k ± 0%  -99.88% (p=0.000 n=8)
-geomean            1.058M        1.232k       -99.88%
+              │ day19-b1.txt │            day19-b2.txt            │
+              │  allocs/op   │  allocs/op   vs base               │
+Day19Part1-16    1.232k ± 0%   1.742k ± 0%  +41.40% (p=0.000 n=8)
+Day19Part2-16    1.233k ± 0%   1.743k ± 0%  +41.36% (p=0.000 n=8)
+geomean          1.232k        1.742k       +41.38%
 ----
 
 == Day 20: Trench Maps
