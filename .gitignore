@@ -3,3 +3,8 @@ b0*
 b1*
 b2*
 benchmark_*.txt
+
+.aider*
+.idea/
+.vscode/
+dev-compass.svg
