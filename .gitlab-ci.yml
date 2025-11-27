@@ -1,7 +1,36 @@
-test-go:
-    stage: test
-    image: golang
-    script:
-        - go get -u golang.org/x/lint/golint
-        - make test
-    coverage: '/coverage: \d+\.\d+%/'
+image: golang:1.24
+
+stages:
+  - test
+
+test-job:
+  stage: test
+  script:
+    - make tidy
+    - make coverage.xml junit.xml gl-code-quality-report.json
+  coverage: '/coverage: \d+\.\d+%/'
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+      junit: junit.xml
+    paths:
+      - coverage.xml
+      - junit.xml
+      - gl-code-quality-report.json
+
+vuln-report:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  script:
+    - make test.log govulncheck.sarif
+  coverage: '/coverage: \d+\.\d+%/'
+  artifacts:
+    reports:
+      sast: govulncheck.sarif
+    paths:
+      - govulncheck.sarif
+      - test.log
